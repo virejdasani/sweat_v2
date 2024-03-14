@@ -4,9 +4,7 @@ logs
 npm-debug.log*
 
 # Environment variables
-.env
 .env.*
-
 # Dependency directories
 node_modules/
 
@@ -42,7 +40,6 @@ build/
 
 # dotenv environment variables file
 .env
-.env.test
 
 # Parcel cache
 .parcel-cache

@@ -1,0 +1,67 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.*
+
+# Dependency directories
+node_modules/
+
+# Build directories
+dist/
+build/
+
+# macOS
+.DS_Store
+
+# Visual Studio Code
+.vscode/
+
+# Editors
+*.sublime-project
+*.sublime-workspace
+*.vscode
+
+# Optional npm cache directory
+.npm
+
+# Optional ESLint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# Parcel cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Gatsby files
+.cache/
+public
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/

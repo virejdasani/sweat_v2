@@ -1,0 +1,1 @@
+const adminRoute = console.log('AdminRoute');

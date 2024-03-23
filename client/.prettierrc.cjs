@@ -1,6 +1,6 @@
-export default {
+module.exports = {
   semi: true,
-  trailingComma: 'all',
+  trailingComa: 'all',
   singleQuote: true,
   printWidth: 80,
   tabWidth: 2,

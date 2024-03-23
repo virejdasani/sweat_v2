@@ -1,1 +1,1 @@
-console.log('config/index.js')
+console.log('config/index.js');

@@ -1,5 +1,5 @@
 {
-  "name": "sweat_v2",
+  "name": "sweat_v2_server",
   "version": "1.0.0",
   "description": "student workload impact evaluation tool",
   "main": "app.js",

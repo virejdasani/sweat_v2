@@ -125,7 +125,10 @@ function CalendarView() {
   return (
     <>
       <div className="calendar">
-        <h1>Admin panel 2023/2024 Calendar</h1>
+        <div className="calendarHeader">
+          <h1>Admin panel 2023/2024 Calendar</h1>
+          <h4>Click on a date to add an event</h4>
+        </div>
 
         <Calendar
           localizer={localizer}

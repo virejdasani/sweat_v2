@@ -31,10 +31,10 @@ const eventsOnCalendar: Event[] = [
   // note: months are 0 indexed, days are 1 indexed
   // note: end date is 11:59pm of the day before the end date
   {
-    title: 'COMP222 Assignment 1',
+    title: 'Easter break',
     allDay: true,
-    start: new Date(2024, 2, 6),
-    end: new Date(2024, 2, 10),
+    start: new Date(2024, 2, 22),
+    end: new Date(2024, 3, 15),
   },
 ];
 

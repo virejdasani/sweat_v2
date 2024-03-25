@@ -7,8 +7,8 @@ function App() {
 
   return (
     <>
-      <div>
-        <h1>Sweat_v2</h1>
+      <div className="App">
+        {/* <h1>Sweat_v2</h1> */}
         <CalendarView />
       </div>
     </>

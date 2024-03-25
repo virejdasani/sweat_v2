@@ -7,6 +7,7 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
+import './CalendarView.css';
 
 interface Event {
   title: string;
@@ -50,6 +51,9 @@ function CalendarView() {
   const [allEvents, setAllEvents] = useState(eventsOnCalendar);
 
   const handleAddEvent = () => {
+    // TODO: add event to mongodb so it persists
+    // TODO: check that there is an event title
+
     const clashDetected = checkClash(newEvent, allEvents);
 
     if (clashDetected) {
@@ -77,42 +81,53 @@ function CalendarView() {
     <>
       {/* TODO separate calendar view and add event view into separate components */}
       <div className="calendar">
-        <h1>Calendar</h1>
-        <h2>Add New Coursework/Exam/Event 👇</h2>
+        <h1>Admin panel 2023/2024 Calendar</h1>
+        <h2>Add Key Dates👇</h2>
 
         <div>
           <input
             type="text"
-            placeholder="Add Coursework/Exam/Event title"
+            placeholder="Add Sem start, Reading week, etc."
             style={{ width: '20%', marginRight: '10px' }}
             value={newEvent.title}
             onChange={(e) =>
               setNewEvent({ ...newEvent, title: e.target.value })
             }
           />
-          {/* TODO: date pickers have some styling error where something is overlapping with them, fix soon */}
-          <DatePicker
-            placeholderText="Start Date"
-            selected={newEvent.start}
-            onChange={(start: Date) => setNewEvent({ ...newEvent, start })}
-          />
-          <DatePicker
-            placeholderText="End Date"
-            selected={newEvent.end}
-            onChange={(end: Date) => setNewEvent({ ...newEvent, end })}
-          />
+          {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
+          <div className="datePickerContainer">
+            <DatePicker
+              placeholderText="Start Date"
+              selected={newEvent.start}
+              onChange={(start: Date) => setNewEvent({ ...newEvent, start })}
+            />
+          </div>
+          <div className="datePickerContainer">
+            <DatePicker
+              placeholderText="End Date"
+              selected={newEvent.end}
+              onChange={(end: Date) => setNewEvent({ ...newEvent, end })}
+            />
+          </div>
           <button style={{ marginTop: '10px' }} onClick={handleAddEvent}>
             Add Event
           </button>
         </div>
 
-        {/* Calendar View */}
         <Calendar
           localizer={localizer}
           events={allEvents}
+          views={['month', 'week', 'day']}
+          defaultView="month"
           startAccessor="start"
           endAccessor="end"
-          style={{ height: 500, margin: '50px' }}
+          style={{
+            height: 800,
+            marginLeft: '50px',
+            marginRight: '50px',
+            marginTop: '20px',
+            marginBottom: '20px',
+          }}
         />
       </div>
     </>

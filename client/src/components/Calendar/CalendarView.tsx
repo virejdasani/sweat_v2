@@ -48,21 +48,66 @@ function CalendarView() {
     end: new Date(),
   });
 
-  const [allEvents, setAllEvents] = useState(eventsOnCalendar);
+  // hardcoded state that will be used to render the calendar
+  const [events, setEvents] = useState(eventsOnCalendar);
 
-  const handleAddEvent = () => {
-    // TODO: add event to mongodb so it persists
-    // TODO: check that there is an event title
+  const [showModal, setShowModal] = useState(false);
+  const [eventTitle, setEventTitle] = useState('');
+  const [selectEvent, setSelectEvent] = useState<Event | null>(null);
 
-    const clashDetected = checkClash(newEvent, allEvents);
+  // called when a user clicks on a calendar slot
+  function handleSelectSlot(slotInfo: { start: Date; end: Date }) {
+    setNewEvent({
+      title: '',
+      allDay: true,
+      start: slotInfo.start,
+      end: slotInfo.end,
+    });
+    setShowModal(true);
+  }
 
-    if (clashDetected) {
-      alert('Clash with another event detected');
+  // called when a user clicks on an existing event
+  function handleSelectedEvent(event: Event) {
+    setEventTitle(event.title);
+    setNewEvent(event);
+    setSelectEvent(event);
+    setShowModal(true);
+  }
+
+  // called when a user clicks save on the modal
+  function saveEvent() {
+    // Combine new event properties with its title
+    const updatedEvent = { ...newEvent, title: eventTitle };
+
+    // check if there is a clash only if saving a new event not editing an existing event
+    if (!selectEvent && checkClash(updatedEvent, events)) {
+      alert('Clash with another event');
     }
-    // add new event to the calendar even if there is a clash
-    setAllEvents([...allEvents, newEvent]);
-  };
 
+    // update the events array with the new event
+    if (selectEvent) {
+      const newEvents = events.map((event) =>
+        event === selectEvent ? updatedEvent : event,
+      );
+      setEvents(newEvents);
+    }
+    // add the new event to the events array
+    else {
+      setEvents([...events, updatedEvent]);
+    }
+    // reset modal state
+    setShowModal(false);
+  }
+
+  function deleteEvents() {
+    if (selectEvent) {
+      const newEvents = events.filter((event) => event !== selectEvent);
+      setEvents(newEvents);
+      setShowModal(false);
+    }
+  }
+
+  // checks for clash with another event (overlap on the calendar)
   function checkClash(newEvent: Event, allEvents: Event[]): boolean {
     for (let i = 0; i < allEvents.length; i++) {
       const d1 = new Date(allEvents[i].start);
@@ -79,48 +124,19 @@ function CalendarView() {
 
   return (
     <>
-      {/* TODO separate calendar view and add event view into separate components */}
       <div className="calendar">
         <h1>Admin panel 2023/2024 Calendar</h1>
-        <h2>Add Key Dates👇</h2>
-
-        <div>
-          <input
-            type="text"
-            placeholder="Add Sem start, Reading week, etc."
-            style={{ width: '20%', marginRight: '10px' }}
-            value={newEvent.title}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, title: e.target.value })
-            }
-          />
-          {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
-          <div className="datePickerContainer">
-            <DatePicker
-              placeholderText="Start Date"
-              selected={newEvent.start}
-              onChange={(start: Date) => setNewEvent({ ...newEvent, start })}
-            />
-          </div>
-          <div className="datePickerContainer">
-            <DatePicker
-              placeholderText="End Date"
-              selected={newEvent.end}
-              onChange={(end: Date) => setNewEvent({ ...newEvent, end })}
-            />
-          </div>
-          <button style={{ marginTop: '10px' }} onClick={handleAddEvent}>
-            Add Event
-          </button>
-        </div>
 
         <Calendar
           localizer={localizer}
-          events={allEvents}
+          events={events}
           views={['month', 'week', 'day']}
           defaultView="month"
           startAccessor="start"
           endAccessor="end"
+          selectable={true}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectedEvent}
           style={{
             height: 800,
             marginLeft: '50px',
@@ -129,6 +145,90 @@ function CalendarView() {
             marginBottom: '20px',
           }}
         />
+
+        {showModal && (
+          <div
+            className="modal"
+            style={{
+              display: 'block',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              position: 'fixed',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    {selectEvent ? 'Edit key date' : 'Add key date'}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowModal(false);
+                      setEventTitle('');
+                      setSelectEvent(null);
+                    }}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <label htmlFor="eventTitle" className="form-label">
+                    Event Title:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="eventTitle"
+                    value={eventTitle}
+                    onChange={(e) => setEventTitle(e.target.value)}
+                  />
+                  {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
+                  <div className="datePickerContainer">
+                    {/* TODO: change to dd/mm instead of mm/dd */}
+                    <DatePicker
+                      placeholderText="Start Date"
+                      selected={newEvent.start}
+                      onChange={(start: Date) =>
+                        setNewEvent({ ...newEvent, start })
+                      }
+                    />
+                  </div>
+                  <div className="datePickerContainer">
+                    <DatePicker
+                      placeholderText="End Date"
+                      selected={newEvent.end}
+                      onChange={(end: Date) =>
+                        setNewEvent({ ...newEvent, end })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  {selectEvent && (
+                    <button
+                      type="button"
+                      className="btn btn-danger me-2"
+                      onClick={deleteEvents}
+                    >
+                      Delete Event
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={saveEvent}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

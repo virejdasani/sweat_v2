@@ -93,7 +93,7 @@ function DateSetter() {
       <div className="calendar">
         <div className="calendarHeader">
           <h1>Academic Calendar</h1>
-          <h2>Add New Coursework/Exam/Event</h2>
+          <h2>Admin can set key dates</h2>
           <div>
             {/* Input fields for adding holidays */}
             <input

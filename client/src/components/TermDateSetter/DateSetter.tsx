@@ -65,6 +65,13 @@ function DateSetter() {
   const [allEvents, setAllEvents] = useState(eventsOnCalendar);
 
   const handleAddEvent = (event: Event) => {
+    // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
+    if (event.title === semester1Event.title) {
+      event.title = 'Semester 1 Start Date';
+    } else if (event.title === semester2Event.title) {
+      event.title = 'Semester 2 Start Date';
+    }
+
     const clashDetected = checkClash(event, allEvents);
 
     if (clashDetected) {
@@ -88,12 +95,51 @@ function DateSetter() {
     return false; // No clash detected
   }
 
+  // TODO: auto bank holidays add
+  // TODO: click on event to CRUD
   return (
     <>
       <div className="calendar">
         <div className="calendarHeader">
           <h1>Academic Calendar</h1>
-          <h2>Admin can set key dates</h2>
+          <h3>Admin sets key dates here</h3>
+          {/* Input field for adding semester 1 start date */}
+          <div>
+            <span>Semester 1 Start Date: </span>
+            <DatePicker
+              placeholderText="Start Date"
+              selected={semester1Event.start}
+              onChange={
+                (start: Date) =>
+                  setSemester1Event({ ...semester1Event, start, end: start }) // Set end date to start date
+              }
+            />
+            <button
+              style={{ marginTop: '10px' }}
+              onClick={() => handleAddEvent(semester1Event)}
+            >
+              Add Semester 1 Start Date
+            </button>
+          </div>
+
+          {/* Input fields for adding semester 2 start date */}
+          <div>
+            <span>Semester 2 Start Date: </span>
+            <DatePicker
+              placeholderText="Start Date"
+              selected={semester2Event.start}
+              onChange={
+                (start: Date) =>
+                  setSemester2Event({ ...semester2Event, start, end: start }) // Set end date to start date
+              }
+            />
+            <button
+              style={{ marginTop: '10px' }}
+              onClick={() => handleAddEvent(semester2Event)}
+            >
+              Add Semester 2 Start Date
+            </button>
+          </div>
           <div>
             {/* Input fields for adding holidays */}
             <input
@@ -125,60 +171,6 @@ function DateSetter() {
               onClick={() => handleAddEvent(holidayEvent)}
             >
               Add Holiday
-            </button>
-          </div>
-
-          {/* Input fields for adding semester 1 start date */}
-          <div>
-            <input
-              type="text"
-              placeholder="Semester 1 Start Date"
-              style={{ width: '20%', marginRight: '10px' }}
-              value={semester1Event.title}
-              onChange={(e) =>
-                setSemester1Event({ ...semester1Event, title: e.target.value })
-              }
-            />
-            <DatePicker
-              placeholderText="Start Date"
-              selected={semester1Event.start}
-              onChange={
-                (start: Date) =>
-                  setSemester1Event({ ...semester1Event, start, end: start }) // Set end date to start date
-              }
-            />
-            <button
-              style={{ marginTop: '10px' }}
-              onClick={() => handleAddEvent(semester1Event)}
-            >
-              Add Semester 1 Start Date
-            </button>
-          </div>
-
-          {/* Input fields for adding semester 2 start date */}
-          <div>
-            <input
-              type="text"
-              placeholder="Semester 2 Start Date"
-              style={{ width: '20%', marginRight: '10px' }}
-              value={semester2Event.title}
-              onChange={(e) =>
-                setSemester2Event({ ...semester2Event, title: e.target.value })
-              }
-            />
-            <DatePicker
-              placeholderText="Start Date"
-              selected={semester2Event.start}
-              onChange={
-                (start: Date) =>
-                  setSemester2Event({ ...semester2Event, start, end: start }) // Set end date to start date
-              }
-            />
-            <button
-              style={{ marginTop: '10px' }}
-              onClick={() => handleAddEvent(semester2Event)}
-            >
-              Add Semester 2 Start Date
             </button>
           </div>
         </div>

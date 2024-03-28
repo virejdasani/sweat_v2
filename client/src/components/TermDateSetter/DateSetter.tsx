@@ -40,7 +40,6 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
-// TODO: add all bank holidays to the calendar
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({
     title: '',
@@ -143,15 +142,9 @@ function DateSetter() {
             <DatePicker
               placeholderText="Start Date"
               selected={semester1Event.start}
-              onChange={(start: Date) =>
-                setSemester1Event({ ...semester1Event, start })
-              }
-            />
-            <DatePicker
-              placeholderText="End Date"
-              selected={semester1Event.end}
-              onChange={(end: Date) =>
-                setSemester1Event({ ...semester1Event, end })
+              onChange={
+                (start: Date) =>
+                  setSemester1Event({ ...semester1Event, start, end: start }) // Set end date to start date
               }
             />
             <button
@@ -176,15 +169,9 @@ function DateSetter() {
             <DatePicker
               placeholderText="Start Date"
               selected={semester2Event.start}
-              onChange={(start: Date) =>
-                setSemester2Event({ ...semester2Event, start })
-              }
-            />
-            <DatePicker
-              placeholderText="End Date"
-              selected={semester2Event.end}
-              onChange={(end: Date) =>
-                setSemester2Event({ ...semester2Event, end })
+              onChange={
+                (start: Date) =>
+                  setSemester2Event({ ...semester2Event, start, end: start }) // Set end date to start date
               }
             />
             <button

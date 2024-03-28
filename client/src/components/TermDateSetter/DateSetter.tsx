@@ -8,8 +8,8 @@ import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Calendar/CalendarView.css';
-import { Dropdown } from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
+// import { Dropdown } from 'react-bootstrap';
+// import Form from 'react-bootstrap/Form';
 
 interface Event {
   title: string;

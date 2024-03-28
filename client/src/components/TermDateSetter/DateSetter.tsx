@@ -1,0 +1,218 @@
+import format from 'date-fns/format';
+import getDay from 'date-fns/getDay';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import React, { useState } from 'react';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import DatePicker from 'react-datepicker';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../Calendar/CalendarView.css';
+import { Dropdown } from 'react-bootstrap';
+import Form from 'react-bootstrap/Form';
+
+interface Event {
+  title: string;
+  start: Date;
+  end: Date;
+  allDay: boolean;
+}
+
+const locales = {
+  //   'en-US': require('date-fns/locale/en-US'), // require not defined
+};
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
+
+const eventsOnCalendar: Event[] = [
+  // note: months are 0 indexed, days are 1 indexed
+  // note: end date is 11:59pm of the day before the end date
+  {
+    title: 'COMP222 Assignment 1',
+    allDay: true,
+    start: new Date(2024, 2, 6),
+    end: new Date(2024, 2, 10),
+  },
+];
+
+// TODO: add all bank holidays to the calendar
+function DateSetter() {
+  const [holidayEvent, setHolidayEvent] = useState({
+    title: '',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [semester1Event, setSemester1Event] = useState({
+    title: '',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [semester2Event, setSemester2Event] = useState({
+    title: '',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [allEvents, setAllEvents] = useState(eventsOnCalendar);
+
+  const handleAddEvent = (event: Event) => {
+    const clashDetected = checkClash(event, allEvents);
+
+    if (clashDetected) {
+      alert('Clash with another event detected');
+    }
+    // add new event to the calendar even if there is a clash
+    setAllEvents([...allEvents, event]);
+  };
+
+  function checkClash(newEvent: Event, allEvents: Event[]): boolean {
+    for (let i = 0; i < allEvents.length; i++) {
+      const d1 = new Date(allEvents[i].start);
+      const d2 = new Date(newEvent.start);
+      const d3 = new Date(allEvents[i].end);
+      const d4 = new Date(newEvent.end);
+
+      if ((d1 <= d2 && d2 <= d3) || (d1 <= d4 && d4 <= d3)) {
+        return true; // Clash detected
+      }
+    }
+    return false; // No clash detected
+  }
+
+  return (
+    <>
+      <div className="calendar">
+        <div className="calendarHeader">
+          <h1>Academic Calendar</h1>
+          <h2>Add New Coursework/Exam/Event</h2>
+          <div>
+            {/* Input fields for adding holidays */}
+            <input
+              type="text"
+              placeholder="Bank holiday name"
+              style={{ width: '20%', marginRight: '10px' }}
+              value={holidayEvent.title}
+              onChange={(e) =>
+                setHolidayEvent({ ...holidayEvent, title: e.target.value })
+              }
+            />
+
+            <DatePicker
+              placeholderText="Add Holiday"
+              selected={holidayEvent.start}
+              onChange={(start: Date) =>
+                setHolidayEvent({ ...holidayEvent, start })
+              }
+            />
+            <DatePicker
+              placeholderText="End Date"
+              selected={holidayEvent.end}
+              onChange={(end: Date) =>
+                setHolidayEvent({ ...holidayEvent, end })
+              }
+            />
+            <button
+              style={{ marginTop: '10px' }}
+              onClick={() => handleAddEvent(holidayEvent)}
+            >
+              Add Holiday
+            </button>
+          </div>
+
+          {/* Input fields for adding semester 1 start date */}
+          <div>
+            <input
+              type="text"
+              placeholder="Semester 1 Start Date"
+              style={{ width: '20%', marginRight: '10px' }}
+              value={semester1Event.title}
+              onChange={(e) =>
+                setSemester1Event({ ...semester1Event, title: e.target.value })
+              }
+            />
+            <DatePicker
+              placeholderText="Start Date"
+              selected={semester1Event.start}
+              onChange={(start: Date) =>
+                setSemester1Event({ ...semester1Event, start })
+              }
+            />
+            <DatePicker
+              placeholderText="End Date"
+              selected={semester1Event.end}
+              onChange={(end: Date) =>
+                setSemester1Event({ ...semester1Event, end })
+              }
+            />
+            <button
+              style={{ marginTop: '10px' }}
+              onClick={() => handleAddEvent(semester1Event)}
+            >
+              Add Semester 1 Start Date
+            </button>
+          </div>
+
+          {/* Input fields for adding semester 2 start date */}
+          <div>
+            <input
+              type="text"
+              placeholder="Semester 2 Start Date"
+              style={{ width: '20%', marginRight: '10px' }}
+              value={semester2Event.title}
+              onChange={(e) =>
+                setSemester2Event({ ...semester2Event, title: e.target.value })
+              }
+            />
+            <DatePicker
+              placeholderText="Start Date"
+              selected={semester2Event.start}
+              onChange={(start: Date) =>
+                setSemester2Event({ ...semester2Event, start })
+              }
+            />
+            <DatePicker
+              placeholderText="End Date"
+              selected={semester2Event.end}
+              onChange={(end: Date) =>
+                setSemester2Event({ ...semester2Event, end })
+              }
+            />
+            <button
+              style={{ marginTop: '10px' }}
+              onClick={() => handleAddEvent(semester2Event)}
+            >
+              Add Semester 2 Start Date
+            </button>
+          </div>
+        </div>
+
+        {/* Calendar View */}
+        <Calendar
+          localizer={localizer}
+          events={allEvents}
+          startAccessor="start"
+          endAccessor="end"
+          style={{
+            height: 800,
+            marginLeft: '50px',
+            marginRight: '50px',
+            marginTop: '20px',
+            marginBottom: '20px',
+          }}
+        />
+      </div>
+    </>
+  );
+}
+
+export default DateSetter;

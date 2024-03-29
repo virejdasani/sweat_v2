@@ -75,7 +75,7 @@ function DateSetter() {
     const clashDetected = checkClash(event, allEvents);
 
     if (clashDetected) {
-      alert('Clash with another event detected');
+      //   alert('Clash with another event detected');
     }
     // add new event to the calendar even if there is a clash
     setAllEvents([...allEvents, event]);
@@ -122,7 +122,7 @@ function DateSetter() {
             </button>
           </div>
 
-          {/* Input fields for adding semester 2 start date */}
+          {/* Input field for adding semester 2 start date */}
           <div>
             <span>Semester 2 Start Date: </span>
             <DatePicker
@@ -141,7 +141,9 @@ function DateSetter() {
             </button>
           </div>
           <div>
-            {/* Input fields for adding holidays */}
+            <span>Add bank holiday(s): </span>
+
+            {/* Input field for adding holidays */}
             <input
               type="text"
               placeholder="Bank holiday name"
@@ -174,6 +176,8 @@ function DateSetter() {
             </button>
           </div>
         </div>
+
+        <hr className="rounded"></hr>
 
         {/* Calendar View */}
         <Calendar

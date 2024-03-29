@@ -11,14 +11,21 @@
     "format": "prettier --write './**/*.{js,jsx,ts,tsx}'"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.14",
+    "@mui/material": "^5.15.14",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-beautiful-dnd": "^13.1.1",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
     "@testing-library/react": "^14.2.1",
     "@types/jest": "^29.5.12",
     "@types/mocha": "^10.0.6",
     "@types/react": "^18.2.64",
+    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18.2.21",
     "@types/testing-library__react": "^10.2.0",
     "@typescript-eslint/eslint-plugin": "^7.2.0",

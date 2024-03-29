@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
+import ProgrammeDesignPage from './pages/admin/ProgrammeDesign/ProgrammeDesign';
 
 function App() {
-  //   const [count, setCount] = useState(0);
-
   return (
-    <>
-      <div>
-        <h1>Sweat_v2</h1>
-      </div>
-    </>
+    <Router>
+      <Routes>
+        <Route
+          path="/admin/programme-design"
+          element={<ProgrammeDesignPage />}
+        />
+      </Routes>
+    </Router>
   );
 }
 

@@ -1,0 +1,69 @@
+.programme-designer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+.programme-container {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 24px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 32px;
+  overflow-x: auto;
+}
+
+.programme-box {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  box-sizing: border-box;
+  flex: 0 0 calc(25% - 24px);
+  max-width: calc(25% - 24px);
+}
+
+.programme-box h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333333;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.save-button-container {
+  margin-top: 32px; /* Add spacing between programme boxes and button */
+}
+
+.save-programme-button:hover {
+  transform: scale(1.05); /* Slightly increase size on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .programme-box {
+    flex: 0 0 calc(50% - 24px);
+    max-width: calc(50% - 24px);
+  }
+  .save-programme-button {
+    padding: 0.5rem 0.8rem; /* Slightly smaller padding */
+    font-size: 0.9rem; /* Slightly smaller font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .programme-box {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .save-programme-button {
+    padding: 0.4rem 0.6rem; /* Smaller padding */
+    font-size: 0.8rem; /* Smaller font size */
+  }
+}

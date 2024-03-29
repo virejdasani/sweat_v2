@@ -143,7 +143,7 @@ function CalendarView() {
           defaultView="month"
           startAccessor="start"
           endAccessor="end"
-          selectable={true}
+          // selectable={true} // this is being able to select a date (not an event)
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectedEvent}
           style={{

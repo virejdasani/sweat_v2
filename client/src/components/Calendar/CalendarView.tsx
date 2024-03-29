@@ -197,8 +197,8 @@ function CalendarView() {
                   />
                   {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
                   <div className="datePickerContainer">
-                    {/* TODO: change to dd/mm instead of mm/dd */}
                     <DatePicker
+                      dateFormat="dd/MM/yyyy"
                       placeholderText="Start Date"
                       selected={newEvent.start}
                       onChange={(start: Date) =>
@@ -208,6 +208,7 @@ function CalendarView() {
                   </div>
                   <div className="datePickerContainer">
                     <DatePicker
+                      dateFormat="dd/MM/yyyy"
                       placeholderText="End Date"
                       selected={newEvent.end}
                       onChange={(end: Date) =>

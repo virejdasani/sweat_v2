@@ -170,7 +170,9 @@ function DateSetter() {
           {/* Input field for adding semester 1 start date */}
           <div>
             <span>Semester 1 Start Date: </span>
+            {/* TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug */}
             <DatePicker
+              dateFormat="dd/MM/yyyy"
               placeholderText="Start Date"
               selected={semester1Event.start}
               onChange={
@@ -190,6 +192,7 @@ function DateSetter() {
           <div>
             <span>Semester 2 Start Date: </span>
             <DatePicker
+              dateFormat="dd/MM/yyyy"
               placeholderText="Start Date"
               selected={semester2Event.start}
               onChange={
@@ -219,6 +222,7 @@ function DateSetter() {
             />
 
             <DatePicker
+              dateFormat="dd/MM/yyyy"
               placeholderText="Add Holiday"
               selected={holidayEvent.start}
               onChange={(start: Date) =>
@@ -226,6 +230,7 @@ function DateSetter() {
               }
             />
             <DatePicker
+              dateFormat="dd/MM/yyyy"
               placeholderText="End Date"
               selected={holidayEvent.end}
               onChange={(end: Date) =>
@@ -307,8 +312,9 @@ function DateSetter() {
                   />
                   {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
                   <div className="datePickerContainer">
-                    {/* TODO: change to dd/mm instead of mm/dd */}
+                    {/* TODO: change from DatePicker to mui date picker if that looks better */}
                     <DatePicker
+                      dateFormat="dd/MM/yyyy"
                       placeholderText="Start Date"
                       selected={newEvent.start}
                       onChange={(start: Date) =>
@@ -318,6 +324,7 @@ function DateSetter() {
                   </div>
                   <div className="datePickerContainer">
                     <DatePicker
+                      dateFormat="dd/MM/yyyy"
                       placeholderText="End Date"
                       selected={newEvent.end}
                       onChange={(end: Date) =>

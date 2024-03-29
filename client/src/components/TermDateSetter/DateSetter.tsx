@@ -40,6 +40,12 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
+// TODO: auto bank holidays add
+// TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
+// TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
+// TODO: change from DatePicker to mui date picker if that looks better
+// TODO: add data to centralised database
+
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({
     title: '',
@@ -159,7 +165,6 @@ function DateSetter() {
     return false; // No clash detected
   }
 
-  // TODO: auto bank holidays add
   return (
     <>
       <div className="calendar">
@@ -169,7 +174,6 @@ function DateSetter() {
           {/* Input field for adding semester 1 start date */}
           <div>
             <span>Semester 1 Start Date: </span>
-            {/* TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug */}
             <DatePicker
               dateFormat="dd/MM/yyyy"
               placeholderText="Start Date"
@@ -268,7 +272,6 @@ function DateSetter() {
           }}
         />
 
-        {/* TODO: put this in its own component so it can be rendered here and professor view too */}
         {showModal && (
           <div
             className="modal"
@@ -311,7 +314,6 @@ function DateSetter() {
                   />
                   {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
                   <div className="datePickerContainer">
-                    {/* TODO: change from DatePicker to mui date picker if that looks better */}
                     <DatePicker
                       dateFormat="dd/MM/yyyy"
                       placeholderText="Start Date"

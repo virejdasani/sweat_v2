@@ -40,6 +40,7 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
+// TODO: change color of bank holidays fetched from api
 // TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better

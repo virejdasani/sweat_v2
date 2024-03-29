@@ -1,5 +1,5 @@
 import './App.css';
-import CalendarView from './components/Calendar/CalendarView';
+// import CalendarView from './components/Calendar/CalendarView';
 import DateSetter from './components/TermDateSetter/DateSetter';
 
 // using npm big calendar app. Tried npm react scheduler component but this is better

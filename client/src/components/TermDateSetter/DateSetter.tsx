@@ -2,7 +2,7 @@ import format from 'date-fns/format';
 import getDay from 'date-fns/getDay';
 import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -40,7 +40,6 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
-// TODO: auto bank holidays add
 // TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better
@@ -164,6 +163,41 @@ function DateSetter() {
     }
     return false; // No clash detected
   }
+
+  // fetch bank holidays from api and add to calendar
+  useEffect(() => {
+    fetch('https://www.gov.uk/bank-holidays.json')
+      .then((response) => response.json())
+      .then((data) => {
+        const bankHolidays = data['england-and-wales'].events;
+        setEvents((prevEvents) => {
+          // Filter out duplicate bank holidays
+          const uniqueBankHolidays = bankHolidays.filter(
+            (holiday: { date: string }) => {
+              const holidayDate = new Date(holiday.date).toISOString();
+              return !prevEvents.some(
+                (event) => event.start.toISOString() === holidayDate,
+              );
+            },
+          );
+          // Merge unique bank holidays with previous events
+          return [
+            ...prevEvents,
+            ...uniqueBankHolidays.map(
+              (holiday: { title: string; date: string }) => ({
+                title: holiday.title,
+                start: new Date(holiday.date),
+                end: new Date(holiday.date),
+                allDay: true,
+              }),
+            ),
+          ];
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching bank holidays: ', error);
+      });
+  }, []);
 
   return (
     <>

@@ -62,7 +62,19 @@ function DateSetter() {
     end: new Date(),
   });
 
-  const [allEvents, setAllEvents] = useState(eventsOnCalendar);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  // hardcoded state that will be used to render the calendar
+  const [events, setEvents] = useState(eventsOnCalendar);
+
+  const [showModal, setShowModal] = useState(false);
+  const [eventTitle, setEventTitle] = useState('');
+  const [selectEvent, setSelectEvent] = useState<Event | null>(null);
 
   const handleAddEvent = (event: Event) => {
     // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
@@ -72,14 +84,66 @@ function DateSetter() {
       event.title = 'Semester 2 Start Date';
     }
 
-    const clashDetected = checkClash(event, allEvents);
+    const clashDetected = checkClash(event, events);
 
     if (clashDetected) {
       //   alert('Clash with another event detected');
     }
     // add new event to the calendar even if there is a clash
-    setAllEvents([...allEvents, event]);
+    setEvents([...events, event]);
   };
+
+  // called when a user clicks on a calendar slot
+  function handleSelectSlot(slotInfo: { start: Date; end: Date }) {
+    setNewEvent({
+      title: '',
+      allDay: true,
+      start: slotInfo.start,
+      end: slotInfo.end,
+    });
+    setShowModal(true);
+  }
+
+  // called when a user clicks on an existing event
+  function handleSelectedEvent(event: Event) {
+    setEventTitle(event.title);
+    setNewEvent(event);
+    setSelectEvent(event);
+    setShowModal(true);
+  }
+
+  // called when a user clicks save on the modal
+  function saveEvent() {
+    // Combine new event properties with its title
+    const updatedEvent = { ...newEvent, title: eventTitle };
+
+    // check if there is a clash only if saving a new event not editing an existing event
+    if (!selectEvent && checkClash(updatedEvent, events)) {
+      alert('Clash with another event');
+    }
+
+    // update the events array with the new event
+    if (selectEvent) {
+      const newEvents = events.map((event) =>
+        event === selectEvent ? updatedEvent : event,
+      );
+      setEvents(newEvents);
+    }
+    // add the new event to the events array
+    else {
+      setEvents([...events, updatedEvent]);
+    }
+    // reset modal state
+    setShowModal(false);
+  }
+
+  function deleteEvents() {
+    if (selectEvent) {
+      const newEvents = events.filter((event) => event !== selectEvent);
+      setEvents(newEvents);
+      setShowModal(false);
+    }
+  }
 
   function checkClash(newEvent: Event, allEvents: Event[]): boolean {
     for (let i = 0; i < allEvents.length; i++) {
@@ -177,14 +241,20 @@ function DateSetter() {
           </div>
         </div>
 
+        {/* divider */}
         <hr className="rounded"></hr>
 
         {/* Calendar View */}
         <Calendar
           localizer={localizer}
-          events={allEvents}
+          events={events}
+          views={['month', 'week', 'day']}
+          defaultView="month"
           startAccessor="start"
           endAccessor="end"
+          selectable={true}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectedEvent}
           style={{
             height: 800,
             marginLeft: '50px',
@@ -193,6 +263,91 @@ function DateSetter() {
             marginBottom: '20px',
           }}
         />
+
+        {/* TODO: put this in its own component so it can be rendered here and professor view too */}
+        {showModal && (
+          <div
+            className="modal"
+            style={{
+              display: 'block',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              position: 'fixed',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    {selectEvent ? 'Edit key date' : 'Add key date'}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowModal(false);
+                      setEventTitle('');
+                      setSelectEvent(null);
+                    }}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <label htmlFor="eventTitle" className="form-label">
+                    Event Title:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="eventTitle"
+                    value={eventTitle}
+                    onChange={(e) => setEventTitle(e.target.value)}
+                  />
+                  {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
+                  <div className="datePickerContainer">
+                    {/* TODO: change to dd/mm instead of mm/dd */}
+                    <DatePicker
+                      placeholderText="Start Date"
+                      selected={newEvent.start}
+                      onChange={(start: Date) =>
+                        setNewEvent({ ...newEvent, start })
+                      }
+                    />
+                  </div>
+                  <div className="datePickerContainer">
+                    <DatePicker
+                      placeholderText="End Date"
+                      selected={newEvent.end}
+                      onChange={(end: Date) =>
+                        setNewEvent({ ...newEvent, end })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  {selectEvent && (
+                    <button
+                      type="button"
+                      className="btn btn-danger me-2"
+                      onClick={deleteEvents}
+                    >
+                      Delete Event
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={saveEvent}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

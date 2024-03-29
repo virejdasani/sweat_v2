@@ -160,7 +160,6 @@ function DateSetter() {
   }
 
   // TODO: auto bank holidays add
-  // TODO: click on event to CRUD
   return (
     <>
       <div className="calendar">

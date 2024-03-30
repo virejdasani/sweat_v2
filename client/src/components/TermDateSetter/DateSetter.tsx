@@ -39,6 +39,7 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
+// TODO: make input take input like 'week 1 thursday' and auto populate the date
 // TODO: fix styling (spacing of input form fields and buttons)
 // TODO: add data to centralised database
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too

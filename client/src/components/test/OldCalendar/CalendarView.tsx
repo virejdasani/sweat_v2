@@ -9,6 +9,9 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './CalendarView.css';
 
+// TODO: make form with dropdown that has reading week, sem 1 start etc. with dates like week 1 thursday and it auto populates into calendar
+// TODO: add 'add to google calendar' button to each event
+
 // new vision: admin input form, to add events.
 // professors can see cal with all events and add events to their own cal by pressing on the event
 
@@ -41,6 +44,7 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
+// TODO: add all bank holidays to the calendar
 // note: renaming this to Calendar causes conflicts with external imports
 function CalendarView() {
   const [newEvent, setNewEvent] = useState({

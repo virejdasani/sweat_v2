@@ -45,6 +45,7 @@ const eventsOnCalendar: Event[] = [
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better
 // TODO: add data to centralised database
+// TODO: add 'add to google calendar' button to each event
 
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({

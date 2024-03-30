@@ -40,12 +40,12 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
-// TODO: change color of bank holidays fetched from api
-// TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
-// TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
-// TODO: change from DatePicker to mui date picker if that looks better
-// TODO: add data to centralised database
 // TODO: add 'add to google calendar' button to each event
+// TODO: add data to centralised database
+// TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
+// TODO: change from DatePicker to mui date picker if that looks better (tried mui, the documentation is terrible and not worth it)
+// TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
+// TODO: change color of bank holidays fetched from api (big react calendar doesn't have props for this, need to use css)
 
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({

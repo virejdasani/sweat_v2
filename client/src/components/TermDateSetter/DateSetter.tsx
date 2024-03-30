@@ -4,12 +4,11 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import React, { useState, useEffect } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { AddToCalendarButton } from 'add-to-calendar-button-react';
 import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Calendar/CalendarView.css';
-// import { Dropdown } from 'react-bootstrap';
-// import Form from 'react-bootstrap/Form';
 
 interface Event {
   title: string;
@@ -40,7 +39,8 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
-// TODO: add 'add to google calendar' button to each event
+// add 'add to google calendar' button to each event (DONE)
+// TODO: change add to calendar button to show right date and title from event
 // TODO: add data to centralised database
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better (tried mui, the documentation is terrible and not worth it)
@@ -76,7 +76,7 @@ function DateSetter() {
     end: new Date(),
   });
 
-  // hardcoded state that will be used to render the calendar
+  // state that will be used to render the calendar
   const [events, setEvents] = useState(eventsOnCalendar);
 
   const [showModal, setShowModal] = useState(false);
@@ -117,6 +117,9 @@ function DateSetter() {
     setNewEvent(event);
     setSelectEvent(event);
     setShowModal(true);
+    // Set the selected event start and end dates for the add to calendar button
+    setSelectedEventStartDate(event.start);
+    setSelectedEventEndDate(event.end);
   }
 
   // called when a user clicks save on the modal
@@ -371,6 +374,14 @@ function DateSetter() {
                   </div>
                 </div>
                 <div className="modal-footer">
+                  <AddToCalendarButton
+                    name="Title"
+                    options={['Apple', 'Google', 'Outlook.com']}
+                    location="World Wide Web"
+                    startDate="2024-03-23"
+                    endDate="2024-03-23"
+                    timeZone="America/Los_Angeles"
+                  ></AddToCalendarButton>
                   {selectEvent && (
                     <button
                       type="button"

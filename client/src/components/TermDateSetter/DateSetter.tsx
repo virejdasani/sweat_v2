@@ -39,8 +39,6 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
-// add 'add to google calendar' button to each event (DONE)
-// TODO: change add to calendar button to show right date and title from event
 // TODO: add data to centralised database
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better (tried mui, the documentation is terrible and not worth it)
@@ -82,6 +80,23 @@ function DateSetter() {
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [selectEvent, setSelectEvent] = useState<Event | null>(null);
+
+  // state to store the start and end dates of the selected event
+  const [selectedEventStartDate, setSelectedEventStartDate] = useState<Date>(
+    new Date(),
+  );
+
+  const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
+    new Date(),
+  );
+
+  // Function to format date to "YYYY-MM-DD" format
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const handleAddEvent = (event: Event) => {
     // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
@@ -374,14 +389,17 @@ function DateSetter() {
                   </div>
                 </div>
                 <div className="modal-footer">
+                  {/* new add to calendar button but this one dynamically gets date and event name */}
                   <AddToCalendarButton
-                    name="Title"
+                    name={eventTitle + ' (Added from SWEAT)'}
                     options={['Apple', 'Google', 'Outlook.com']}
                     location="World Wide Web"
-                    startDate="2024-03-23"
-                    endDate="2024-03-23"
-                    timeZone="America/Los_Angeles"
+                    startDate={formatDate(selectedEventStartDate)}
+                    endDate={formatDate(selectedEventEndDate)}
+                    timeZone="Europe/London"
                   ></AddToCalendarButton>
+
+                  {/* Delete and save buttons */}
                   {selectEvent && (
                     <button
                       type="button"

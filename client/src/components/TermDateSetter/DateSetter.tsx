@@ -399,6 +399,8 @@ function DateSetter() {
                     startDate={formatDate(selectedEventStartDate)}
                     endDate={formatDate(selectedEventEndDate)}
                     timeZone="Europe/London"
+                    styleLight="z-index: 0;"
+                    styleDark="z-index: 0;"
                   ></AddToCalendarButton>
 
                   {/* Delete and save buttons */}

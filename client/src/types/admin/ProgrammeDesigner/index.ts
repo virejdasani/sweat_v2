@@ -2,6 +2,7 @@ export interface Module {
   id: string;
   name: string;
   credits: number;
+  year: 1 | 2 | 3 | 4;
 }
 
 export interface Programme {
@@ -29,17 +30,22 @@ export interface ModuleInstance {
 }
 
 export const modules: Module[] = [
-  { id: 'ELEC101', name: 'Programming Fundamentals', credits: 4 },
-  { id: 'ELEC202', name: 'Digital Electronics', credits: 3 },
-  { id: 'ELEC303', name: 'Data Structures and Algorithms', credits: 4 },
-  { id: 'ELEC404', name: 'Control Systems', credits: 4 },
-  { id: 'ELEC505', name: 'Embedded Systems', credits: 3 },
-  { id: 'ELEC606', name: 'Aircraft Systems', credits: 4 },
-  { id: 'ELEC707', name: 'Avionics Communication', credits: 3 },
-  { id: 'ELEC808', name: 'Robotics Principles', credits: 4 },
-  { id: 'ELEC909', name: 'Mechatronics Design', credits: 4 },
-  { id: 'ELEC010', name: 'Power Electronics', credits: 3 },
-  { id: 'ELEC111', name: 'Signals and Systems', credits: 4 },
+  { id: 'ELEC101', name: 'Programming Fundamentals', credits: 4, year: 1 },
+  { id: 'ELEC202', name: 'Digital Electronics', credits: 3, year: 2 },
+  {
+    id: 'ELEC303',
+    name: 'Data Structures and Algorithms',
+    credits: 4,
+    year: 3,
+  },
+  { id: 'ELEC404', name: 'Control Systems', credits: 4, year: 4 },
+  { id: 'ELEC505', name: 'Embedded Systems', credits: 3, year: 3 },
+  { id: 'ELEC606', name: 'Aircraft Systems', credits: 4, year: 4 },
+  { id: 'ELEC707', name: 'Avionics Communication', credits: 3, year: 4 },
+  { id: 'ELEC808', name: 'Robotics Principles', credits: 4, year: 4 },
+  { id: 'ELEC909', name: 'Mechatronics Design', credits: 4, year: 4 },
+  { id: 'ELEC010', name: 'Power Electronics', credits: 3, year: 3 },
+  { id: 'ELEC111', name: 'Signals and Systems', credits: 4, year: 3 },
 ];
 
 export const moduleInstances: ModuleInstance[] = [

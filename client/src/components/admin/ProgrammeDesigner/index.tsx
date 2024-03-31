@@ -14,18 +14,21 @@ import {
   moduleInstances,
 } from '../../../types/admin/ProgrammeDesigner';
 import {
+  handleFilterChange,
   handleOnDragEnd,
   handleSaveAllProgrammes,
 } from '../../../utils/admin/ProgrammeDesigner';
 import ModuleList from './ModuleCard';
 import './ProgrammeDesigner.css';
 import { Button as MuiButton } from '@mui/material';
+import ModuleFilterButtons from './ModuleFilterButtons';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>(programmes);
   const [moduleState, setModuleState] = useState<Module[]>(modules);
   const [moduleInstanceState, setModuleInstanceState] =
     useState<ModuleInstance[]>(moduleInstances);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   const getModuleById = (moduleId: string) => {
     return moduleState.find((module) => module.id === moduleId);
@@ -37,8 +40,17 @@ function ProgrammeDesigner() {
     );
   };
 
+  const filteredModuleInstances = selectedYear
+    ? moduleInstanceState.filter(
+        (instance) => getModuleById(instance.moduleId)?.year === selectedYear,
+      )
+    : moduleInstanceState;
+
   return (
     <div className="programme-designer">
+      <ModuleFilterButtons
+        onFilterChange={(year) => handleFilterChange(year, setSelectedYear)}
+      />
       <DragDropContext
         onDragEnd={(result: DropResult) =>
           handleOnDragEnd(
@@ -47,6 +59,8 @@ function ProgrammeDesigner() {
             setProgrammeState,
             moduleInstanceState,
             setModuleInstanceState,
+            selectedYear,
+            moduleState,
           )
         }
       >
@@ -57,33 +71,40 @@ function ProgrammeDesigner() {
               <Droppable droppableId={programme.id}>
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
-                    {programme.moduleInstanceIds.map(
-                      (moduleInstanceId, index) => {
+                    {programme.moduleInstanceIds
+                      .map((moduleInstanceId) => {
                         const moduleInstance =
                           getModuleInstanceById(moduleInstanceId);
                         const module = moduleInstance
                           ? getModuleById(moduleInstance.moduleId)
                           : null;
-
-                        return moduleInstance && module ? (
-                          <Draggable
-                            key={moduleInstance.id}
-                            draggableId={moduleInstance.id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <ModuleList modules={[module]} />
-                              </div>
-                            )}
-                          </Draggable>
-                        ) : null;
-                      },
-                    )}
+                        return { moduleInstance, module };
+                      })
+                      .filter(
+                        ({ module }) =>
+                          !selectedYear || module?.year === selectedYear,
+                      )
+                      .map(({ moduleInstance, module }, index) => (
+                        <Draggable
+                          key={moduleInstance?.id}
+                          draggableId={moduleInstance?.id || ''}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div>
+                              {module ? (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <ModuleList modules={[module]} />
+                                </div>
+                              ) : null}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
                     {provided.placeholder}
                   </div>
                 )}

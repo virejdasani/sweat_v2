@@ -3,6 +3,7 @@ import { DropResult } from 'react-beautiful-dnd';
 import {
   Programme,
   ModuleInstance,
+  Module,
 } from '../../../types/admin/ProgrammeDesigner';
 
 export function handleOnDragEnd(
@@ -11,10 +12,13 @@ export function handleOnDragEnd(
   setProgrammes: (programmes: Programme[]) => void,
   moduleInstances: ModuleInstance[],
   setModuleInstances: (moduleInstances: ModuleInstance[]) => void,
+  selectedYear: number | null,
+  modules: Module[],
 ) {
   if (!result.destination) return;
 
   const { source, destination } = result;
+
   const newProgrammes = Array.from(programmes);
   const newModuleInstances = Array.from(moduleInstances);
 
@@ -48,7 +52,6 @@ export function handleOnDragEnd(
         0,
         draggedModuleInstanceId,
       );
-
       const draggedModuleInstance = newModuleInstances.find(
         (instance) => instance.id === draggedModuleInstanceId,
       );
@@ -58,8 +61,16 @@ export function handleOnDragEnd(
     }
   }
 
+  // Filter the moduleInstances based on the selected year
+  const filteredModuleInstances = selectedYear
+    ? newModuleInstances.filter((instance) => {
+        const module = modules.find((m) => m.id === instance.moduleId);
+        return module?.year === selectedYear;
+      })
+    : newModuleInstances;
+
   setProgrammes(newProgrammes);
-  setModuleInstances(newModuleInstances);
+  setModuleInstances(filteredModuleInstances);
 }
 
 export const saveAllProgrammes = (programmeState: Programme[]) => {
@@ -73,4 +84,11 @@ export const handleSaveAllProgrammes = (
 ) => {
   event.preventDefault(); // Prevent default button behavior
   saveAllProgrammes(programmeState);
+};
+
+export const handleFilterChange = (
+  year: number,
+  setSelectedYear: (year: number) => void,
+) => {
+  setSelectedYear(year);
 };

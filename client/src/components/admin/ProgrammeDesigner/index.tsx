@@ -50,6 +50,7 @@ function ProgrammeDesigner() {
     <div className="programme-designer">
       <ModuleFilterButtons
         onFilterChange={(year) => handleFilterChange(year, setSelectedYear)}
+        selectedYear={selectedYear}
       />
       <DragDropContext
         onDragEnd={(result: DropResult) =>

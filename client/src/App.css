@@ -18,6 +18,10 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+body {
+  background: radial-gradient(circle at 50% 100%, #0c1c3d, #000000 90%);
+}
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

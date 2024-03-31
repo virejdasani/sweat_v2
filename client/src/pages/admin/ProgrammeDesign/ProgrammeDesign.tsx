@@ -3,7 +3,7 @@ import ProgrammeDesigner from '../../../components/admin/ProgrammeDesigner';
 const ProgrammeDesignPage: React.FC = () => {
   return (
     <div>
-      <h1>Program Design</h1>
+      <h1>Programme Design</h1>
       <ProgrammeDesigner />
     </div>
   );

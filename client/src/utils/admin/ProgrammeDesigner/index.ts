@@ -87,8 +87,8 @@ export const handleSaveAllProgrammes = (
 };
 
 export const handleFilterChange = (
-  year: number,
-  setSelectedYear: (year: number) => void,
+  year: number | null,
+  setSelectedYear: (year: number | null) => void,
 ) => {
   setSelectedYear(year);
 };

@@ -221,15 +221,17 @@ function DateSetter() {
           {/* Input field for adding semester 1 start date */}
           <div className="formInput">
             <span>Semester 1 Start Date: </span>
-            <DatePicker
-              dateFormat="dd/MM/yyyy"
-              placeholderText="Start Date"
-              selected={semester1Event.start}
-              onChange={
-                (start: Date) =>
-                  setSemester1Event({ ...semester1Event, start, end: start }) // Set end date to start date
-              }
-            />
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Start Date"
+                selected={semester1Event.start}
+                onChange={(start: Date) =>
+                  // Set end date to start date because it's a one day event element
+                  setSemester1Event({ ...semester1Event, start, end: start })
+                }
+              />
+            </div>
             <button
               className="eventButton"
               onClick={() => handleAddEvent(semester1Event)}
@@ -241,15 +243,17 @@ function DateSetter() {
           {/* Input field for adding semester 2 start date */}
           <div className="formInput">
             <span>Semester 2 Start Date: </span>
-            <DatePicker
-              dateFormat="dd/MM/yyyy"
-              placeholderText="Start Date"
-              selected={semester2Event.start}
-              onChange={
-                (start: Date) =>
-                  setSemester2Event({ ...semester2Event, start, end: start }) // Set end date to start date
-              }
-            />
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Start Date"
+                selected={semester2Event.start}
+                onChange={(start: Date) =>
+                  // Set end date to start date because it's a one day event element
+                  setSemester2Event({ ...semester2Event, start, end: start })
+                }
+              />
+            </div>
             <button
               className="eventButton"
               onClick={() => handleAddEvent(semester2Event)}
@@ -272,25 +276,29 @@ function DateSetter() {
             />
             <div className="datePickers">
               <span>Start date: </span>
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Add Holiday"
-                selected={holidayEvent.start}
-                onChange={(start: Date) =>
-                  setHolidayEvent({ ...holidayEvent, start })
-                }
-              />
+              <div className="d-inline">
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Add Holiday"
+                  selected={holidayEvent.start}
+                  onChange={(start: Date) =>
+                    setHolidayEvent({ ...holidayEvent, start })
+                  }
+                />
+              </div>
             </div>
             <div className="datePickers">
               <span>End date: </span>
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="End Date"
-                selected={holidayEvent.end}
-                onChange={(end: Date) =>
-                  setHolidayEvent({ ...holidayEvent, end })
-                }
-              />
+              <div className="d-inline">
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="End Date"
+                  selected={holidayEvent.end}
+                  onChange={(end: Date) =>
+                    setHolidayEvent({ ...holidayEvent, end })
+                  }
+                />
+              </div>
             </div>
 
             <button

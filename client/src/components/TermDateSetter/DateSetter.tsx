@@ -226,8 +226,8 @@ function DateSetter() {
     <>
       <div className="calendar">
         <div className="calendarHeader">
-          <h1>Academic Calendar</h1>
-          <h3>Admin sets key dates here</h3>
+          <h1 className="mb-4">Academic Calendar</h1>
+          {/* <h3>Admin sets key dates here</h3> */}
           {/* Input field for adding semester 1 start date */}
           <div className="formInput">
             <span>Semester 1 Start Date: </span>

@@ -4,8 +4,8 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import React, { useState, useEffect } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import { AddToCalendarButton } from 'add-to-calendar-button-react';
 import DatePicker from 'react-datepicker';
+import Modal from './Modal'; // Import the Modal component
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../Calendar/CalendarView.css';
@@ -40,7 +40,6 @@ const eventsOnCalendar: Event[] = [
 ];
 
 // TODO: add data to centralised database
-// TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better (tried mui, the documentation is terrible and not worth it)
 // TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
 // TODO: change color of bank holidays fetched from api (big react calendar doesn't have props for this, need to use css)
@@ -91,14 +90,6 @@ function DateSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
-
-  // Function to format date to "YYYY-MM-DD" format
-  const formatDate = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-indexed
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const handleAddEvent = (event: Event) => {
     // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
@@ -334,102 +325,20 @@ function DateSetter() {
           }}
         />
 
-        {showModal && (
-          <div
-            className="modal"
-            style={{
-              display: 'block',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              position: 'fixed',
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            }}
-          >
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">
-                    {selectEvent ? 'Edit key date' : 'Add key date'}
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => {
-                      setShowModal(false);
-                      setEventTitle('');
-                      setSelectEvent(null);
-                    }}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <label htmlFor="eventTitle" className="form-label">
-                    Event Title:
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="eventTitle"
-                    value={eventTitle}
-                    onChange={(e) => setEventTitle(e.target.value)}
-                  />
-                  {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
-                  <div className="datePickerContainer">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Start Date"
-                      selected={newEvent.start}
-                      onChange={(start: Date) =>
-                        setNewEvent({ ...newEvent, start })
-                      }
-                    />
-                  </div>
-                  <div className="datePickerContainer">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="End Date"
-                      selected={newEvent.end}
-                      onChange={(end: Date) =>
-                        setNewEvent({ ...newEvent, end })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <AddToCalendarButton
-                    name={eventTitle + ' (Added from SWEAT)'}
-                    options={['Apple', 'Google', 'Outlook.com']}
-                    location="World Wide Web"
-                    startDate={formatDate(selectedEventStartDate)}
-                    endDate={formatDate(selectedEventEndDate)}
-                    timeZone="Europe/London"
-                    styleLight="z-index: 0;"
-                    styleDark="z-index: 0;"
-                  ></AddToCalendarButton>
-
-                  {/* Delete and save buttons */}
-                  {selectEvent && (
-                    <button
-                      type="button"
-                      className="btn btn-danger me-2"
-                      onClick={deleteEvents}
-                    >
-                      Delete Event
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={saveEvent}
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          eventTitle={eventTitle}
+          showModal={showModal}
+          selectEvent={selectEvent}
+          newEvent={newEvent}
+          selectedEventStartDate={selectedEventStartDate}
+          selectedEventEndDate={selectedEventEndDate}
+          setShowModal={setShowModal}
+          setEventTitle={setEventTitle}
+          setSelectEvent={setSelectEvent}
+          setNewEvent={setNewEvent}
+          saveEvent={saveEvent}
+          deleteEvents={deleteEvents}
+        />
       </div>
     </>
   );

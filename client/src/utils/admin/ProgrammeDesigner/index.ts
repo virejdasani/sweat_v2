@@ -1,4 +1,3 @@
-// dragUtils.ts
 import { DropResult } from 'react-beautiful-dnd';
 import {
   Programme,
@@ -13,7 +12,8 @@ export function handleOnDragEnd(
   moduleInstances: ModuleInstance[],
   setModuleInstances: (moduleInstances: ModuleInstance[]) => void,
   selectedYear: number | null,
-  modules: Module[],
+  searchResults: Module[],
+  selectedModuleType: string | null,
 ) {
   if (!result.destination) return;
 
@@ -61,13 +61,14 @@ export function handleOnDragEnd(
     }
   }
 
-  // Filter the moduleInstances based on the selected year
-  const filteredModuleInstances = selectedYear
-    ? newModuleInstances.filter((instance) => {
-        const module = modules.find((m) => m.id === instance.moduleId);
-        return module?.year === selectedYear;
-      })
-    : newModuleInstances;
+  const filteredModuleInstances = newModuleInstances.filter((instance) => {
+    const module = searchResults.find((m) => m.id === instance.moduleId);
+    return (
+      module &&
+      (!selectedYear || module.year === selectedYear) &&
+      (!selectedModuleType || module.type === selectedModuleType)
+    );
+  });
 
   setProgrammes(newProgrammes);
   setModuleInstances(filteredModuleInstances);
@@ -91,4 +92,48 @@ export const handleFilterChange = (
   setSelectedYear: (year: number | null) => void,
 ) => {
   setSelectedYear(year);
+};
+
+export const handleSearchChange = (
+  event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>,
+  onSearch: (results: Module[]) => void,
+  modules: Module[],
+) => {
+  const query = event.target.value;
+  setSearchQuery(query);
+
+  // Filter modules based on the search query
+  const filteredModules = modules.filter((module) => {
+    const lowercaseQuery = query.toLowerCase();
+    return (
+      module.id.toLowerCase().includes(lowercaseQuery) ||
+      module.name.toLowerCase().includes(lowercaseQuery)
+    );
+  });
+
+  onSearch(filteredModules);
+};
+
+export const handleModuleTypeFilterChange = (
+  moduleType: string | null,
+  setSelectedModuleType: React.Dispatch<React.SetStateAction<string | null>>,
+) => {
+  setSelectedModuleType(moduleType);
+};
+
+export const handleSearch = (
+  results: Module[],
+  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+) => {
+  setSearchResults(results);
+};
+
+export const getModuleInstanceById = (
+  moduleInstanceId: string,
+  moduleInstanceState: ModuleInstance[],
+) => {
+  return moduleInstanceState.find(
+    (instance) => instance.id === moduleInstanceId,
+  );
 };

@@ -1,10 +1,5 @@
-// ModuleFilterButtons.tsx
 import { Button as MuiButton } from '@mui/material';
-
-interface ModuleFilterButtonsProps {
-  onFilterChange: (year: number | null) => void;
-  selectedYear: number | null;
-}
+import { ModuleFilterButtonsProps } from '../../../types/admin/ProgrammeDesigner';
 
 function ModuleFilterButtons({
   onFilterChange,

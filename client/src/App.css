@@ -19,7 +19,8 @@
 }
 
 body {
-  background: radial-gradient(circle at 50% 100%, #0c1c3d, #000000 90%);
+  /* background: radial-gradient(circle at 50% 100%, #0c1c3d, #000000 90%); */
+  background: darkgrey;
 }
 
 @keyframes logo-spin {

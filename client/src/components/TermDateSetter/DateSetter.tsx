@@ -46,6 +46,7 @@ const eventsOnCalendar: Event[] = [
 // TODO: change from DatePicker to mui date picker if that looks better (tried mui, the documentation is terrible and not worth it)
 // TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
 // TODO: change color of bank holidays fetched from api (big react calendar doesn't have props for this, need to use css)
+// TODO: (LOW PRIORITY) make it so that events can be added by clicking on a date on the calendar too
 
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({

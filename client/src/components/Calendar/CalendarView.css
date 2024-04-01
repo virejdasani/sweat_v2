@@ -1,19 +1,43 @@
 .calendar {}
 
 .calendarHeader {
-    text-align: center;
-    margin-top: 32px;
-    margin-bottom: 40px;
+  text-align: center;
+  margin-top: 32px;
+  margin-bottom: 40px;
 }
 
 .rounded {
-    border-top: 2px solid #000000 !important;
-    width: 90%;
-    /* make it centered */
-    margin-left: auto;
-    margin-right: auto;
+  border-top: 2px solid #000000 !important;
+  width: 90%;
+  /* make it centered */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .datePickerContainer {
-    /* margin-left: 40px; */
+  /* margin-left: 40px; */
+}
+
+.eventButton {
+  margin-left: 10px;
+  background-color: #1b89ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.formInput {
+  margin-bottom: 10px;
+}
+
+
+.datePickers {
+  margin: 10px;
+}
+
+input {
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  padding: 5px;
 }

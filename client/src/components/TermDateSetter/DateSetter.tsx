@@ -39,13 +39,13 @@ const eventsOnCalendar: Event[] = [
   },
 ];
 
-// TODO: make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
 // TODO: fix styling (spacing of input form fields and buttons)
 // TODO: add data to centralised database
 // TODO: put show modal element in its own component so it can be rendered here and professor calendar view too
 // TODO: change from DatePicker to mui date picker if that looks better (tried mui, the documentation is terrible and not worth it)
 // TODO: push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
 // TODO: change color of bank holidays fetched from api (big react calendar doesn't have props for this, need to use css)
+// TODO: make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
 // TODO: (LOW PRIORITY) make it so that events can be added by clicking on a date on the calendar too
 
 function DateSetter() {
@@ -229,7 +229,7 @@ function DateSetter() {
           <h1>Academic Calendar</h1>
           <h3>Admin sets key dates here</h3>
           {/* Input field for adding semester 1 start date */}
-          <div>
+          <div className="formInput">
             <span>Semester 1 Start Date: </span>
             <DatePicker
               dateFormat="dd/MM/yyyy"
@@ -241,7 +241,7 @@ function DateSetter() {
               }
             />
             <button
-              style={{ marginTop: '10px' }}
+              className="eventButton"
               onClick={() => handleAddEvent(semester1Event)}
             >
               Add Semester 1 Start Date
@@ -249,7 +249,7 @@ function DateSetter() {
           </div>
 
           {/* Input field for adding semester 2 start date */}
-          <div>
+          <div className="formInput">
             <span>Semester 2 Start Date: </span>
             <DatePicker
               dateFormat="dd/MM/yyyy"
@@ -261,14 +261,14 @@ function DateSetter() {
               }
             />
             <button
-              style={{ marginTop: '10px' }}
+              className="eventButton"
               onClick={() => handleAddEvent(semester2Event)}
             >
               Add Semester 2 Start Date
             </button>
           </div>
           <div>
-            <span>Add bank holiday(s): </span>
+            <span>Add bank holiday: </span>
 
             {/* Input field for adding holidays */}
             <input
@@ -280,25 +280,31 @@ function DateSetter() {
                 setHolidayEvent({ ...holidayEvent, title: e.target.value })
               }
             />
+            <div className="datePickers">
+              <span>Start date: </span>
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Add Holiday"
+                selected={holidayEvent.start}
+                onChange={(start: Date) =>
+                  setHolidayEvent({ ...holidayEvent, start })
+                }
+              />
+            </div>
+            <div className="datePickers">
+              <span>End date: </span>
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="End Date"
+                selected={holidayEvent.end}
+                onChange={(end: Date) =>
+                  setHolidayEvent({ ...holidayEvent, end })
+                }
+              />
+            </div>
 
-            <DatePicker
-              dateFormat="dd/MM/yyyy"
-              placeholderText="Add Holiday"
-              selected={holidayEvent.start}
-              onChange={(start: Date) =>
-                setHolidayEvent({ ...holidayEvent, start })
-              }
-            />
-            <DatePicker
-              dateFormat="dd/MM/yyyy"
-              placeholderText="End Date"
-              selected={holidayEvent.end}
-              onChange={(end: Date) =>
-                setHolidayEvent({ ...holidayEvent, end })
-              }
-            />
             <button
-              style={{ marginTop: '10px' }}
+              className="eventButton"
               onClick={() => handleAddEvent(holidayEvent)}
             >
               Add Holiday

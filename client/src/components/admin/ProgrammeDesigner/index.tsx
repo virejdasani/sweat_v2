@@ -21,6 +21,9 @@ import {
   handleSaveAllProgrammes,
   handleSearch,
   handleSearchChange,
+  openAddModuleModal,
+  closeModuleModal,
+  handleModuleSubmit,
 } from '../../../utils/admin/ProgrammeDesigner';
 import ModuleList from './ModuleCard';
 import './ProgrammeDesigner.css';
@@ -28,6 +31,7 @@ import { Button as MuiButton } from '@mui/material';
 import ModuleFilterButtons from './ModuleFilterButtons';
 import SearchBar from './SearchBar';
 import ModuleTypeFilterButtons from './ModuleTypeFilterButtons';
+import ModuleForm from './ModuleForm';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>(programmes);
@@ -38,6 +42,11 @@ function ProgrammeDesigner() {
   const [searchResults, setSearchResults] = useState<Module[]>(modules);
   const [selectedModuleType, setSelectedModuleType] = useState<string | null>(
     null,
+  );
+  const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [selectedModule, setSelectedModule] = useState<Module | undefined>(
+    undefined,
   );
 
   return (
@@ -67,6 +76,19 @@ function ProgrammeDesigner() {
           }
           selectedModuleType={selectedModuleType}
         />
+        <MuiButton
+          variant="contained"
+          color="primary"
+          onClick={() =>
+            openAddModuleModal(
+              setModalMode,
+              setSelectedModule,
+              setIsModuleModalOpen,
+            )
+          }
+        >
+          Add Module
+        </MuiButton>
       </div>
       <DragDropContext
         onDragEnd={(result: DropResult) =>
@@ -149,6 +171,19 @@ function ProgrammeDesigner() {
           Save All Programmes
         </MuiButton>
       </div>
+      {/* Module Modal */}
+      {isModuleModalOpen && (
+        <ModuleForm
+          mode={modalMode}
+          module={selectedModule}
+          onClose={() => closeModuleModal(setIsModuleModalOpen)}
+          onSubmit={(module) =>
+            handleModuleSubmit(module, modalMode, () =>
+              closeModuleModal(setIsModuleModalOpen),
+            )
+          }
+        />
+      )}
     </div>
   );
 }

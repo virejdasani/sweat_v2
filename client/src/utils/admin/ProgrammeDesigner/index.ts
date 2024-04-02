@@ -4,6 +4,8 @@ import {
   ModuleInstance,
   Module,
 } from '../../../types/admin/ProgrammeDesigner';
+import { useCallback } from 'react';
+import { toast } from 'react-toastify';
 
 export function handleOnDragEnd(
   result: DropResult,
@@ -136,4 +138,96 @@ export const getModuleInstanceById = (
   return moduleInstanceState.find(
     (instance) => instance.id === moduleInstanceId,
   );
+};
+
+export const useModuleActions = () => {
+  const handleEditModule = useCallback(
+    (
+      module: Module,
+      setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
+      setSelectedModule: React.Dispatch<
+        React.SetStateAction<Module | undefined>
+      >,
+      setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    ) => {
+      openEditModuleModal(
+        module,
+        setModalMode,
+        setSelectedModule,
+        setIsModuleModalOpen,
+      );
+    },
+    [],
+  );
+
+  const handleRemoveModule = useCallback((module: Module) => {
+    const confirmRemove = window.confirm(
+      `Are you sure you want to remove the module "${module.name}"?`,
+    );
+    if (confirmRemove) {
+      // TODO: Implement the removal logic using Express.js and MongoDB
+      toast.success(`Module "${module.name}" has been removed.`);
+    }
+  }, []);
+
+  return {
+    handleEditModule,
+    handleRemoveModule,
+  };
+};
+
+export const handleAddModuleClick = (
+  setIsAddModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  setIsAddModuleModalOpen(true);
+};
+
+export const openAddModuleModal = (
+  setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
+  setSelectedModule: React.Dispatch<React.SetStateAction<Module | undefined>>,
+  setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  setModalMode('add');
+  setSelectedModule(undefined);
+  setIsModuleModalOpen(true);
+};
+
+export const openEditModuleModal = (
+  module: Module,
+  setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
+  setSelectedModule: React.Dispatch<React.SetStateAction<Module | undefined>>,
+  setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  setModalMode('edit');
+  setSelectedModule(module);
+  setIsModuleModalOpen(true);
+};
+
+export const closeModuleModal = (
+  setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
+  setIsModuleModalOpen(false);
+};
+
+export const handleModuleSubmit = (
+  module: Module,
+  modalMode: 'add' | 'edit',
+  closeModuleModal: () => void,
+) => {
+  if (modalMode === 'add') {
+    handleAddModule(module);
+  } else if (modalMode === 'edit') {
+    handleUpdateModule(module);
+  }
+  closeModuleModal();
+};
+
+export const handleAddModule = (module: Module) => {
+  // Implement the logic to add a new module to the programme
+  // Update the `modules` state or dispatch an action to add the module
+};
+
+export const handleUpdateModule = (module: Module) => {
+  // Implement the logic to update an existing module in the programme
+  // Update the `modules` state or dispatch an action to update the module
 };

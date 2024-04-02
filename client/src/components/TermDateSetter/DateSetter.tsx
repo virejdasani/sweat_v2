@@ -8,7 +8,7 @@ import DatePicker from 'react-datepicker';
 import Modal from './Modal'; // Import the Modal component
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../Calendar/CalendarView.css';
+import './DateSetter.css';
 
 interface Event {
   title: string;
@@ -18,7 +18,8 @@ interface Event {
 }
 
 const locales = {
-  //   'en-US': require('date-fns/locale/en-US'), // require not defined
+  // require not defined
+  //   'en-US': require('date-fns/locale/en-US'),
 };
 const localizer = dateFnsLocalizer({
   format,

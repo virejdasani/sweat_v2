@@ -26,8 +26,8 @@ interface ModuleFormStep1Props {
   moduleData: FormModuleData;
   handleChange: (
     event:
-      | React.ChangeEvent<{ value: unknown; name?: string }>
-      | SelectChangeEvent<number | string | string[]>,
+      | SelectChangeEvent<string | number | string[]>
+      | React.ChangeEvent<{ value: unknown; name?: string }>,
   ) => void;
 }
 

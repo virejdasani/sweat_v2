@@ -79,14 +79,12 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
     const { name, value } = event.target;
 
     if (typeof name === 'string') {
-      const inputValue = value === '' ? '' : value;
-
       setModuleData((prevData) => ({
         ...prevData,
-        [name]: inputValue,
+        [name]: value,
         teachingSchedule: {
           ...prevData.teachingSchedule,
-          [name]: inputValue === '' ? '' : Number(inputValue),
+          [name]: value,
         },
       }));
     }
@@ -124,10 +122,10 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
         ...prevData.courseworks,
         {
           cwTitle: '',
-          weight: 0,
+          weight: '',
           type: 'assignment',
-          deadlineWeek: 0,
-          releasedWeekEarlier: 0,
+          deadlineWeek: '',
+          releasedWeekEarlier: '',
         },
       ],
     }));
@@ -153,16 +151,7 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
         return (
           <ModuleFormStep2
             teachingSchedule={moduleData.teachingSchedule}
-            handleChange={(event) => {
-              const { name, value } = event.target;
-              setModuleData((prevData) => ({
-                ...prevData,
-                teachingSchedule: {
-                  ...prevData.teachingSchedule,
-                  [name]: Number(value),
-                },
-              }));
-            }}
+            handleChange={handleChange}
           />
         );
       case 2:

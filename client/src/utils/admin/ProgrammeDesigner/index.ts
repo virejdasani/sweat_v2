@@ -140,7 +140,16 @@ export const getModuleInstanceById = (
   );
 };
 
-export const useModuleActions = () => {
+export const useModuleActions = (
+  searchResults: Module[],
+  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+  programmeState: Programme[],
+  setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>,
+  moduleInstanceState: ModuleInstance[],
+  setModuleInstanceState: React.Dispatch<
+    React.SetStateAction<ModuleInstance[]>
+  >,
+) => {
   const handleEditModule = useCallback(
     (
       module: Module,
@@ -160,15 +169,55 @@ export const useModuleActions = () => {
     [],
   );
 
-  const handleRemoveModule = useCallback((module: Module) => {
-    const confirmRemove = window.confirm(
-      `Are you sure you want to remove the module "${module.name}"?`,
-    );
-    if (confirmRemove) {
-      // TODO: Implement the removal logic using Express.js and MongoDB
-      toast.success(`Module "${module.name}" has been removed.`);
-    }
-  }, []);
+  const handleRemoveModule = useCallback(
+    (moduleId: string, programmeId: string) => {
+      const module = searchResults.find((m) => m.id === moduleId);
+      if (module) {
+        const confirmRemove = window.confirm(
+          `Are you sure you want to remove the module "${module.name}" from the programme?`,
+        );
+        if (confirmRemove) {
+          // Remove the module instance from the specific programme
+          setProgrammeState(
+            programmeState.map((programme) =>
+              programme.id === programmeId
+                ? {
+                    ...programme,
+                    moduleInstanceIds: programme.moduleInstanceIds.filter(
+                      (id) =>
+                        getModuleInstanceById(id, moduleInstanceState)
+                          ?.moduleId !== moduleId,
+                    ),
+                  }
+                : programme,
+            ),
+          );
+
+          // Remove the module instance associated with the module and programme
+          setModuleInstanceState(
+            moduleInstanceState.filter(
+              (instance) =>
+                !(
+                  instance.moduleId === moduleId &&
+                  instance.programmeId === programmeId
+                ),
+            ),
+          );
+
+          toast.success(
+            `Module "${module.name}" has been removed from the programme.`,
+          );
+        }
+      }
+    },
+    [
+      searchResults,
+      programmeState,
+      setProgrammeState,
+      moduleInstanceState,
+      setModuleInstanceState,
+    ],
+  );
 
   return {
     handleEditModule,
@@ -213,21 +262,31 @@ export const handleModuleSubmit = (
   module: Module,
   modalMode: 'add' | 'edit',
   closeModuleModal: () => void,
+  searchResults: Module[],
+  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
 ) => {
   if (modalMode === 'add') {
-    handleAddModule(module);
+    handleAddModule(module, searchResults, setSearchResults);
   } else if (modalMode === 'edit') {
-    handleUpdateModule(module);
+    handleUpdateModule(module, searchResults, setSearchResults);
   }
   closeModuleModal();
 };
 
-export const handleAddModule = (module: Module) => {
-  // Implement the logic to add a new module to the programme
-  // Update the `modules` state or dispatch an action to add the module
+export const handleAddModule = (
+  module: Module,
+  searchResults: Module[],
+  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+) => {
+  // Add the new module to the searchResults array
+  setSearchResults([...searchResults, module]);
 };
 
-export const handleUpdateModule = (module: Module) => {
-  // Implement the logic to update an existing module in the programme
-  // Update the `modules` state or dispatch an action to update the module
+export const handleUpdateModule = (
+  module: Module,
+  searchResults: Module[],
+  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+) => {
+  // Update the existing module in the searchResults array
+  setSearchResults(searchResults.map((m) => (m.id === module.id ? module : m)));
 };

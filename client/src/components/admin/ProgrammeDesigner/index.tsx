@@ -32,6 +32,7 @@ import ModuleFilterButtons from './ModuleFilterButtons';
 import SearchBar from './SearchBar';
 import ModuleTypeFilterButtons from './ModuleTypeFilterButtons';
 import ModuleForm from './ModuleForm';
+import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>(programmes);
@@ -47,6 +48,15 @@ function ProgrammeDesigner() {
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [selectedModule, setSelectedModule] = useState<Module | undefined>(
     undefined,
+  );
+
+  const { handleEditModule, handleRemoveModule } = useModuleActions(
+    searchResults,
+    setSearchResults,
+    programmeState,
+    setProgrammeState,
+    moduleInstanceState,
+    setModuleInstanceState,
   );
 
   return (
@@ -148,7 +158,21 @@ function ProgrammeDesigner() {
                               {...provided.dragHandleProps}
                               className="module-item"
                             >
-                              {module && <ModuleList modules={[module]} />}
+                              {module && (
+                                <ModuleList
+                                  modules={[module]}
+                                  programmeId={programme.id}
+                                  onEdit={(module) =>
+                                    handleEditModule(
+                                      module,
+                                      setModalMode,
+                                      setSelectedModule,
+                                      setIsModuleModalOpen,
+                                    )
+                                  }
+                                  onRemove={handleRemoveModule}
+                                />
+                              )}
                             </div>
                           )}
                         </Draggable>
@@ -178,8 +202,12 @@ function ProgrammeDesigner() {
           module={selectedModule}
           onClose={() => closeModuleModal(setIsModuleModalOpen)}
           onSubmit={(module) =>
-            handleModuleSubmit(module, modalMode, () =>
-              closeModuleModal(setIsModuleModalOpen),
+            handleModuleSubmit(
+              module,
+              modalMode,
+              () => closeModuleModal(setIsModuleModalOpen),
+              searchResults,
+              setSearchResults,
             )
           }
         />

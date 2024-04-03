@@ -18,10 +18,16 @@ export interface ProgrammeModuleMap {
 
 export interface ModuleCardProps {
   module: Module;
+  programmeId: string;
+  onEdit: (module: Module) => void;
+  onRemove: (moduleId: string, programmeId: string) => void;
 }
 
 export interface ModuleListProps {
   modules: Module[];
+  programmeId: string;
+  onEdit: (module: Module) => void;
+  onRemove: (moduleId: string, programmeId: string) => void;
 }
 
 export interface ModuleInstance {

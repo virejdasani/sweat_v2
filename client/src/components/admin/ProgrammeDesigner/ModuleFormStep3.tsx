@@ -19,7 +19,7 @@ export interface Coursework {
   type: 'assignment' | 'class test' | 'lab report' | 'presentation' | 'other';
   deadlineWeek: string | number;
   releasedWeekEarlier: string | number;
-  [key: string]: string | number; // Add this index signature
+  [key: string]: string | number;
 }
 
 interface ModuleFormStep3Props {

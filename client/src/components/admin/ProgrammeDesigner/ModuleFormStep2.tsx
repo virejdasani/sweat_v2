@@ -7,6 +7,7 @@ import {
   TableCell,
   TableBody,
   TextField,
+  SelectChangeEvent,
 } from '@mui/material';
 
 export interface TeachingSchedule {
@@ -20,7 +21,11 @@ export interface TeachingSchedule {
 
 interface ModuleFormStep2Props {
   teachingSchedule: TeachingSchedule;
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (
+    event:
+      | SelectChangeEvent<string | number | string[]>
+      | React.ChangeEvent<{ value: unknown; name?: string }>,
+  ) => void;
 }
 
 const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({

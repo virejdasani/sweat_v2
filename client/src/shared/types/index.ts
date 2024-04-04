@@ -1,5 +1,5 @@
 export interface Programme {
-  id: string;
+  id: 'CSEE' | 'AVS' | 'MCR' | 'EEE';
   name: string;
   moduleIds: string[];
 }
@@ -37,8 +37,8 @@ export interface Module {
   year: 1 | 2 | 3 | 4;
   type: 'core' | 'optional';
   programme: string[];
-  semester: string;
-  credits: number;
+  semester: 'first' | 'second' | 'whole session';
+  credits: 7.5 | 15 | 30;
   totalStudyHours: number;
   timetabledHours: number;
   privateStudyHours: number;

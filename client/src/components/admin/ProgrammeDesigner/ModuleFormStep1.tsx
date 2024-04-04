@@ -67,6 +67,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         >
           <MenuItem value={7.5}>7.5</MenuItem>
           <MenuItem value={15}>15</MenuItem>
+          <MenuItem value={15}>30</MenuItem>
         </Select>
       </FormControl>
       <TextField

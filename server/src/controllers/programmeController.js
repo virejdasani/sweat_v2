@@ -70,6 +70,24 @@ exports.updateProgrammeById = async (req, res) => {
   }
 };
 
+exports.updateModuleIdsForAllProgrammes = async (req, res) => {
+  try {
+    const { moduleIds } = req.body;
+
+    // Validate and sanitize the input data if needed
+
+    const updatedDocs = await Programme.updateMany(
+      {},
+      { $set: { moduleIds } },
+      { new: true },
+    );
+
+    res.json(updatedDocs);
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
 exports.deleteProgrammeById = async (req, res) => {
   try {
     const programmeId = req.params.id;

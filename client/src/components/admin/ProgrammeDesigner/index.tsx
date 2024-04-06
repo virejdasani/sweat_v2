@@ -1,20 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
+import { Module, Programme } from '../../../shared/types';
 import {
-  Programme,
-  Module,
-  programmes,
-  ModuleInstance,
-  moduleInstances,
-  modules,
-} from '../../../types/admin/ProgrammeDesigner';
-import {
-  getModuleInstanceById,
   handleFilterChange,
   handleModuleTypeFilterChange,
   handleOnDragEnd,
@@ -24,6 +16,7 @@ import {
   openAddModuleModal,
   closeModuleModal,
   handleModuleSubmit,
+  fetchData,
 } from '../../../utils/admin/ProgrammeDesigner';
 import ModuleList from './ModuleCard';
 import './ProgrammeDesigner.css';
@@ -33,14 +26,13 @@ import SearchBar from './SearchBar';
 import ModuleTypeFilterButtons from './ModuleTypeFilterButtons';
 import ModuleForm from './ModuleForm';
 import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
+import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
 
 function ProgrammeDesigner() {
-  const [programmeState, setProgrammeState] = useState<Programme[]>(programmes);
-  const [moduleInstanceState, setModuleInstanceState] =
-    useState<ModuleInstance[]>(moduleInstances);
+  const [programmeState, setProgrammeState] = useState<Programme[]>([]);
+  const [searchResults, setSearchResults] = useState<Module[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Module[]>(modules);
   const [selectedModuleType, setSelectedModuleType] = useState<string | null>(
     null,
   );
@@ -49,14 +41,17 @@ function ProgrammeDesigner() {
   const [selectedModule, setSelectedModule] = useState<Module | undefined>(
     undefined,
   );
+  const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
+
+  useEffect(() => {
+    fetchData(setProgrammeState, setSearchResults, setModuleInstances);
+  }, []);
 
   const { handleEditModule, handleRemoveModule } = useModuleActions(
-    searchResults,
-    setSearchResults,
+    moduleInstances,
+    setModuleInstances,
     programmeState,
     setProgrammeState,
-    moduleInstanceState,
-    setModuleInstanceState,
   );
 
   return (
@@ -69,7 +64,9 @@ function ProgrammeDesigner() {
               event,
               setSearchQuery,
               (results) => handleSearch(results, setSearchResults),
-              modules,
+              searchResults,
+              selectedYear,
+              selectedModuleType,
             )
           }
           onSearch={(results) => handleSearch(results, setSearchResults)}
@@ -104,51 +101,45 @@ function ProgrammeDesigner() {
         onDragEnd={(result: DropResult) =>
           handleOnDragEnd(
             result,
+            moduleInstances,
+            setModuleInstances,
+            searchResults,
+            setSearchResults,
             programmeState,
             setProgrammeState,
-            moduleInstanceState,
-            setModuleInstanceState,
-            selectedYear,
-            searchResults,
-            selectedModuleType,
           )
         }
       >
         <div className="programme-container">
           {programmeState.map((programme) => (
-            <div key={programme.id} className="programme-box">
-              <h2 className="programme-name">{programme.name}</h2>
-              <Droppable droppableId={programme.id}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="module-list-container"
-                  >
-                    {programme.moduleInstanceIds
-                      .map((moduleInstanceId) => {
-                        const moduleInstance = getModuleInstanceById(
-                          moduleInstanceId,
-                          moduleInstanceState,
-                        );
-                        const module = moduleInstance
-                          ? searchResults.find(
-                              (m) => m.id === moduleInstance.moduleId,
-                            )
-                          : null;
-                        return { moduleInstance, module };
-                      })
+            <Droppable droppableId={programme.id} key={programme.id}>
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="programme-box"
+                >
+                  <h2 className="programme-name">{programme.name}</h2>
+                  <div className="module-list-container">
+                    {moduleInstances
                       .filter(
-                        ({ module }) =>
-                          module &&
-                          (!selectedYear || module.year === selectedYear) &&
+                        (mi) =>
+                          mi.programmeId === programme.id &&
+                          (!selectedYear || mi.module.year === selectedYear) &&
                           (!selectedModuleType ||
-                            module.type === selectedModuleType),
+                            mi.module.type === selectedModuleType) &&
+                          (searchQuery === '' ||
+                            mi.module.name
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase()) ||
+                            mi.module.id
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase())),
                       )
-                      .map(({ moduleInstance, module }, index) => (
+                      .map((mi, index) => (
                         <Draggable
-                          key={moduleInstance?.id}
-                          draggableId={moduleInstance?.id || ''}
+                          key={mi.uniqueId}
+                          draggableId={mi.uniqueId}
                           index={index}
                         >
                           {(provided) => (
@@ -158,30 +149,30 @@ function ProgrammeDesigner() {
                               {...provided.dragHandleProps}
                               className="module-item"
                             >
-                              {module && (
-                                <ModuleList
-                                  modules={[module]}
-                                  programmeId={programme.id}
-                                  onEdit={(module) =>
-                                    handleEditModule(
-                                      module,
-                                      setModalMode,
-                                      setSelectedModule,
-                                      setIsModuleModalOpen,
-                                    )
-                                  }
-                                  onRemove={handleRemoveModule}
-                                />
-                              )}
+                              <ModuleList
+                                modules={[mi.module]}
+                                programmeId={programme.id}
+                                onEdit={() =>
+                                  handleEditModule(
+                                    mi,
+                                    setModalMode,
+                                    setSelectedModule,
+                                    setIsModuleModalOpen,
+                                  )
+                                }
+                                onRemove={() =>
+                                  handleRemoveModule(mi.module.id, programme.id)
+                                }
+                              />
                             </div>
                           )}
                         </Draggable>
                       ))}
                     {provided.placeholder}
                   </div>
-                )}
-              </Droppable>
-            </div>
+                </div>
+              )}
+            </Droppable>
           ))}
         </div>
       </DragDropContext>
@@ -189,13 +180,12 @@ function ProgrammeDesigner() {
         <MuiButton
           variant="contained"
           color="primary"
-          onClick={(event) => handleSaveAllProgrammes(programmeState, event)}
+          onClick={(event) => handleSaveAllProgrammes(event, programmeState)}
           className="save-programme-button"
         >
           Save All Programmes
         </MuiButton>
       </div>
-      {/* Module Modal */}
       {isModuleModalOpen && (
         <ModuleForm
           mode={modalMode}

@@ -42,7 +42,10 @@ const moduleSchema = new mongoose.Schema({
     type: String,
     enum: ['core', 'optional'],
   },
-  programme: [String],
+  programme: {
+    type: [String],
+    default: [],
+  },
   semester: {
     type: String,
     enum: ['first', 'second', 'whole session'],
@@ -89,6 +92,6 @@ const moduleSchema = new mongoose.Schema({
   totalHours: [distributionSchema],
 });
 
-const Module = mongoose.model('Module', moduleSchema);
+const Module = mongoose.model('modules', moduleSchema);
 
 module.exports = Module;

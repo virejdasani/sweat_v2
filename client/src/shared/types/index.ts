@@ -1,5 +1,5 @@
 export interface Programme {
-  id: 'CSEE' | 'AVS' | 'MCR' | 'EEE';
+  id: string;
   name: string;
   moduleIds: string[];
 }

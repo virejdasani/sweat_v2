@@ -1,92 +1,124 @@
 import { DropResult } from 'react-beautiful-dnd';
-import {
-  Programme,
-  ModuleInstance,
-  Module,
-} from '../../../types/admin/ProgrammeDesigner';
+import { Module, Programme } from '../../../shared/types';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
+import {
+  createModule,
+  removeModuleFromProgramme,
+  updateModuleById,
+  updateModuleIdsForAllProgrammes,
+  updateProgrammeArrayInModules,
+} from '../../../services/admin/ProgrammeDesigner';
+import { getAllProgrammes, getAllModules } from '../../../shared/api';
+import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
 
 export function handleOnDragEnd(
   result: DropResult,
-  programmes: Programme[],
-  setProgrammes: (programmes: Programme[]) => void,
   moduleInstances: ModuleInstance[],
   setModuleInstances: (moduleInstances: ModuleInstance[]) => void,
-  selectedYear: number | null,
   searchResults: Module[],
-  selectedModuleType: string | null,
+  setSearchResults: (searchResults: Module[]) => void,
+  programmeState: Programme[],
+  setProgrammeState: (programmeState: Programme[]) => void,
 ) {
-  if (!result.destination) return;
+  const { destination, source, draggableId } = result;
 
-  const { source, destination } = result;
+  if (!destination) return;
 
-  const newProgrammes = Array.from(programmes);
-  const newModuleInstances = Array.from(moduleInstances);
-
-  if (source.droppableId === destination.droppableId) {
-    const programme = newProgrammes.find((p) => p.id === source.droppableId);
-    if (programme) {
-      const newModuleInstanceIds = Array.from(programme.moduleInstanceIds);
-      const [draggedModuleInstanceId] = newModuleInstanceIds.splice(
-        source.index,
-        1,
-      );
-      newModuleInstanceIds.splice(
-        destination.index,
-        0,
-        draggedModuleInstanceId,
-      );
-      programme.moduleInstanceIds = newModuleInstanceIds;
-    }
-  } else {
-    const sourceProgramme = newProgrammes.find(
-      (p) => p.id === source.droppableId,
-    );
-    const destinationProgramme = newProgrammes.find(
-      (p) => p.id === destination.droppableId,
-    );
-    if (sourceProgramme && destinationProgramme) {
-      const [draggedModuleInstanceId] =
-        sourceProgramme.moduleInstanceIds.splice(source.index, 1);
-      destinationProgramme.moduleInstanceIds.splice(
-        destination.index,
-        0,
-        draggedModuleInstanceId,
-      );
-      const draggedModuleInstance = newModuleInstances.find(
-        (instance) => instance.id === draggedModuleInstanceId,
-      );
-      if (draggedModuleInstance) {
-        draggedModuleInstance.programmeId = destinationProgramme.id;
-      }
-    }
+  if (
+    destination.droppableId === source.droppableId &&
+    destination.index === source.index
+  ) {
+    return;
   }
 
-  const filteredModuleInstances = newModuleInstances.filter((instance) => {
-    const module = searchResults.find((m) => m.id === instance.moduleId);
-    return (
-      module &&
-      (!selectedYear || module.year === selectedYear) &&
-      (!selectedModuleType || module.type === selectedModuleType)
-    );
-  });
+  const newModuleInstances = [...moduleInstances];
+  const draggedModuleIndex = newModuleInstances.findIndex(
+    (mi) => mi.uniqueId === draggableId,
+  );
 
-  setProgrammes(newProgrammes);
-  setModuleInstances(filteredModuleInstances);
+  if (draggedModuleIndex === -1) return;
+
+  const draggedModule = newModuleInstances[draggedModuleIndex];
+
+  newModuleInstances.splice(draggedModuleIndex, 1);
+
+  if (destination.droppableId === source.droppableId) {
+    newModuleInstances.splice(destination.index, 0, draggedModule);
+  } else {
+    const destinationProgrammeModules = newModuleInstances.filter(
+      (mi) => mi.programmeId === destination.droppableId,
+    );
+    const destinationIndex = destination.index;
+
+    newModuleInstances.splice(
+      newModuleInstances.indexOf(destinationProgrammeModules[destinationIndex]),
+      0,
+      {
+        ...draggedModule,
+        programmeId: destination.droppableId,
+      },
+    );
+  }
+
+  setModuleInstances(newModuleInstances);
+
+  // Update the moduleIds in the Programme state
+  const updatedProgrammeState = programmeState.map((programme) => ({
+    ...programme,
+    moduleIds: newModuleInstances
+      .filter((mi) => mi.programmeId === programme.id)
+      .map((mi) => mi.module.id),
+  }));
+
+  setProgrammeState(updatedProgrammeState);
+
+  setSearchResults(
+    searchResults.map((module) => {
+      const foundInstance = newModuleInstances.find(
+        (mi) => mi.module.id === module.id,
+      );
+      return foundInstance ? foundInstance.module : module;
+    }),
+  );
 }
 
-export const saveAllProgrammes = (programmeState: Programme[]) => {
-  // Perform save logic for all programmes
-  console.log('Saved all programmes:', programmeState);
-};
-
-export const handleSaveAllProgrammes = (
-  programmeState: Programme[],
+export const handleSaveAllProgrammes = async (
   event: React.MouseEvent<HTMLButtonElement>,
+  programmes: Programme[],
 ) => {
-  event.preventDefault(); // Prevent default button behavior
-  saveAllProgrammes(programmeState);
+  event.preventDefault();
+
+  try {
+    await Promise.all(
+      programmes.map(async (programme) => {
+        try {
+          await updateModuleIdsForAllProgrammes(
+            programme.id,
+            programme.moduleIds,
+          );
+        } catch (error) {
+          console.error(
+            `Error updating module IDs for programme ${programme.id}:`,
+            error,
+          );
+          throw error;
+        }
+      }),
+    );
+
+    try {
+      await updateProgrammeArrayInModules();
+    } catch (error) {
+      console.error('Error updating programme array in modules:', error);
+      throw error;
+    }
+
+    toast.success('All programmes saved successfully');
+  } catch (error) {
+    console.error('Error updating module IDs for programmes:', error);
+    toast.error('Error saving programmes. Please try again');
+  }
 };
 
 export const handleFilterChange = (
@@ -101,18 +133,34 @@ export const handleSearchChange = (
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>,
   onSearch: (results: Module[]) => void,
   modules: Module[],
+  selectedYear: number | null,
+  selectedModuleType: string | null,
 ) => {
   const query = event.target.value;
   setSearchQuery(query);
 
   // Filter modules based on the search query
-  const filteredModules = modules.filter((module) => {
+  let filteredModules = modules.filter((module) => {
     const lowercaseQuery = query.toLowerCase();
     return (
       module.id.toLowerCase().includes(lowercaseQuery) ||
       module.name.toLowerCase().includes(lowercaseQuery)
     );
   });
+
+  // Apply year filter if a specific year is selected
+  if (selectedYear) {
+    filteredModules = filteredModules.filter(
+      (module) => module.year === selectedYear,
+    );
+  }
+
+  // Apply module type filter if a specific type is selected
+  if (selectedModuleType) {
+    filteredModules = filteredModules.filter(
+      (module) => module.type === selectedModuleType,
+    );
+  }
 
   onSearch(filteredModules);
 };
@@ -131,28 +179,15 @@ export const handleSearch = (
   setSearchResults(results);
 };
 
-export const getModuleInstanceById = (
-  moduleInstanceId: string,
-  moduleInstanceState: ModuleInstance[],
-) => {
-  return moduleInstanceState.find(
-    (instance) => instance.id === moduleInstanceId,
-  );
-};
-
 export const useModuleActions = (
-  searchResults: Module[],
-  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+  moduleInstances: ModuleInstance[],
+  setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>,
   programmeState: Programme[],
   setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>,
-  moduleInstanceState: ModuleInstance[],
-  setModuleInstanceState: React.Dispatch<
-    React.SetStateAction<ModuleInstance[]>
-  >,
 ) => {
   const handleEditModule = useCallback(
     (
-      module: Module,
+      moduleInstance: ModuleInstance,
       setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
       setSelectedModule: React.Dispatch<
         React.SetStateAction<Module | undefined>
@@ -160,7 +195,7 @@ export const useModuleActions = (
       setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
     ) => {
       openEditModuleModal(
-        module,
+        moduleInstance.module,
         setModalMode,
         setSelectedModule,
         setIsModuleModalOpen,
@@ -170,53 +205,50 @@ export const useModuleActions = (
   );
 
   const handleRemoveModule = useCallback(
-    (moduleId: string, programmeId: string) => {
-      const module = searchResults.find((m) => m.id === moduleId);
-      if (module) {
+    async (moduleId: string, programmeId: string) => {
+      const moduleInstanceToRemove = moduleInstances.find(
+        (mi) => mi.module.id === moduleId && mi.programmeId === programmeId,
+      );
+
+      if (moduleInstanceToRemove) {
         const confirmRemove = window.confirm(
-          `Are you sure you want to remove the module "${module.name}" from the programme?`,
+          `Are you sure you want to remove the module "${moduleInstanceToRemove.module.name}" from the programme?`,
         );
+
         if (confirmRemove) {
-          // Remove the module instance from the specific programme
-          setProgrammeState(
-            programmeState.map((programme) =>
-              programme.id === programmeId
-                ? {
-                    ...programme,
-                    moduleInstanceIds: programme.moduleInstanceIds.filter(
-                      (id) =>
-                        getModuleInstanceById(id, moduleInstanceState)
-                          ?.moduleId !== moduleId,
-                    ),
-                  }
-                : programme,
-            ),
-          );
+          try {
+            // Remove the module from the specific programme using the API request
+            const updatedProgramme = await removeModuleFromProgramme(
+              programmeId,
+              moduleId,
+            );
 
-          // Remove the module instance associated with the module and programme
-          setModuleInstanceState(
-            moduleInstanceState.filter(
-              (instance) =>
-                !(
-                  instance.moduleId === moduleId &&
-                  instance.programmeId === programmeId
-                ),
-            ),
-          );
+            // Update the programmeState with the updated programme
+            setProgrammeState(
+              programmeState.map((programme) =>
+                programme.id === programmeId ? updatedProgramme : programme,
+              ),
+            );
 
-          toast.success(
-            `Module "${module.name}" has been removed from the programme.`,
-          );
+            // Remove the ModuleInstance object from the moduleInstances array
+            const updatedModuleInstances = moduleInstances.filter(
+              (mi) => mi !== moduleInstanceToRemove,
+            );
+            setModuleInstances(updatedModuleInstances);
+
+            toast.success(
+              `Module "${moduleInstanceToRemove.module.name}" has been removed from the programme.`,
+            );
+          } catch (error) {
+            console.error('Error removing module from programme:', error);
+            toast.error(
+              'An error occurred while removing the module from the programme.',
+            );
+          }
         }
       }
     },
-    [
-      searchResults,
-      programmeState,
-      setProgrammeState,
-      moduleInstanceState,
-      setModuleInstanceState,
-    ],
+    [moduleInstances, programmeState, setProgrammeState, setModuleInstances],
   );
 
   return {
@@ -273,20 +305,70 @@ export const handleModuleSubmit = (
   closeModuleModal();
 };
 
-export const handleAddModule = (
+export const handleAddModule = async (
   module: Module,
   searchResults: Module[],
   setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
 ) => {
-  // Add the new module to the searchResults array
-  setSearchResults([...searchResults, module]);
+  try {
+    // Create a new module using the API
+    const newModule = await createModule(module);
+
+    // Add the new module to the searchResults array
+    setSearchResults([...searchResults, newModule]);
+  } catch (error) {
+    console.error('Error adding module:', error);
+  }
 };
 
-export const handleUpdateModule = (
+export const handleUpdateModule = async (
   module: Module,
   searchResults: Module[],
   setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
 ) => {
-  // Update the existing module in the searchResults array
-  setSearchResults(searchResults.map((m) => (m.id === module.id ? module : m)));
+  try {
+    // Update the existing module using the API
+    const updatedModule = await updateModuleById(module.id, module);
+
+    // Update the existing module in the searchResults array
+    setSearchResults(
+      searchResults.map((m) => (m.id === updatedModule.id ? updatedModule : m)),
+    );
+  } catch (error) {
+    console.error('Error updating module:', error);
+  }
+};
+
+export const fetchData = async (
+  setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>,
+  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+  setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>,
+) => {
+  try {
+    const programmes = await getAllProgrammes();
+    const modules = await getAllModules();
+
+    setProgrammeState(programmes);
+    setSearchResults(modules);
+
+    // Initialize moduleInstances with uniqueId
+    const moduleInstancesData: ModuleInstance[] = programmes
+      .flatMap((programme) =>
+        programme.moduleIds.map((moduleId) => {
+          const foundModule = modules.find((m) => m.id === moduleId);
+          return foundModule
+            ? {
+                module: foundModule,
+                programmeId: programme.id,
+                uniqueId: `${moduleId}-${programme.id}`, // Generate uniqueId here
+              }
+            : null;
+        }),
+      )
+      .filter((mi): mi is ModuleInstance => mi !== null);
+
+    setModuleInstances(moduleInstancesData);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 };

@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { ApiError, ApiErrorResponse } from './types';
 
 const createHttpClient = (): AxiosInstance => {
-  const baseURL = process.env.REACT_APP_API_BASE_URL;
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const httpClient = axios.create({
     baseURL,

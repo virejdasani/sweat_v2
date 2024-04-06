@@ -81,14 +81,47 @@ export const deleteProgrammeById = async (
     throw error;
   }
 };
-
 export const updateModuleIdsForAllProgrammes = async (
+  programmeId: string,
   moduleIds: string[],
 ): Promise<void> => {
   try {
-    await httpClient.put('/programmes/update-module-ids', { moduleIds });
+    await httpClient.put(`/programmes/${programmeId}/update-module-ids`, {
+      moduleIds,
+    });
   } catch (error) {
-    console.error('Error updating module IDs for programmes:', error);
+    console.error(
+      `Error updating module IDs for programme ${programmeId}:`,
+      error,
+    );
+    throw error;
+  }
+};
+
+export const removeModuleFromProgramme = async (
+  programmeId: string,
+  moduleId: string,
+): Promise<Programme> => {
+  try {
+    const response: AxiosResponse<Programme> = await httpClient.put(
+      `/programmes/${programmeId}/remove-module`,
+      { moduleId },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error removing module from programme with ID ${programmeId}:`,
+      error,
+    );
+    throw error;
+  }
+};
+
+export const updateProgrammeArrayInModules = async (): Promise<void> => {
+  try {
+    await httpClient.put('/modules/update-programme-array');
+  } catch (error) {
+    console.error('Error updating programme array in modules:', error);
     throw error;
   }
 };

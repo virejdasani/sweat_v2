@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Accordion,
   AccordionSummary,
@@ -13,14 +13,28 @@ import {
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteModal from './DeleteModal';
 import './ModuleCard.css';
+import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
 
 const ModuleCard: React.FC<ModuleCardProps> = ({
   module,
   programmeId,
+  moduleInstances,
+  setModuleInstances,
+  programmeState,
+  setProgrammeState,
   onEdit,
-  onRemove,
 }) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { handleRemoveFromProgramme, handleRemoveFromDatabase } =
+    useModuleActions(
+      moduleInstances,
+      setModuleInstances,
+      programmeState,
+      setProgrammeState,
+    );
+
   return (
     <Accordion className="module-card">
       <AccordionSummary
@@ -42,7 +56,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
           <IconButton
             onClick={(event) => {
               event.stopPropagation();
-              onRemove(module.id, programmeId);
+              setIsDeleteModalOpen(true);
             }}
           >
             <DeleteIcon />
@@ -52,6 +66,15 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
       <AccordionDetails>
         <Typography variant="body2">Credits: {module.credits}</Typography>
       </AccordionDetails>
+
+      <DeleteModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onRemoveFromProgramme={() =>
+          handleRemoveFromProgramme(module.id, programmeId)
+        }
+        onRemoveFromDatabase={() => handleRemoveFromDatabase(module.id)}
+      />
     </Accordion>
   );
 };
@@ -59,8 +82,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
 const ModuleList: React.FC<ModuleListProps> = ({
   modules,
   programmeId,
+  moduleInstances,
+  setModuleInstances,
+  programmeState,
+  setProgrammeState,
   onEdit,
-  onRemove,
 }) => {
   return (
     <div className="module-list">
@@ -69,8 +95,11 @@ const ModuleList: React.FC<ModuleListProps> = ({
           key={module.id}
           module={module}
           programmeId={programmeId}
+          moduleInstances={moduleInstances}
+          setModuleInstances={setModuleInstances}
+          programmeState={programmeState}
+          setProgrammeState={setProgrammeState}
           onEdit={onEdit}
-          onRemove={onRemove}
         />
       ))}
     </div>

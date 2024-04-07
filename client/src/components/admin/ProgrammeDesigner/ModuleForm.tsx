@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Module } from '../../../types/admin/ProgrammeDesigner';
+import { Module } from '../../../shared/types';
 import ModuleFormStep1, { FormModuleData } from './ModuleFormStep1';
 import ModuleFormStep2, { TeachingSchedule } from './ModuleFormStep2';
 import ModuleFormStep3, { Coursework } from './ModuleFormStep3';

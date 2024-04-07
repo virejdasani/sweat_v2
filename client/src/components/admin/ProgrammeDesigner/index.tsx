@@ -47,7 +47,7 @@ function ProgrammeDesigner() {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
   }, []);
 
-  const { handleEditModule, handleRemoveModule } = useModuleActions(
+  const { handleEditModule } = useModuleActions(
     moduleInstances,
     setModuleInstances,
     programmeState,
@@ -152,6 +152,10 @@ function ProgrammeDesigner() {
                               <ModuleList
                                 modules={[mi.module]}
                                 programmeId={programme.id}
+                                moduleInstances={moduleInstances}
+                                setModuleInstances={setModuleInstances}
+                                programmeState={programmeState}
+                                setProgrammeState={setProgrammeState}
                                 onEdit={() =>
                                   handleEditModule(
                                     mi,
@@ -159,9 +163,6 @@ function ProgrammeDesigner() {
                                     setSelectedModule,
                                     setIsModuleModalOpen,
                                   )
-                                }
-                                onRemove={() =>
-                                  handleRemoveModule(mi.module.id, programme.id)
                                 }
                               />
                             </div>

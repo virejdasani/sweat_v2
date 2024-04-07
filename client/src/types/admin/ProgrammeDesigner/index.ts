@@ -1,17 +1,23 @@
-import { Module } from '../../../shared/types';
+import { Module, Programme } from '../../../shared/types';
 
 export interface ModuleCardProps {
   module: Module;
   programmeId: string;
+  moduleInstances: ModuleInstance[];
+  setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>;
+  programmeState: Programme[];
+  setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>;
   onEdit: (module: Module) => void;
-  onRemove: (moduleId: string, programmeId: string) => void;
 }
 
 export interface ModuleListProps {
   modules: Module[];
   programmeId: string;
+  moduleInstances: ModuleInstance[];
+  setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>;
+  programmeState: Programme[];
+  setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>;
   onEdit: (module: Module) => void;
-  onRemove: (moduleId: string, programmeId: string) => void;
 }
 
 export interface ModuleInstance {
@@ -34,4 +40,11 @@ export interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSearch: (results: Module[]) => void;
+}
+
+export interface DeleteModalProps {
+  open: boolean;
+  onClose: () => void;
+  onRemoveFromProgramme: () => void;
+  onRemoveFromDatabase: () => void;
 }

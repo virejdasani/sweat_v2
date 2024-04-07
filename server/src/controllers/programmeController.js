@@ -115,20 +115,16 @@ exports.deleteProgrammeById = async (req, res) => {
 exports.removeModuleFromProgramme = async (req, res) => {
   try {
     const programmeId = req.params.id;
-    const { moduleInstanceId } = req.body;
+    const { moduleId } = req.body;
 
     // Find the programme by ID
     const programme = await Programme.findOne({ id: programmeId });
-
     if (!programme) {
       return res.status(404).json({ error: 'Programme not found' });
     }
 
-    // Find the index of the module instance in the programme's modules array
-    const moduleIndex = programme.moduleIds.findIndex(
-      (moduleId) => moduleId.toString() === moduleInstanceId,
-    );
-
+    // Find the index of the module in the programme's modules array
+    const moduleIndex = programme.moduleIds.indexOf(moduleId);
     if (moduleIndex === -1) {
       return res
         .status(404)

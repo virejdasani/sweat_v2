@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {
   createModule,
+  deleteModuleById,
   removeModuleFromProgramme,
   updateModuleById,
   updateModuleIdsForAllProgrammes,
@@ -204,56 +205,67 @@ export const useModuleActions = (
     [],
   );
 
-  const handleRemoveModule = useCallback(
+  const handleRemoveFromProgramme = useCallback(
     async (moduleId: string, programmeId: string) => {
-      const moduleInstanceToRemove = moduleInstances.find(
-        (mi) => mi.module.id === moduleId && mi.programmeId === programmeId,
-      );
-
-      if (moduleInstanceToRemove) {
-        const confirmRemove = window.confirm(
-          `Are you sure you want to remove the module "${moduleInstanceToRemove.module.name}" from the programme?`,
+      try {
+        // Remove the module from the specific programme using the API request
+        const updatedProgramme = await removeModuleFromProgramme(
+          programmeId,
+          moduleId,
         );
 
-        if (confirmRemove) {
-          try {
-            // Remove the module from the specific programme using the API request
-            const updatedProgramme = await removeModuleFromProgramme(
-              programmeId,
-              moduleId,
-            );
+        // Update the programmeState with the updated programme
+        setProgrammeState(
+          programmeState.map((programme) =>
+            programme.id === programmeId ? updatedProgramme : programme,
+          ),
+        );
 
-            // Update the programmeState with the updated programme
-            setProgrammeState(
-              programmeState.map((programme) =>
-                programme.id === programmeId ? updatedProgramme : programme,
-              ),
-            );
+        // Remove the ModuleInstance object from the moduleInstances array
+        const updatedModuleInstances = moduleInstances.filter(
+          (mi) =>
+            !(mi.module.id === moduleId && mi.programmeId === programmeId),
+        );
+        setModuleInstances(updatedModuleInstances);
 
-            // Remove the ModuleInstance object from the moduleInstances array
-            const updatedModuleInstances = moduleInstances.filter(
-              (mi) => mi !== moduleInstanceToRemove,
-            );
-            setModuleInstances(updatedModuleInstances);
-
-            toast.success(
-              `Module "${moduleInstanceToRemove.module.name}" has been removed from the programme.`,
-            );
-          } catch (error) {
-            console.error('Error removing module from programme:', error);
-            toast.error(
-              'An error occurred while removing the module from the programme.',
-            );
-          }
-        }
+        toast.success(`Module has been removed from the programme.`);
+      } catch (error) {
+        console.error('Error removing module from programme:', error);
+        toast.error(
+          'An error occurred while removing the module from the programme.',
+        );
       }
     },
     [moduleInstances, programmeState, setProgrammeState, setModuleInstances],
   );
 
+  const handleRemoveFromDatabase = useCallback(
+    async (moduleId: string) => {
+      try {
+        // Delete the module from the database using the API request
+        await deleteModuleById(moduleId);
+
+        // Remove the ModuleInstance objects with the deleted module from the moduleInstances array
+        const updatedModuleInstances = moduleInstances.filter(
+          (mi) => mi.module.id !== moduleId,
+        );
+        setModuleInstances(updatedModuleInstances);
+
+        toast.success(`Module has been deleted from the database.`);
+      } catch (error) {
+        console.error('Error deleting module from database:', error);
+        toast.error(
+          'An error occurred while deleting the module from the database.',
+        );
+      }
+    },
+    [moduleInstances, setModuleInstances],
+  );
+
   return {
     handleEditModule,
-    handleRemoveModule,
+    handleRemoveFromProgramme,
+    handleRemoveFromDatabase,
   };
 };
 

@@ -12,15 +12,7 @@ import {
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-export interface Coursework {
-  cwTitle: string;
-  weight: string | number;
-  type: 'assignment' | 'class test' | 'lab report' | 'presentation' | 'other';
-  deadlineWeek: string | number;
-  releasedWeekEarlier: string | number;
-  [key: string]: string | number;
-}
+import { Coursework } from '../../../shared/types';
 
 interface ModuleFormStep3Props {
   courseworks: Coursework[];

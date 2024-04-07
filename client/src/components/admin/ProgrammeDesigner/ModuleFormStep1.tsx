@@ -10,20 +10,10 @@ import {
   OutlinedInput,
   SelectChangeEvent,
 } from '@mui/material';
-
-export interface FormModuleData {
-  moduleCode: string;
-  moduleTitle: string;
-  moduleCredit: number;
-  timetabledHours: number;
-  studyYear: number;
-  programme: string[];
-  semester: string;
-  type: 'core' | 'optional';
-}
+import { Module } from '../../../shared/types';
 
 interface ModuleFormStep1Props {
-  moduleData: FormModuleData;
+  moduleData: Partial<Module>;
   handleChange: (
     event:
       | SelectChangeEvent<string | number | string[]>
@@ -36,7 +26,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
   handleChange,
 }) => {
   const programmes = ['CSEE', 'AVS', 'MCR', 'EEE'];
-  const semesters = ['First', 'Second', 'Whole Session'];
+  const semesters = ['first', 'second', 'whole session'];
 
   return (
     <div>
@@ -44,7 +34,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
       <TextField
         label="Module Code"
         name="moduleCode"
-        value={moduleData.moduleCode}
+        value={moduleData.id}
         onChange={handleChange}
         margin="normal"
         fullWidth
@@ -52,7 +42,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
       <TextField
         label="Module Title"
         name="moduleTitle"
-        value={moduleData.moduleTitle}
+        value={moduleData.name}
         onChange={handleChange}
         margin="normal"
         fullWidth
@@ -62,12 +52,12 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         <Select
           labelId="module-credit-label"
           name="moduleCredit"
-          value={moduleData.moduleCredit}
+          value={moduleData.credits}
           onChange={(event) => handleChange(event)}
         >
           <MenuItem value={7.5}>7.5</MenuItem>
           <MenuItem value={15}>15</MenuItem>
-          <MenuItem value={15}>30</MenuItem>
+          <MenuItem value={30}>30</MenuItem>
         </Select>
       </FormControl>
       <TextField
@@ -84,7 +74,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         <Select
           labelId="study-year-label"
           name="studyYear"
-          value={moduleData.studyYear}
+          value={moduleData.year}
           onChange={(event) => handleChange(event)}
         >
           <MenuItem value={1}>1</MenuItem>
@@ -99,14 +89,16 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
           labelId="programme-label"
           name="programme"
           multiple
-          value={moduleData.programme}
+          value={moduleData.programme || []}
           onChange={(event: SelectChangeEvent<string[]>) => handleChange(event)}
           input={<OutlinedInput label="Programme" />}
           renderValue={(selected) => selected.join(', ')}
         >
           {programmes.map((programme) => (
             <MenuItem key={programme} value={programme}>
-              <Checkbox checked={moduleData.programme.includes(programme)} />
+              <Checkbox
+                checked={(moduleData.programme || []).includes(programme)}
+              />
               <ListItemText primary={programme} />
             </MenuItem>
           ))}
@@ -122,7 +114,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         >
           {semesters.map((semester) => (
             <MenuItem key={semester} value={semester}>
-              {semester}
+              {semester.charAt(0).toUpperCase() + semester.slice(1)}
             </MenuItem>
           ))}
         </Select>

@@ -5,20 +5,15 @@ const distributionSchema = new mongoose.Schema({
   hours: Number,
 });
 
-const courseworkPrepSchema = new mongoose.Schema({
-  deadline: Number,
-  weightage: Number,
-  studyHours: Number,
-  distribution: {
-    earlybird: [distributionSchema],
-    moderate: [distributionSchema],
-    procrastinator: [distributionSchema],
+const courseworkSchema = new mongoose.Schema({
+  cwTitle: String,
+  weight: Number,
+  type: {
+    type: String,
+    enum: ['assignment', 'class test', 'lab report', 'presentation', 'other'],
   },
-});
-
-const classtestPrepSchema = new mongoose.Schema({
-  deadline: Number,
-  weightage: Number,
+  deadlineWeek: Number,
+  releasedWeekEarlier: Number,
   studyHours: Number,
   distribution: {
     earlybird: [distributionSchema],
@@ -42,18 +37,12 @@ const moduleSchema = new mongoose.Schema({
     type: String,
     enum: ['core', 'optional'],
   },
-  programme: {
-    type: [String],
-    default: [],
-  },
+  programme: [String],
   semester: {
     type: String,
     enum: ['first', 'second', 'whole session'],
   },
-  credits: {
-    type: Number,
-    enum: [7.5, 15, 30],
-  },
+  credits: Number,
   totalStudyHours: Number,
   timetabledHours: Number,
   privateStudyHours: Number,
@@ -87,11 +76,10 @@ const moduleSchema = new mongoose.Schema({
     studyHours: Number,
     distribution: [distributionSchema],
   },
-  courseworkPrep: [courseworkPrepSchema],
-  classtestPrep: [classtestPrepSchema],
+  courseworks: [courseworkSchema], // Updated to match new structure
   totalHours: [distributionSchema],
 });
 
-const Module = mongoose.model('modules', moduleSchema);
+const Module = mongoose.model('Module', moduleSchema);
 
 module.exports = Module;

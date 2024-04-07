@@ -4,27 +4,19 @@ export interface Programme {
   moduleIds: string[];
 }
 
-interface Distribution {
+export interface Distribution {
   week: number;
   hours: number;
 }
 
-interface CourseworkPrep {
-  deadline: number;
-  weightage: number;
-  studyHours: number;
-  distribution: {
-    earlybird: Distribution[];
-    moderate: Distribution[];
-    procrastinator: Distribution[];
-  };
-}
-
-interface ClasstestPrep {
-  deadline: number;
-  weightage: number;
-  studyHours: number;
-  distribution: {
+export interface Coursework {
+  cwTitle: string;
+  weight: string;
+  type: 'assignment' | 'class test' | 'lab report' | 'presentation' | 'other';
+  deadlineWeek: string;
+  releasedWeekEarlier: string;
+  studyHours?: number;
+  distribution?: {
     earlybird: Distribution[];
     moderate: Distribution[];
     procrastinator: Distribution[];
@@ -39,40 +31,39 @@ export interface Module {
   programme: string[];
   semester: 'first' | 'second' | 'whole session';
   credits: 7.5 | 15 | 30;
-  totalStudyHours: number;
+  totalStudyHours?: number;
   timetabledHours: number;
-  privateStudyHours: number;
+  privateStudyHours?: number;
   lectures: {
     hours: number;
-    distribution: Distribution[];
+    distribution?: Distribution[];
   };
   seminars: {
     hours: number;
-    distribution: Distribution[];
+    distribution?: Distribution[];
   };
   tutorials: {
     hours: number;
-    distribution: Distribution[];
+    distribution?: Distribution[];
   };
   labs: {
     hours: number;
-    distribution: Distribution[];
+    distribution?: Distribution[];
   };
   fieldworkPlacement: {
     hours: number;
-    distribution: Distribution[];
+    distribution?: Distribution[];
   };
   other: {
     hours: number;
-    distribution: Distribution[];
+    distribution?: Distribution[];
   };
-  examPrep: {
+  examPrep?: {
     deadline: number;
     weightage: number;
     studyHours: number;
     distribution: Distribution[];
   };
-  courseworkPrep: CourseworkPrep[];
-  classtestPrep: ClasstestPrep[];
-  totalHours: Distribution[];
+  courseworks: Coursework[];
+  totalHours?: Distribution[];
 }

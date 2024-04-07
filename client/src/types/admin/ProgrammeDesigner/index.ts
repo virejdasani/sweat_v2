@@ -48,3 +48,10 @@ export interface DeleteModalProps {
   onRemoveFromProgramme: () => void;
   onRemoveFromDatabase: () => void;
 }
+
+export interface ModuleModalProps {
+  mode: 'add' | 'edit';
+  module?: Module;
+  onClose: () => void;
+  onSubmit: (module: Module) => void;
+}

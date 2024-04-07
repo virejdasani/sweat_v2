@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -6,23 +6,26 @@ import {
   DialogActions,
   Button as MuiButton,
   IconButton,
-  SelectChangeEvent,
   styled,
   Box,
+  SelectChangeEvent,
 } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Module } from '../../../shared/types';
-import ModuleFormStep1, { FormModuleData } from './ModuleFormStep1';
-import ModuleFormStep2, { TeachingSchedule } from './ModuleFormStep2';
-import ModuleFormStep3, { Coursework } from './ModuleFormStep3';
-
-interface ModuleModalProps {
-  mode: 'add' | 'edit';
-  module?: Module;
-  onClose: () => void;
-  onSubmit: (module: Module) => void;
-}
+import ModuleFormStep1 from './ModuleFormStep1';
+import ModuleFormStep2 from './ModuleFormStep2';
+import ModuleFormStep3 from './ModuleFormStep3';
+import { ModuleModalProps } from '../../../types/admin/ProgrammeDesigner';
+import {
+  handleChangeStep1,
+  handleChangeStep2,
+  handleChangeStep3,
+  handleNext,
+  handleBack,
+  addCoursework,
+  removeCoursework,
+} from '../../../utils/admin/ProgrammeDesigner';
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-container': {
@@ -46,57 +49,25 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
   onSubmit,
 }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [moduleData, setModuleData] = useState<
-    FormModuleData & {
-      teachingSchedule: TeachingSchedule;
-      courseworks: Coursework[];
-    }
-  >({
-    moduleCode: module?.id || '',
-    moduleTitle: module?.name || '',
-    moduleCredit: module?.credits || 0,
-    timetabledHours: 0,
-    studyYear: module?.year || 1,
-    programme: [],
-    semester: '',
-    type: module?.type || 'core',
-    teachingSchedule: {
-      lectures: 0,
-      seminars: 0,
-      tutorials: 0,
-      labs: 0,
-      fieldworkPlacement: 0,
-      other: 0,
+  const [moduleData, setModuleData] = useState<Partial<Module>>({
+    id: module?.id || '',
+    name: module?.name || '',
+    year: module?.year || undefined,
+    type: module?.type || undefined,
+    programme: module?.programme || [],
+    semester: module?.semester || undefined,
+    credits: module?.credits || undefined,
+    timetabledHours: module?.timetabledHours || 0,
+    lectures: { hours: module?.lectures?.hours || 0 },
+    seminars: { hours: module?.seminars?.hours || 0 },
+    tutorials: { hours: module?.tutorials?.hours || 0 },
+    labs: { hours: module?.labs?.hours || 0 },
+    fieldworkPlacement: {
+      hours: module?.fieldworkPlacement?.hours || 0,
     },
-    courseworks: [],
+    other: { hours: module?.other?.hours || 0 },
+    courseworks: module?.courseworks || [],
   });
-
-  const handleChange = (
-    event:
-      | SelectChangeEvent<string | number | string[]>
-      | React.ChangeEvent<{ value: unknown; name?: string }>,
-  ) => {
-    const { name, value } = event.target;
-
-    if (typeof name === 'string') {
-      setModuleData((prevData) => ({
-        ...prevData,
-        [name]: value,
-        teachingSchedule: {
-          ...prevData.teachingSchedule,
-          [name]: value,
-        },
-      }));
-    }
-  };
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
 
   const handleSubmit = () => {
     const mappedYear = [1, 2, 3, 4].includes(moduleData.studyYear)
@@ -104,9 +75,9 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
       : 1;
 
     const mappedModule: Module = {
-      id: moduleData.moduleCode,
-      name: moduleData.moduleTitle,
-      credits: moduleData.moduleCredit,
+      id: moduleData.id,
+      name: moduleData.name,
+      credits: moduleData.credits,
       year: mappedYear as 1 | 2 | 3 | 4,
       type: moduleData.type,
     };
@@ -115,27 +86,12 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
     onClose();
   };
 
-  const addCoursework = () => {
-    setModuleData((prevData) => ({
-      ...prevData,
-      courseworks: [
-        ...prevData.courseworks,
-        {
-          cwTitle: '',
-          weight: '',
-          type: 'assignment',
-          deadlineWeek: '',
-          releasedWeekEarlier: '',
-        },
-      ],
-    }));
-  };
-
-  const removeCoursework = (index: number) => {
-    setModuleData((prevData) => ({
-      ...prevData,
-      courseworks: prevData.courseworks.filter((_, i) => i !== index),
-    }));
+  const handleChangeStep1Wrapper = (
+    event:
+      | SelectChangeEvent<string | number | string[]>
+      | ChangeEvent<{ value: unknown; name?: string | undefined }>,
+  ) => {
+    handleChangeStep1(event, setModuleData);
   };
 
   const getStepContent = (step: number) => {
@@ -144,30 +100,32 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
         return (
           <ModuleFormStep1
             moduleData={moduleData}
-            handleChange={handleChange}
+            handleChange={handleChangeStep1Wrapper}
           />
         );
       case 1:
         return (
           <ModuleFormStep2
-            teachingSchedule={moduleData.teachingSchedule}
-            handleChange={handleChange}
+            teachingSchedule={{
+              lectures: moduleData.lectures?.hours || 0,
+              seminars: moduleData.seminars?.hours || 0,
+              tutorials: moduleData.tutorials?.hours || 0,
+              labs: moduleData.labs?.hours || 0,
+              fieldworkPlacement: moduleData.fieldworkPlacement?.hours || 0,
+              other: moduleData.other?.hours || 0,
+            }}
+            handleChange={(event) => handleChangeStep2(event, setModuleData)}
           />
         );
       case 2:
         return (
           <ModuleFormStep3
-            courseworks={moduleData.courseworks}
-            handleChange={(index, field, value) => {
-              setModuleData((prevData) => ({
-                ...prevData,
-                courseworks: prevData.courseworks.map((coursework, i) =>
-                  i === index ? { ...coursework, [field]: value } : coursework,
-                ),
-              }));
-            }}
-            addCoursework={addCoursework}
-            removeCoursework={removeCoursework}
+            courseworks={moduleData.courseworks ?? []}
+            handleChange={(index, field, value) =>
+              handleChangeStep3(index, field, value, setModuleData)
+            }
+            addCoursework={() => addCoursework(setModuleData)}
+            removeCoursework={(index) => removeCoursework(index, setModuleData)}
           />
         );
       default:
@@ -186,11 +144,17 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
             marginBottom: '16px',
           }}
         >
-          <IconButton disabled={activeStep === 0} onClick={handleBack}>
+          <IconButton
+            disabled={activeStep === 0}
+            onClick={handleBack(setActiveStep)}
+          >
             <ArrowBackIosIcon />
           </IconButton>
           {getStepContent(activeStep)}
-          <IconButton disabled={activeStep === 2} onClick={handleNext}>
+          <IconButton
+            disabled={activeStep === 2}
+            onClick={handleNext(setActiveStep)}
+          >
             <ArrowForwardIosIcon />
           </IconButton>
         </Box>
@@ -198,7 +162,9 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
       <DialogActions>
         <MuiButton onClick={onClose}>Cancel</MuiButton>
         <MuiButton
-          onClick={activeStep === 2 ? handleSubmit : handleNext}
+          onClick={() =>
+            activeStep === 2 ? handleSubmit() : handleNext(setActiveStep)()
+          }
           color="primary"
         >
           {activeStep === 2 ? 'Submit' : 'Next'}

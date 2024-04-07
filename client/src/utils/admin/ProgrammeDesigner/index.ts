@@ -1,6 +1,6 @@
 import { DropResult } from 'react-beautiful-dnd';
-import { Module, Programme } from '../../../shared/types';
-import { useCallback } from 'react';
+import { Coursework, Module, Programme } from '../../../shared/types';
+import { ChangeEvent, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {
   createModule,
@@ -12,6 +12,7 @@ import {
 } from '../../../services/admin/ProgrammeDesigner';
 import { getAllProgrammes, getAllModules } from '../../../shared/api';
 import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
+import { SelectChangeEvent } from '@mui/material';
 
 export function handleOnDragEnd(
   result: DropResult,
@@ -383,4 +384,151 @@ export const fetchData = async (
   } catch (error) {
     console.error('Error fetching data:', error);
   }
+};
+
+export const isValidModuleKey = (key: string): key is keyof Module => {
+  const validKeys: Array<keyof Module> = [
+    'id',
+    'name',
+    'year',
+    'type',
+    'programme',
+    'semester',
+    'credits',
+    'totalStudyHours',
+    'timetabledHours',
+    'privateStudyHours',
+    'lectures',
+    'seminars',
+    'tutorials',
+    'labs',
+    'fieldworkPlacement',
+    'other',
+    'examPrep',
+    'courseworks',
+    'totalHours',
+  ];
+
+  return validKeys.includes(key as keyof Module);
+};
+export const updateTeachingScheduleProperty = (
+  prevData: Partial<Module>,
+  propertyName: keyof Module,
+  value: number,
+): Partial<Module> => {
+  if (
+    propertyName === 'lectures' ||
+    propertyName === 'seminars' ||
+    propertyName === 'tutorials' ||
+    propertyName === 'labs' ||
+    propertyName === 'fieldworkPlacement' ||
+    propertyName === 'other'
+  ) {
+    const updatedProperty = {
+      ...prevData[propertyName],
+      hours: value,
+    };
+
+    return {
+      ...prevData,
+      [propertyName]: updatedProperty,
+    };
+  }
+
+  return prevData;
+};
+
+export const handleChangeStep1 = (
+  event:
+    | SelectChangeEvent<string | number | string[]>
+    | React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
+  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
+) => {
+  const { name, value } = event.target;
+
+  if (
+    typeof name === 'string' &&
+    typeof value === 'number' &&
+    isValidModuleKey(name)
+  ) {
+    setModuleData((prevData: Partial<Module>) =>
+      updateTeachingScheduleProperty(prevData, name, value),
+    );
+  } else if (typeof name === 'string') {
+    setModuleData((prevData: Partial<Module>) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  }
+};
+
+export const handleChangeStep2 = (
+  event:
+    | SelectChangeEvent<string | number | string[]>
+    | ChangeEvent<{ value: unknown; name?: string | undefined }>,
+  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
+) => {
+  const { name, value } = event.target;
+
+  if (
+    typeof name === 'string' &&
+    typeof value === 'number' &&
+    isValidModuleKey(name)
+  ) {
+    setModuleData((prevData: Partial<Module>) =>
+      updateTeachingScheduleProperty(prevData, name, value),
+    );
+  }
+};
+
+export const handleChangeStep3 = (
+  index: number,
+  field: keyof Coursework,
+  value: string | number,
+  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
+) => {
+  setModuleData((prevData) => ({
+    ...prevData,
+    courseworks: prevData.courseworks?.map((coursework, i) =>
+      i === index ? { ...coursework, [field]: value } : coursework,
+    ),
+  }));
+};
+
+export const handleNext =
+  (setActiveStep: React.Dispatch<React.SetStateAction<number>>) => () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+export const handleBack =
+  (setActiveStep: React.Dispatch<React.SetStateAction<number>>) => () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+export const addCoursework = (
+  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
+) => {
+  setModuleData((prevData) => ({
+    ...prevData,
+    courseworks: [
+      ...(prevData.courseworks ?? []),
+      {
+        cwTitle: '',
+        weight: '',
+        type: 'assignment',
+        deadlineWeek: '',
+        releasedWeekEarlier: '',
+      },
+    ],
+  }));
+};
+
+export const removeCoursework = (
+  index: number,
+  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
+) => {
+  setModuleData((prevData) => ({
+    ...prevData,
+    courseworks: prevData.courseworks?.filter((_, i) => i !== index),
+  }));
 };

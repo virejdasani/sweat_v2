@@ -105,6 +105,7 @@ function DateSetter() {
     }
     // add new event to the calendar even if there is a clash
     setEvents([...events, event]);
+    console.log('Events: ', events);
   };
 
   // called when a user clicks on a calendar slot
@@ -145,10 +146,12 @@ function DateSetter() {
         event === selectEvent ? updatedEvent : event,
       );
       setEvents(newEvents);
+      console.log('Events: ', events);
     }
     // add the new event to the events array
     else {
       setEvents([...events, updatedEvent]);
+      console.log('Events: ', events);
     }
     // reset modal state
     setShowModal(false);
@@ -158,6 +161,7 @@ function DateSetter() {
     if (selectEvent) {
       const newEvents = events.filter((event) => event !== selectEvent);
       setEvents(newEvents);
+      console.log('Events: ', events);
       setShowModal(false);
     }
   }

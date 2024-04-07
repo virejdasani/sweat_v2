@@ -1,31 +1,6 @@
 const Calendar = require('../models/calendar');
 
-// Function to save events to MongoDB
-// async function saveEvents(events) {
-//   try {
-//     // Create a new calendar instance
-//     const newCalendar = new Calendar({ events });
-//     // Save the calendar to the database
-//     await newCalendar.save();
-//     console.log('Events saved successfully.');
-//   } catch (error) {
-//     console.error('Error saving events:', error);
-//   }
-// }
-
-// // Function to get events from MongoDB
-// async function getEvents() {
-//   try {
-//     // Find the calendar document in the database
-//     const calendar = await Calendar.findOne();
-//     // If calendar exists, return its events, otherwise return an empty array
-//     return calendar ? calendar.events : [];
-//   } catch (error) {
-//     console.error('Error getting events:', error);
-//     return [];
-//   }
-// }
-
+// save events to MongoDB
 const saveEvents = async (req, res) => {
   try {
     const eventsData = req.body;
@@ -36,6 +11,7 @@ const saveEvents = async (req, res) => {
   }
 };
 
+// get events from MongoDB
 const getEvents = async (req, res) => {
   try {
     const events = await Calendar.find();

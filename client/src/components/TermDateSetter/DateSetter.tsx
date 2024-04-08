@@ -76,21 +76,45 @@ function DateSetter() {
   });
 
   // state that will be used to render the calendar
-  const [events, setEvents] = useState(eventsOnCalendar);
+  const [events, setEvents] = useState<Event[]>(eventsOnCalendar);
 
+  const [fetchedItems, setFetchedItems] = useState<Event[]>([]);
   // fetch events from the server and set the events state
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch('http://localhost:8000/');
       const data = await res.json();
-      console.log(data);
-      data.forEach((event: Event) => {
-        console.log(event.title);
-      });
-      // setEvents(data);
+      setFetchedItems(data);
     };
     fetchData();
   }, []);
+
+  // This adds the fetched items to existing events
+  // // Update events state when fetchedItems change
+  // useEffect(() => {
+  //   const localNewEvents = fetchedItems.map((item: Event) => {
+  //     return {
+  //       title: item.title,
+  //       start: new Date(item.start),
+  //       end: new Date(item.end),
+  //       allDay: item.allDay,
+  //     };
+  //   });
+
+  //   setEvents((prevEvents) => [...prevEvents, ...localNewEvents]); // Update events here
+  // }, [fetchedItems]); // Add fetchedItems to dependency array
+
+  // This replaces the existing events with the fetched items so only events from the server are displayed
+  // Update events state with fetched items
+  useEffect(() => {
+    const localNewEvents = fetchedItems.map((item: Event) => ({
+      title: item.title,
+      start: new Date(item.start),
+      end: new Date(item.end),
+      allDay: item.allDay,
+    }));
+    setEvents(localNewEvents); // Update events directly with fetched items
+  }, [fetchedItems]);
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');

@@ -15,9 +15,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+const calendarModel = require('./src/models/calendar.js');
+
+app.get('/', async (req, res) => {
+  try {
+    const calendars = await calendarModel.find();
+    res.json(calendars);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(
+    'mongodb+srv://admin:1234@cluster0.b8ga8wv.mongodb.net/calendar?retryWrites=true&w=majority',
+  )
   .then(() => {
     console.log('MongoDB connected');
 

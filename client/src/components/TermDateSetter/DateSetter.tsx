@@ -78,6 +78,20 @@ function DateSetter() {
   // state that will be used to render the calendar
   const [events, setEvents] = useState(eventsOnCalendar);
 
+  // fetch events from the server and set the events state
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch('http://localhost:8000/');
+      const data = await res.json();
+      console.log(data);
+      data.forEach((event: Event) => {
+        console.log(event.title);
+      });
+      // setEvents(data);
+    };
+    fetchData();
+  }, []);
+
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [selectEvent, setSelectEvent] = useState<Event | null>(null);

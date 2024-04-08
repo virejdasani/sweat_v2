@@ -19,11 +19,17 @@ const calendarModel = require('./src/models/calendar.js');
 
 app.get('/', async (req, res) => {
   try {
-    const calendars = await calendarModel.find();
-    res.json(calendars);
+    const calendar = await calendarModel.find();
+    res.json(calendar);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+app.post('/add-event', async (req, res) => {
+  calendarModel.create(req.body).then((calendar) => {
+    res.json(calendar);
+  });
 });
 
 // MongoDB connection

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import format from 'date-fns/format';
 import getDay from 'date-fns/getDay';
 import parse from 'date-fns/parse';
@@ -129,6 +130,18 @@ function DateSetter() {
     new Date(),
   );
 
+  // Function to add event to MongoDB via API
+  const addEventToMongoDB = (event: Event) => {
+    axios
+      .post('http://localhost:8000/add-event', event)
+      .then((res) => {
+        console.log('Event added to MongoDB: ', res);
+      })
+      .catch((err) => {
+        console.error('Error adding event to MongoDB: ', err);
+      });
+  };
+
   const handleAddEvent = (event: Event) => {
     // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
     if (event.title === semester1Event.title) {
@@ -145,6 +158,9 @@ function DateSetter() {
     // add new event to the calendar even if there is a clash
     setEvents([...events, event]);
     console.log('Events: ', events);
+
+    // Add event to MongoDB
+    addEventToMongoDB(event);
   };
 
   // called when a user clicks on a calendar slot

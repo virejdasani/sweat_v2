@@ -34,12 +34,12 @@ const localizer = dateFnsLocalizer({
 const eventsOnCalendar: Event[] = [
   // note: months are 0 indexed, days are 1 indexed
   // note: end date is 11:59pm of the day before the end date
-  {
-    title: 'COMP222 Assignment 1',
-    allDay: true,
-    start: new Date(2024, 2, 6),
-    end: new Date(2024, 2, 10),
-  },
+  // {
+  //   title: 'COMP222 Assignment 1',
+  //   allDay: true,
+  //   start: new Date(2024, 2, 6),
+  //   end: new Date(2024, 2, 10),
+  // },
 ];
 
 // TODO: add data to centralised database
@@ -86,6 +86,7 @@ function DateSetter() {
       const res = await fetch('http://localhost:8000/');
       const data = await res.json();
       setFetchedItems(data);
+      console.log('Fetched items: ', data);
     };
     fetchData();
   }, []);
@@ -109,6 +110,7 @@ function DateSetter() {
   // Update events state with fetched items
   useEffect(() => {
     const localNewEvents = fetchedItems.map((item: Event) => ({
+      _id: item._id,
       title: item.title,
       start: new Date(item.start),
       end: new Date(item.end),
@@ -164,6 +166,28 @@ function DateSetter() {
     addEventToMongoDB(event);
   };
 
+  // deletes from mongodb and updates the events state locally
+  function deleteEvents() {
+    if (selectEvent) {
+      // Make DELETE request to backend API endpoint to delete the event from MongoDB
+      axios
+        .delete(`http://localhost:8000/delete-event/${selectEvent._id}`)
+        .then((res) => {
+          console.log('Event deleted from MongoDB: ', selectEvent);
+          console.log(res);
+        })
+        .catch((err) => {
+          console.error('Error deleting event from MongoDB: ', err);
+        });
+
+      // Update local state to reflect the event deletion
+      const newEvents = events.filter((event) => event !== selectEvent);
+      setEvents(newEvents);
+      console.log('Events: ', newEvents);
+      setShowModal(false);
+    }
+  }
+
   // called when a user clicks on a calendar slot
   function handleSelectSlot(slotInfo: { start: Date; end: Date }) {
     setNewEvent({
@@ -211,15 +235,6 @@ function DateSetter() {
     }
     // reset modal state
     setShowModal(false);
-  }
-
-  function deleteEvents() {
-    if (selectEvent) {
-      const newEvents = events.filter((event) => event !== selectEvent);
-      setEvents(newEvents);
-      console.log('Events: ', events);
-      setShowModal(false);
-    }
   }
 
   function checkClash(newEvent: Event, allEvents: Event[]): boolean {

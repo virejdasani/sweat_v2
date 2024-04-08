@@ -135,7 +135,8 @@ function DateSetter() {
     axios
       .post('http://localhost:8000/add-event', event)
       .then((res) => {
-        console.log('Event added to MongoDB: ', res);
+        console.log('Event added to MongoDB: ', event);
+        console.log(res);
       })
       .catch((err) => {
         console.error('Error adding event to MongoDB: ', err);

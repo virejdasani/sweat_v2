@@ -39,6 +39,15 @@ app.delete('/delete-event/:eventId', async (req, res) => {
   });
 });
 
+app.put('/update-event/:eventId', async (req, res) => {
+  const eventId = req.params.eventId;
+  calendarModel
+    .findByIdAndUpdate({ _id: eventId }, req.body)
+    .then((calendar) => {
+      res.json(calendar);
+    });
+});
+
 // MongoDB connection
 mongoose
   .connect(

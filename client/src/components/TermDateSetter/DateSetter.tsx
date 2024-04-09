@@ -222,22 +222,39 @@ function DateSetter() {
     // check if there is a clash only if saving a new event not editing an existing event
     if (!selectEvent && checkClash(updatedEvent, events)) {
       alert('Clash with another event');
+      return; // Exit early if there's a clash
     }
 
-    // update the events array with the new event
+    // If it's an existing event (selectEvent is defined), update the event
     if (selectEvent) {
-      const newEvents = events.map((event) =>
+      // Make PUT request to update the event in MongoDB
+      axios
+        .put(
+          `http://localhost:8000/update-event/${selectEvent._id}`,
+          updatedEvent,
+        )
+        .then((res: { data: Event }) => {
+          console.log('Event updated in MongoDB: ', updatedEvent);
+          console.log(res);
+        })
+        .catch((err: { data: Event }) => {
+          console.error('Error updating event in MongoDB: ', err);
+        });
+
+      // Update the event in the local state
+      const updatedEvents = events.map((event) =>
         event === selectEvent ? updatedEvent : event,
       );
-      setEvents(newEvents);
-      console.log('Events: ', events);
+      setEvents(updatedEvents);
+      console.log('Events: ', updatedEvents);
     }
-    // add the new event to the events array
+    // If it's a new event, add it to the events array
     else {
       setEvents([...events, updatedEvent]);
-      console.log('Events: ', events);
+      console.log('Events: ', [...events, updatedEvent]);
     }
-    // reset modal state
+
+    // Reset modal state
     setShowModal(false);
   }
 

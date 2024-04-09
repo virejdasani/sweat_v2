@@ -10,6 +10,8 @@ import Modal from './Modal'; // Import the Modal component
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
+import AWN from 'awesome-notifications';
+import 'awesome-notifications/dist/style.css';
 
 interface Event {
   _id?: string;
@@ -45,9 +47,8 @@ const eventsOnCalendar: Event[] = [
 // TODO: would it be better to have all bank holidays in mongodb and fetch them from there or fetch them from api and store them in the local state only:
 // if it's in mongodb, it can be edited/deleted by the admin, but if it's in the local state, it can't be edited/deleted, it will always be displayed.
 
-// TODO: move the bank holidays fetching func to a separate file
 // TODO: add notifs for when an event is added, edited, or deleted to show the user that the action was successful because right now it's not clear if anything even happened
-// TODO: make editing bank holidays impossible from UI else website posting to mongobd breaks
+// TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
 // TODO: (LOW PRIORITY) push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
@@ -145,18 +146,43 @@ function DateSetter() {
     new Date(),
   );
 
+  const globalOptions = {
+    position: 'top-right',
+    duration: 2000,
+    labels: {
+      success: 'Added',
+      info: 'Updated',
+      alert: 'Alert',
+      warning: 'Warning',
+    },
+    maxNotifications: 4,
+    durations: {
+      success: 2000,
+      info: 2000,
+      alert: 2000,
+      warning: 2000,
+    },
+  };
+
+  // Initialize instance of AWN
+  const notifier = new AWN(globalOptions); // TODO: fix this
+
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: Event) => {
     // check that event title is not empty (so bank holidays can't be added without a title)
     if (!event.title) {
-      alert('Please enter a title for the event');
+      notifier.alert('Please enter a title for the event');
       return;
     }
 
+    notifier.success(event.title);
+
+    // TODO: fix clash detection
     const clashDetected = checkClash(event, events);
+    console.log('CLAsh detected: ', clashDetected);
 
     if (clashDetected) {
-      // alert('Clash with another event detected');
+      notifier.warning('Clash with another event detected');
     }
 
     // Make POST request to add the event to MongoDB
@@ -234,6 +260,14 @@ function DateSetter() {
 
   // called when a user clicks save on the modal
   function saveEvent() {
+    // Check if the event title is empty
+    if (!eventTitle) {
+      alert('Please enter a title for the event');
+      return;
+    }
+
+    notifier.info(eventTitle);
+
     // Combine new event properties with its title
     const updatedEvent = { ...newEvent, title: eventTitle };
 

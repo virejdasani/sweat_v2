@@ -44,6 +44,7 @@ const eventsOnCalendar: Event[] = [
 
 // TODO: would it be better to have all bank holidays in mongodb and fetch them from there or fetch them from api and store them in the local state only:
 // if it's in mongodb, it can be edited/deleted by the admin, but if it's in the local state, it can't be edited/deleted, it will always be displayed.
+
 // TODO: (HIGH PRIORITY) fix sem 1 and sem 2 start date bug where it shows up as sem1 even when sem2 is added + sem 1 is added when bank holiday is blank and added
 // TODO: make editing bank holidays impossible from UI else website posting to mongobd breaks
 // TODO: move code to respective components
@@ -59,14 +60,14 @@ function DateSetter() {
   });
 
   const [semester1Event, setSemester1Event] = useState({
-    title: '',
+    title: 'Semester 1 Start Date', // hardcoded to prevent changing the title to anything else
     allDay: true,
     start: new Date(),
     end: new Date(),
   });
 
   const [semester2Event, setSemester2Event] = useState({
-    title: '',
+    title: 'Semester 2 Start Date', // hardcoded to prevent changing the title to anything else
     allDay: true,
     start: new Date(),
     end: new Date(),
@@ -145,13 +146,6 @@ function DateSetter() {
 
   // Function to add event to MongoDB via API
   const handleAddEvent = (event: Event) => {
-    // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
-    if (event.title === semester1Event.title) {
-      event.title = 'Semester 1 Start Date';
-    } else if (event.title === semester2Event.title) {
-      event.title = 'Semester 2 Start Date';
-    }
-
     const clashDetected = checkClash(event, events);
 
     if (clashDetected) {

@@ -10,7 +10,7 @@ import Modal from './Modal'; // Import the Modal component
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
-import AWN from 'awesome-notifications';
+import AWN, { AwnPosition, AwnOptions } from 'awesome-notifications';
 import 'awesome-notifications/dist/style.css';
 
 interface Event {
@@ -146,9 +146,8 @@ function DateSetter() {
     new Date(),
   );
 
-  const globalOptions = {
+  const globalOptions: AwnOptions<Error> = {
     position: 'top-right',
-    duration: 2000,
     labels: {
       success: 'Added',
       info: 'Updated',
@@ -167,7 +166,7 @@ function DateSetter() {
   };
 
   // Initialize instance of AWN
-  const notifier = new AWN(globalOptions); // TODO: fix this
+  const notifier = new AWN(globalOptions);
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: Event) => {

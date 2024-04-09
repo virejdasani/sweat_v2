@@ -43,6 +43,8 @@ const eventsOnCalendar: Event[] = [
 ];
 
 // TODO: (HIGH PRIORITY) fix sem 1 and sem 2 start date bug where it shows up as sem1 even when sem2 is added + sem 1 is added when bank holiday is blank and added
+// TODO: add bank holidays to the calendar
+// TODO: move code to respective components
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
 // TODO: (LOW PRIORITY) push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
 

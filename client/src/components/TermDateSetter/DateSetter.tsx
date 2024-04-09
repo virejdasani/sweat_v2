@@ -45,7 +45,7 @@ const eventsOnCalendar: Event[] = [
 // TODO: would it be better to have all bank holidays in mongodb and fetch them from there or fetch them from api and store them in the local state only:
 // if it's in mongodb, it can be edited/deleted by the admin, but if it's in the local state, it can't be edited/deleted, it will always be displayed.
 
-// TODO: (HIGH PRIORITY) fix sem 1 and sem 2 start date bug where it shows up as sem1 even when sem2 is added + sem 1 is added when bank holiday is blank and added
+// TODO: move the bank holidays fetching func to a separate file
 // TODO: add notifs for when an event is added, edited, or deleted to show the user that the action was successful because right now it's not clear if anything even happened
 // TODO: make editing bank holidays impossible from UI else website posting to mongobd breaks
 // TODO: move code to respective components
@@ -215,6 +215,14 @@ function DateSetter() {
 
   // called when a user clicks on an existing event
   function handleSelectedEvent(event: Event) {
+    // Prevent editing or deleting bank holidays
+    // Bank holidays have '(BH)' in their title
+    // an alternative way to check if it's a bank holiday is to check if the event has an _id because only mongodb events have an _id
+    if (event.title.includes('(BH)')) {
+      alert('Bank holidays cannot be edited or deleted');
+      return;
+    }
+
     setEventTitle(event.title);
     setNewEvent(event);
     setSelectEvent(event);

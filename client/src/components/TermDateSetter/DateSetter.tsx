@@ -42,8 +42,9 @@ const eventsOnCalendar: Event[] = [
   // },
 ];
 
+// TODO: would it be better to have all bank holidays in mongodb and fetch them from there or fetch them from api and store them in the local state only:
+// if it's in mongodb, it can be edited/deleted by the admin, but if it's in the local state, it can't be edited/deleted, it will always be displayed.
 // TODO: (HIGH PRIORITY) fix sem 1 and sem 2 start date bug where it shows up as sem1 even when sem2 is added + sem 1 is added when bank holiday is blank and added
-// TODO: add bank holidays to the calendar
 // TODO: move code to respective components
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
 // TODO: (LOW PRIORITY) push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
@@ -92,23 +93,9 @@ function DateSetter() {
     fetchData();
   }, []);
 
+  // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // This adds the fetched items to existing events
-  // // Update events state when fetchedItems change
-  // useEffect(() => {
-  //   const localNewEvents = fetchedItems.map((item: Event) => {
-  //     return {
-  //       title: item.title,
-  //       start: new Date(item.start),
-  //       end: new Date(item.end),
-  //       allDay: item.allDay,
-  //     };
-  //   });
-
-  //   setEvents((prevEvents) => [...prevEvents, ...localNewEvents]); // Update events here
-  // }, [fetchedItems]); // Add fetchedItems to dependency array
-
-  // This replaces the existing events with the fetched items so only events from the server are displayed
-  // Update events state with fetched items
+  // Update events state when fetchedItems change
   useEffect(() => {
     const localNewEvents = fetchedItems.map((item: Event) => ({
       _id: item._id,
@@ -117,8 +104,29 @@ function DateSetter() {
       end: new Date(item.end),
       allDay: item.allDay,
     }));
-    setEvents(localNewEvents); // Update events directly with fetched items
+
+    // Filter out events that already exist in the events array
+    const uniqueNewEvents = localNewEvents.filter((newEvent) =>
+      events.every((existingEvent) => existingEvent._id !== newEvent._id),
+    );
+
+    // Update events array by concatenating unique new events
+    setEvents((prevEvents) => [...prevEvents, ...uniqueNewEvents]);
   }, [fetchedItems]);
+
+  // this is if we have added all bank holidays to MongoDB
+  // This replaces the existing events with the fetched items so only events from the server are displayed
+  // Update events state with fetched items
+  // useEffect(() => {
+  //   const localNewEvents = fetchedItems.map((item: Event) => ({
+  //     _id: item._id,
+  //     title: item.title,
+  //     start: new Date(item.start),
+  //     end: new Date(item.end),
+  //     allDay: item.allDay,
+  //   }));
+  //   setEvents(localNewEvents); // Update events directly with fetched items
+  // }, [fetchedItems]);
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
@@ -292,7 +300,7 @@ function DateSetter() {
             ...prevEvents,
             ...uniqueBankHolidays.map(
               (holiday: { title: string; date: string }) => ({
-                title: holiday.title,
+                title: '(BH) ' + holiday.title,
                 start: new Date(holiday.date),
                 end: new Date(holiday.date),
                 allDay: true,

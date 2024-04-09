@@ -177,10 +177,8 @@ function DateSetter() {
 
     notifier.success(event.title);
 
-    // TODO: fix clash detection
+    // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
-    console.log('CLAsh detected: ', clashDetected);
-
     if (clashDetected) {
       notifier.warning('Clash with another event detected');
     }
@@ -311,16 +309,27 @@ function DateSetter() {
   }
 
   function checkClash(newEvent: Event, allEvents: Event[]): boolean {
-    for (let i = 0; i < allEvents.length; i++) {
-      const d1 = new Date(allEvents[i].start);
-      const d2 = new Date(newEvent.start);
-      const d3 = new Date(allEvents[i].end);
-      const d4 = new Date(newEvent.end);
+    // Iterate over all existing events
+    for (const event of allEvents) {
+      // Extract the date part of the start and end times of the events
+      const existingEventStartDate = new Date(event.start.setHours(0, 0, 0, 0));
+      const existingEventEndDate = new Date(event.end.setHours(0, 0, 0, 0));
+      const newEventStartDate = new Date(newEvent.start.setHours(0, 0, 0, 0));
+      const newEventEndDate = new Date(newEvent.end.setHours(0, 0, 0, 0));
 
-      if ((d1 <= d2 && d2 <= d3) || (d1 <= d4 && d4 <= d3)) {
+      // Check if the new event overlaps with the existing event
+      if (
+        (newEventStartDate >= existingEventStartDate &&
+          newEventStartDate <= existingEventEndDate) || // New event starts during the existing event
+        (newEventEndDate >= existingEventStartDate &&
+          newEventEndDate <= existingEventEndDate) || // New event ends during the existing event
+        (newEventStartDate <= existingEventStartDate &&
+          newEventEndDate >= existingEventEndDate) // New event spans the entire existing event
+      ) {
         return true; // Clash detected
       }
     }
+
     return false; // No clash detected
   }
 

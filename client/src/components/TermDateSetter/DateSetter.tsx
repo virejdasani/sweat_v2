@@ -154,6 +154,7 @@ function DateSetter() {
       info: 'Updated',
       alert: 'Alert',
       warning: 'Warning',
+      tip: 'Deleted',
     },
     maxNotifications: 4,
     durations: {
@@ -161,6 +162,7 @@ function DateSetter() {
       info: 2000,
       alert: 2000,
       warning: 2000,
+      tip: 2000,
     },
   };
 
@@ -175,13 +177,8 @@ function DateSetter() {
       return;
     }
 
-    notifier.success(event.title);
-
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
-    if (clashDetected) {
-      notifier.warning('Clash with another event detected');
-    }
 
     // Make POST request to add the event to MongoDB
     axios
@@ -201,7 +198,12 @@ function DateSetter() {
 
     // Add the new event to the calendar even if there is a clash
     setEvents([...events, event]);
-    console.log('Events: ', events);
+
+    if (clashDetected) {
+      notifier.warning('Clash with another event detected');
+    }
+
+    notifier.success(event.title);
   };
 
   // deletes from mongodb and updates the events state locally
@@ -221,8 +223,9 @@ function DateSetter() {
       // Update local state to reflect the event deletion
       const newEvents = events.filter((event) => event !== selectEvent);
       setEvents(newEvents);
-      console.log('Events: ', newEvents);
       setShowModal(false);
+
+      notifier.tip(selectEvent.title);
     }
   }
 
@@ -243,7 +246,7 @@ function DateSetter() {
     // Bank holidays have '(BH)' in their title
     // an alternative way to check if it's a bank holiday is to check if the event has an _id because only mongodb events have an _id
     if (event.title.includes('(BH)')) {
-      alert('Bank holidays cannot be edited or deleted');
+      notifier.alert('Bank holidays cannot be edited or deleted');
       return;
     }
 
@@ -257,22 +260,20 @@ function DateSetter() {
   }
 
   // called when a user clicks save on the modal
+  // this function also has support for adding events by clicking on a calendar slot and editing events by clicking on an existing event
   function saveEvent() {
     // Check if the event title is empty
     if (!eventTitle) {
-      alert('Please enter a title for the event');
+      notifier.alert('Please enter a title for the event');
       return;
     }
-
-    notifier.info(eventTitle);
 
     // Combine new event properties with its title
     const updatedEvent = { ...newEvent, title: eventTitle };
 
     // check if there is a clash only if saving a new event not editing an existing event
     if (!selectEvent && checkClash(updatedEvent, events)) {
-      alert('Clash with another event');
-      return; // Exit early if there's a clash
+      notifier.alert('Clash with another event');
     }
 
     // If it's an existing event (selectEvent is defined), update the event
@@ -296,7 +297,8 @@ function DateSetter() {
         event === selectEvent ? updatedEvent : event,
       );
       setEvents(updatedEvents);
-      console.log('Events: ', updatedEvents);
+
+      notifier.info(eventTitle);
     }
     // If it's a new event, add it to the events array
     else {

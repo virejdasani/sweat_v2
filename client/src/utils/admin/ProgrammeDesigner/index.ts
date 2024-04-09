@@ -1,6 +1,6 @@
 import { DropResult } from 'react-beautiful-dnd';
 import { Coursework, Module, Programme } from '../../../shared/types';
-import { ChangeEvent, useCallback } from 'react';
+import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {
   createModule,
@@ -441,46 +441,39 @@ export const updateTeachingScheduleProperty = (
 export const handleChangeStep1 = (
   event:
     | SelectChangeEvent<string | number | string[]>
-    | React.ChangeEvent<{ value: unknown; name?: string | undefined }>,
+    | React.ChangeEvent<{ value: unknown; name?: string }>,
   setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
 ) => {
   const { name, value } = event.target;
 
-  if (
-    typeof name === 'string' &&
-    typeof value === 'number' &&
-    isValidModuleKey(name)
-  ) {
-    setModuleData((prevData: Partial<Module>) =>
-      updateTeachingScheduleProperty(prevData, name, value),
-    );
-  } else if (typeof name === 'string') {
+  if (name === 'timetabledHours') {
     setModuleData((prevData: Partial<Module>) => ({
       ...prevData,
-      [name]: value,
+      timetabledHours: value === '' ? 0 : parseInt(value as string, 10),
+    }));
+  } else {
+    setModuleData((prevData: Partial<Module>) => ({
+      ...prevData,
+      [name as string]: value,
     }));
   }
 };
 
 export const handleChangeStep2 = (
-  event:
-    | SelectChangeEvent<string | number | string[]>
-    | ChangeEvent<{ value: unknown; name?: string | undefined }>,
+  event: React.ChangeEvent<{ value: unknown; name?: string }>,
   setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
 ) => {
   const { name, value } = event.target;
-
-  if (
-    typeof name === 'string' &&
-    typeof value === 'number' &&
-    isValidModuleKey(name)
-  ) {
-    setModuleData((prevData: Partial<Module>) =>
-      updateTeachingScheduleProperty(prevData, name, value),
-    );
+  if (typeof name === 'string') {
+    const hours = value === '' ? 0 : parseInt(value as string, 10);
+    setModuleData((prevData: Partial<Module>) => ({
+      ...prevData,
+      [name]: {
+        hours,
+      },
+    }));
   }
 };
-
 export const handleChangeStep3 = (
   index: number,
   field: keyof Coursework,

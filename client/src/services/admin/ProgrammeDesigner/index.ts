@@ -5,7 +5,7 @@ import { Module, Programme } from '../../../shared/types';
 export const createModule = async (moduleData: Module): Promise<Module> => {
   try {
     const response: AxiosResponse<Module> = await httpClient.post(
-      '/modules',
+      '/modules/create-module',
       moduleData,
     );
     return response.data;

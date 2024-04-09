@@ -7,7 +7,6 @@ import {
   TableCell,
   TableBody,
   TextField,
-  SelectChangeEvent,
 } from '@mui/material';
 
 export interface TeachingSchedule {
@@ -22,9 +21,7 @@ export interface TeachingSchedule {
 interface ModuleFormStep2Props {
   teachingSchedule: TeachingSchedule;
   handleChange: (
-    event:
-      | SelectChangeEvent<string | number | string[]>
-      | React.ChangeEvent<{ value: unknown; name?: string }>,
+    event: React.ChangeEvent<{ value: unknown; name?: string }>,
   ) => void;
 }
 
@@ -50,7 +47,7 @@ const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
                 <TextField
                   type="number"
                   name="lectures"
-                  value={teachingSchedule.lectures}
+                  value={teachingSchedule.lectures || ''}
                   onChange={handleChange}
                 />
               </TableCell>
@@ -61,7 +58,7 @@ const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
                 <TextField
                   type="number"
                   name="seminars"
-                  value={teachingSchedule.seminars}
+                  value={teachingSchedule.seminars || ''}
                   onChange={handleChange}
                 />
               </TableCell>
@@ -72,7 +69,7 @@ const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
                 <TextField
                   type="number"
                   name="tutorials"
-                  value={teachingSchedule.tutorials}
+                  value={teachingSchedule.tutorials || ''}
                   onChange={handleChange}
                 />
               </TableCell>
@@ -83,7 +80,7 @@ const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
                 <TextField
                   type="number"
                   name="labs"
-                  value={teachingSchedule.labs}
+                  value={teachingSchedule.labs || ''}
                   onChange={handleChange}
                 />
               </TableCell>
@@ -94,7 +91,7 @@ const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
                 <TextField
                   type="number"
                   name="fieldworkPlacement"
-                  value={teachingSchedule.fieldworkPlacement}
+                  value={teachingSchedule.fieldworkPlacement || ''}
                   onChange={handleChange}
                 />
               </TableCell>
@@ -105,7 +102,7 @@ const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
                 <TextField
                   type="number"
                   name="other"
-                  value={teachingSchedule.other}
+                  value={teachingSchedule.other || ''}
                   onChange={handleChange}
                 />
               </TableCell>

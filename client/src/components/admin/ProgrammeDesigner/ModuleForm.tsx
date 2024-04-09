@@ -42,21 +42,16 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const ModuleForm: React.FC<ModuleModalProps> = ({
-  mode,
-  module,
-  onClose,
-  onSubmit,
-}) => {
+const ModuleForm: React.FC<ModuleModalProps> = ({ mode, module, onClose }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [moduleData, setModuleData] = useState<Partial<Module>>({
     id: module?.id || '',
     name: module?.name || '',
-    year: module?.year || undefined,
-    type: module?.type || undefined,
+    year: module?.year || 1,
+    type: module?.type || 'core',
     programme: module?.programme || [],
-    semester: module?.semester || undefined,
-    credits: module?.credits || undefined,
+    semester: module?.semester || 'first',
+    credits: module?.credits || 7.5,
     timetabledHours: module?.timetabledHours || 0,
     lectures: { hours: module?.lectures?.hours || 0 },
     seminars: { hours: module?.seminars?.hours || 0 },
@@ -69,21 +64,46 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
     courseworks: module?.courseworks || [],
   });
 
-  const handleSubmit = () => {
-    const mappedYear = [1, 2, 3, 4].includes(moduleData.studyYear)
-      ? moduleData.studyYear
-      : 1;
-
+  const handleSubmit = async () => {
     const mappedModule: Module = {
-      id: moduleData.id,
-      name: moduleData.name,
-      credits: moduleData.credits,
-      year: mappedYear as 1 | 2 | 3 | 4,
-      type: moduleData.type,
+      id: moduleData.id || '',
+      name: moduleData.name || '',
+      year: moduleData.year as 1 | 2 | 3 | 4,
+      type: moduleData.type || 'core',
+      programme: moduleData.programme || [],
+      semester: moduleData.semester || 'first',
+      credits: moduleData.credits || 7.5,
+      timetabledHours: moduleData.timetabledHours || 0,
+      lectures: {
+        hours: moduleData.lectures?.hours || 0,
+      },
+      seminars: {
+        hours: moduleData.seminars?.hours || 0,
+      },
+      tutorials: {
+        hours: moduleData.tutorials?.hours || 0,
+      },
+      labs: {
+        hours: moduleData.labs?.hours || 0,
+      },
+      fieldworkPlacement: {
+        hours: moduleData.fieldworkPlacement?.hours || 0,
+      },
+      other: {
+        hours: moduleData.other?.hours || 0,
+      },
+      courseworks: moduleData.courseworks || [],
     };
 
-    onSubmit(mappedModule);
-    onClose();
+    console.log('Mapped Module:', mappedModule);
+
+    // try {
+    //   const createdModule = await createModule(mappedModule);
+    //   onSubmit(createdModule);
+    //   onClose();
+    // } catch (error) {
+    //   console.error('Error creating module:', error);
+    // }
   };
 
   const handleChangeStep1Wrapper = (
@@ -92,6 +112,12 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
       | ChangeEvent<{ value: unknown; name?: string | undefined }>,
   ) => {
     handleChangeStep1(event, setModuleData);
+  };
+
+  const handleChangeStep2Wrapper = (
+    event: React.ChangeEvent<{ value: unknown; name?: string }>,
+  ) => {
+    handleChangeStep2(event, setModuleData);
   };
 
   const getStepContent = (step: number) => {
@@ -114,7 +140,7 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
               fieldworkPlacement: moduleData.fieldworkPlacement?.hours || 0,
               other: moduleData.other?.hours || 0,
             }}
-            handleChange={(event) => handleChangeStep2(event, setModuleData)}
+            handleChange={handleChangeStep2Wrapper}
           />
         );
       case 2:

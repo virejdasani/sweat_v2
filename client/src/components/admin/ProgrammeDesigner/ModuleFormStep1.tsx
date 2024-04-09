@@ -33,16 +33,16 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
       <h2>Setup Module</h2>
       <TextField
         label="Module Code"
-        name="moduleCode"
-        value={moduleData.id}
+        name="id"
+        value={moduleData.id || ''}
         onChange={handleChange}
         margin="normal"
         fullWidth
       />
       <TextField
         label="Module Title"
-        name="moduleTitle"
-        value={moduleData.name}
+        name="name"
+        value={moduleData.name || ''}
         onChange={handleChange}
         margin="normal"
         fullWidth
@@ -51,8 +51,8 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         <InputLabel id="module-credit-label">Module Credit</InputLabel>
         <Select
           labelId="module-credit-label"
-          name="moduleCredit"
-          value={moduleData.credits}
+          name="credits"
+          value={moduleData.credits || ''}
           onChange={(event) => handleChange(event)}
         >
           <MenuItem value={7.5}>7.5</MenuItem>
@@ -64,7 +64,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         label="Timetabled Hours"
         name="timetabledHours"
         type="number"
-        value={moduleData.timetabledHours}
+        value={moduleData.timetabledHours || ''}
         onChange={handleChange}
         margin="normal"
         fullWidth
@@ -73,8 +73,8 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         <InputLabel id="study-year-label">Study Year</InputLabel>
         <Select
           labelId="study-year-label"
-          name="studyYear"
-          value={moduleData.year}
+          name="year"
+          value={moduleData.year || ''}
           onChange={(event) => handleChange(event)}
         >
           <MenuItem value={1}>1</MenuItem>
@@ -109,7 +109,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         <Select
           labelId="semester-label"
           name="semester"
-          value={moduleData.semester}
+          value={moduleData.semester || ''}
           onChange={(event) => handleChange(event)}
         >
           {semesters.map((semester) => (
@@ -124,7 +124,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         <Select
           labelId="type-label"
           name="type"
-          value={moduleData.type}
+          value={moduleData.type || ''}
           onChange={(event) => handleChange(event)}
         >
           <MenuItem value="core">Core</MenuItem>

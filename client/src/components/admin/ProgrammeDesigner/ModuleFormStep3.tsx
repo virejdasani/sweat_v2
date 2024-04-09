@@ -76,6 +76,7 @@ const ModuleFormStep3: React.FC<ModuleFormStep3Props> = ({
                       handleChange(index, 'type', e.target.value)
                     }
                   >
+                    <MenuItem value="exam">Exam</MenuItem>
                     <MenuItem value="assignment">Assignment</MenuItem>
                     <MenuItem value="class test">Class Test</MenuItem>
                     <MenuItem value="lab report">Lab Report</MenuItem>

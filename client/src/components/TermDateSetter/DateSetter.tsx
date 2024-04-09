@@ -10,7 +10,7 @@ import Modal from './Modal'; // Import the Modal component
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
-import AWN, { AwnPosition, AwnOptions } from 'awesome-notifications';
+import AWN, { AwnOptions } from 'awesome-notifications';
 import 'awesome-notifications/dist/style.css';
 
 interface Event {

@@ -136,11 +136,11 @@ function DateSetter() {
   const addEventToMongoDB = (event: Event) => {
     axios
       .post('http://localhost:8000/add-event', event)
-      .then((res) => {
+      .then((res: { data: Event }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
       })
-      .catch((err) => {
+      .catch((err: { data: Event }) => {
         console.error('Error adding event to MongoDB: ', err);
       });
   };
@@ -172,11 +172,11 @@ function DateSetter() {
       // Make DELETE request to backend API endpoint to delete the event from MongoDB
       axios
         .delete(`http://localhost:8000/delete-event/${selectEvent._id}`)
-        .then((res) => {
+        .then((res: { data: Event }) => {
           console.log('Event deleted from MongoDB: ', selectEvent);
           console.log(res);
         })
-        .catch((err) => {
+        .catch((err: { data: Event }) => {
           console.error('Error deleting event from MongoDB: ', err);
         });
 

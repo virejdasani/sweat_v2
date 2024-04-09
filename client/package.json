@@ -14,6 +14,7 @@
     "@types/react-big-calendar": "^1.8.9",
     "@types/react-datepicker": "^6.2.0",
     "add-to-calendar-button-react": "^2.6.9",
+    "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "date-fns": "^3.6.0",
     "react": "^18.2.0",

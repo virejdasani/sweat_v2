@@ -42,10 +42,9 @@ const eventsOnCalendar: Event[] = [
   // },
 ];
 
-// TODO: add data to centralised database
+// TODO: (HIGH PRIORITY) fix sem 1 and sem 2 start date bug where it shows up as sem1 even when sem2 is added + sem 1 is added when bank holiday is blank and added
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
 // TODO: (LOW PRIORITY) push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
-// TODO: (LOW PRIORITY) make it so that events can be added by clicking on a date on the calendar too
 
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({
@@ -133,22 +132,6 @@ function DateSetter() {
   );
 
   // Function to add event to MongoDB via API
-  const addEventToMongoDB = (event: Event) => {
-    axios
-      .post('http://localhost:8000/add-event', event)
-      .then((res: { data: Event }) => {
-        console.log('Event added to MongoDB: ', event);
-        console.log(res);
-
-        // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
-        const newEvent = { ...event, _id: res.data._id };
-        setEvents([...events, newEvent]);
-      })
-      .catch((err: { data: Event }) => {
-        console.error('Error adding event to MongoDB: ', err);
-      });
-  };
-
   const handleAddEvent = (event: Event) => {
     // if the event is semester 1 or semester 2, hardcode the title to be 'Semester 1' or 'Semester 2'
     if (event.title === semester1Event.title) {
@@ -160,14 +143,28 @@ function DateSetter() {
     const clashDetected = checkClash(event, events);
 
     if (clashDetected) {
-      //   alert('Clash with another event detected');
+      // alert('Clash with another event detected');
     }
-    // add new event to the calendar even if there is a clash
+
+    // Make POST request to add the event to MongoDB
+    axios
+      .post('http://localhost:8000/add-event', event)
+      .then((res: { data: Event }) => {
+        console.log('Event added to MongoDB: ', event);
+        console.log(res);
+
+        // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
+        const newEvent = { ...event, _id: res.data._id };
+        // Add the new event to the events array in the local state
+        setEvents([...events, newEvent]);
+      })
+      .catch((err: { data: Event }) => {
+        console.error('Error adding event to MongoDB: ', err);
+      });
+
+    // Add the new event to the calendar even if there is a clash
     setEvents([...events, event]);
     console.log('Events: ', events);
-
-    // Add event to MongoDB
-    addEventToMongoDB(event);
   };
 
   // deletes from mongodb and updates the events state locally

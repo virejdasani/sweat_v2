@@ -139,6 +139,10 @@ function DateSetter() {
       .then((res: { data: Event }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
+
+        // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
+        const newEvent = { ...event, _id: res.data._id };
+        setEvents([...events, newEvent]);
       })
       .catch((err: { data: Event }) => {
         console.error('Error adding event to MongoDB: ', err);

@@ -46,6 +46,7 @@ const eventsOnCalendar: Event[] = [
 // if it's in mongodb, it can be edited/deleted by the admin, but if it's in the local state, it can't be edited/deleted, it will always be displayed.
 
 // TODO: (HIGH PRIORITY) fix sem 1 and sem 2 start date bug where it shows up as sem1 even when sem2 is added + sem 1 is added when bank holiday is blank and added
+// TODO: add notifs for when an event is added, edited, or deleted to show the user that the action was successful because right now it's not clear if anything even happened
 // TODO: make editing bank holidays impossible from UI else website posting to mongobd breaks
 // TODO: move code to respective components
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
@@ -144,8 +145,14 @@ function DateSetter() {
     new Date(),
   );
 
-  // Function to add event to MongoDB via API
+  // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: Event) => {
+    // check that event title is not empty (so bank holidays can't be added without a title)
+    if (!event.title) {
+      alert('Please enter a title for the event');
+      return;
+    }
+
     const clashDetected = checkClash(event, events);
 
     if (clashDetected) {
@@ -360,12 +367,12 @@ function DateSetter() {
             </button>
           </div>
           <div>
-            <span>Add bank holiday: </span>
+            <span>Add holiday: </span>
 
             {/* Input field for adding holidays */}
             <input
               type="text"
-              placeholder="Bank holiday name"
+              placeholder="Holiday name"
               style={{ width: '20%', marginRight: '10px' }}
               value={holidayEvent.title}
               onChange={(e) =>
@@ -373,7 +380,7 @@ function DateSetter() {
               }
             />
             <div className="datePickers">
-              <span>Start date: </span>
+              <span>Holiday start date: </span>
               <div className="d-inline">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -386,7 +393,7 @@ function DateSetter() {
               </div>
             </div>
             <div className="datePickers">
-              <span>End date: </span>
+              <span>Holiday end date: </span>
               <div className="d-inline">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"

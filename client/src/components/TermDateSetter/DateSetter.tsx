@@ -6,25 +6,19 @@ import startOfWeek from 'date-fns/startOfWeek';
 import { useState, useEffect } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
-import Modal from './Modal'; // Import the Modal component
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
 import AWN, { AwnOptions } from 'awesome-notifications';
 import 'awesome-notifications/dist/style.css';
-
-interface Event {
-  _id?: string;
-  title: string;
-  start: Date;
-  end: Date;
-  allDay: boolean;
-}
+import Modal from './Modal';
+import { Event } from '../shared/types/';
 
 const locales = {
   // require not defined
   //   'en-US': require('date-fns/locale/en-US'),
 };
+
 const localizer = dateFnsLocalizer({
   format,
   parse,

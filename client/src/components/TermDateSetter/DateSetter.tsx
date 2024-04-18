@@ -348,7 +348,7 @@ function DateSetter() {
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>
-          {/* <h3>Admin sets key dates here</h3> */}
+
           {/* Input field for adding semester 1 start date */}
           <div className="formInput">
             <span>Semester 1 Start Date: </span>
@@ -452,7 +452,7 @@ function DateSetter() {
           defaultView="month"
           startAccessor="start"
           endAccessor="end"
-          // selectable={true} // this is being able to select a date (not an event)
+          // selectable={true} // this is being able to select a date slot (not event)
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectedEvent}
           style={{

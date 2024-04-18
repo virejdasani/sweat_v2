@@ -8,22 +8,7 @@ import {
   TableBody,
   TextField,
 } from '@mui/material';
-
-export interface TeachingSchedule {
-  lectures: number;
-  seminars: number;
-  tutorials: number;
-  labs: number;
-  fieldworkPlacement: number;
-  other: number;
-}
-
-interface ModuleFormStep2Props {
-  teachingSchedule: TeachingSchedule;
-  handleChange: (
-    event: React.ChangeEvent<{ value: unknown; name?: string }>,
-  ) => void;
-}
+import { ModuleFormStep2Props } from '../../../types/admin/ProgrammeDesigner';
 
 const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
   teachingSchedule,

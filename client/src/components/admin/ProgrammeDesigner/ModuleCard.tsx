@@ -16,6 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteModal from './DeleteModal';
 import './ModuleCard.css';
 import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
+import { Module } from '../../../shared/types';
 
 const ModuleCard: React.FC<ModuleCardProps> = ({
   module,
@@ -90,7 +91,7 @@ const ModuleList: React.FC<ModuleListProps> = ({
 }) => {
   return (
     <div className="module-list">
-      {modules.map((module) => (
+      {modules.map((module: Module) => (
         <ModuleCard
           key={module.id}
           module={module}

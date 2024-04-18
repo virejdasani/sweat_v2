@@ -25,6 +25,7 @@ import {
   handleBack,
   addCoursework,
   removeCoursework,
+  useModuleActions,
 } from '../../../utils/admin/ProgrammeDesigner';
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
@@ -42,7 +43,15 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const ModuleForm: React.FC<ModuleModalProps> = ({ mode, module, onClose }) => {
+const ModuleForm: React.FC<ModuleModalProps> = ({
+  mode,
+  module,
+  onClose,
+  moduleInstances,
+  setModuleInstances,
+  programmeState,
+  setProgrammeState,
+}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [moduleData, setModuleData] = useState<Partial<Module>>({
     id: module?.id || '',
@@ -64,47 +73,12 @@ const ModuleForm: React.FC<ModuleModalProps> = ({ mode, module, onClose }) => {
     courseworks: module?.courseworks || [],
   });
 
-  const handleSubmit = async () => {
-    const mappedModule: Module = {
-      id: moduleData.id || '',
-      name: moduleData.name || '',
-      year: moduleData.year as 1 | 2 | 3 | 4,
-      type: moduleData.type || 'core',
-      programme: moduleData.programme || [],
-      semester: moduleData.semester || 'first',
-      credits: moduleData.credits || 7.5,
-      timetabledHours: moduleData.timetabledHours || 0,
-      lectures: {
-        hours: moduleData.lectures?.hours || 0,
-      },
-      seminars: {
-        hours: moduleData.seminars?.hours || 0,
-      },
-      tutorials: {
-        hours: moduleData.tutorials?.hours || 0,
-      },
-      labs: {
-        hours: moduleData.labs?.hours || 0,
-      },
-      fieldworkPlacement: {
-        hours: moduleData.fieldworkPlacement?.hours || 0,
-      },
-      other: {
-        hours: moduleData.other?.hours || 0,
-      },
-      courseworks: moduleData.courseworks || [],
-    };
-
-    console.log('Mapped Module:', mappedModule);
-
-    // try {
-    //   const createdModule = await createModule(mappedModule);
-    //   onSubmit(createdModule);
-    //   onClose();
-    // } catch (error) {
-    //   console.error('Error creating module:', error);
-    // }
-  };
+  const { handleSubmit } = useModuleActions(
+    moduleInstances,
+    setModuleInstances,
+    programmeState,
+    setProgrammeState,
+  );
 
   const handleChangeStep1Wrapper = (
     event:
@@ -189,7 +163,9 @@ const ModuleForm: React.FC<ModuleModalProps> = ({ mode, module, onClose }) => {
         <MuiButton onClick={onClose}>Cancel</MuiButton>
         <MuiButton
           onClick={() =>
-            activeStep === 2 ? handleSubmit() : handleNext(setActiveStep)()
+            activeStep === 2
+              ? handleSubmit(moduleData, onClose)
+              : handleNext(setActiveStep)()
           }
           color="primary"
         >

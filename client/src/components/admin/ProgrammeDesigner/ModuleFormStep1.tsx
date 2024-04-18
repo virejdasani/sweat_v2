@@ -10,16 +10,7 @@ import {
   OutlinedInput,
   SelectChangeEvent,
 } from '@mui/material';
-import { Module } from '../../../shared/types';
-
-interface ModuleFormStep1Props {
-  moduleData: Partial<Module>;
-  handleChange: (
-    event:
-      | SelectChangeEvent<string | number | string[]>
-      | React.ChangeEvent<{ value: unknown; name?: string }>,
-  ) => void;
-}
+import { ModuleFormStep1Props } from '../../../types/admin/ProgrammeDesigner';
 
 const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
   moduleData,
@@ -38,6 +29,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         onChange={handleChange}
         margin="normal"
         fullWidth
+        required
       />
       <TextField
         label="Module Title"
@@ -46,6 +38,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         onChange={handleChange}
         margin="normal"
         fullWidth
+        required
       />
       <FormControl fullWidth margin="normal">
         <InputLabel id="module-credit-label">Module Credit</InputLabel>
@@ -54,6 +47,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
           name="credits"
           value={moduleData.credits || ''}
           onChange={(event) => handleChange(event)}
+          required
         >
           <MenuItem value={7.5}>7.5</MenuItem>
           <MenuItem value={15}>15</MenuItem>
@@ -68,6 +62,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
         onChange={handleChange}
         margin="normal"
         fullWidth
+        required
       />
       <FormControl fullWidth margin="normal">
         <InputLabel id="study-year-label">Study Year</InputLabel>
@@ -76,6 +71,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
           name="year"
           value={moduleData.year || ''}
           onChange={(event) => handleChange(event)}
+          required
         >
           <MenuItem value={1}>1</MenuItem>
           <MenuItem value={2}>2</MenuItem>
@@ -93,6 +89,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
           onChange={(event: SelectChangeEvent<string[]>) => handleChange(event)}
           input={<OutlinedInput label="Programme" />}
           renderValue={(selected) => selected.join(', ')}
+          required
         >
           {programmes.map((programme) => (
             <MenuItem key={programme} value={programme}>
@@ -111,6 +108,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
           name="semester"
           value={moduleData.semester || ''}
           onChange={(event) => handleChange(event)}
+          required
         >
           {semesters.map((semester) => (
             <MenuItem key={semester} value={semester}>
@@ -126,6 +124,7 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
           name="type"
           value={moduleData.type || ''}
           onChange={(event) => handleChange(event)}
+          required
         >
           <MenuItem value="core">Core</MenuItem>
           <MenuItem value="optional">Optional</MenuItem>

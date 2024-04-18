@@ -10,7 +10,14 @@ const courseworkSchema = new mongoose.Schema({
   weight: Number,
   type: {
     type: String,
-    enum: ['assignment', 'class test', 'lab report', 'presentation', 'other'],
+    enum: [
+      'exam',
+      'assignment',
+      'class test',
+      'lab report',
+      'presentation',
+      'other',
+    ],
   },
   deadlineWeek: Number,
   releasedWeekEarlier: Number,
@@ -76,10 +83,10 @@ const moduleSchema = new mongoose.Schema({
     studyHours: Number,
     distribution: [distributionSchema],
   },
-  courseworks: [courseworkSchema], // Updated to match new structure
+  courseworks: [courseworkSchema],
   totalHours: [distributionSchema],
 });
 
-const Module = mongoose.model('Module', moduleSchema);
+const Module = mongoose.model('modules', moduleSchema);
 
 module.exports = Module;

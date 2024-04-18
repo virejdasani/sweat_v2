@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DropResult } from 'react-beautiful-dnd';
 import { Coursework, Module, Programme } from '../../../shared/types';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import {
   createModule,
   deleteModuleById,
@@ -230,6 +233,7 @@ export const useModuleActions = (
         setModuleInstances(updatedModuleInstances);
 
         toast.success(`Module has been removed from the programme.`);
+        toast.info('Please remember to save all programmes.');
       } catch (error) {
         console.error('Error removing module from programme:', error);
         toast.error(
@@ -263,11 +267,159 @@ export const useModuleActions = (
     [moduleInstances, setModuleInstances],
   );
 
+  const handleSubmit = useCallback(
+    async (moduleData: Partial<Module>, onCloseCallback?: () => void) => {
+      if (!validateModuleData(moduleData, toast)) {
+        return;
+      }
+      const mappedModule = {
+        id: (moduleData.id || '').trim(),
+        name: (moduleData.name || '').trim(),
+        year: moduleData.year as 1 | 2 | 3 | 4,
+        type: moduleData.type || 'core',
+        programme: moduleData.programme || [],
+        semester: moduleData.semester || 'first',
+        credits: moduleData.credits || 7.5,
+        timetabledHours: moduleData.timetabledHours || 0,
+        lectures: {
+          hours: moduleData.lectures?.hours || 0,
+        },
+        seminars: {
+          hours: moduleData.seminars?.hours || 0,
+        },
+        tutorials: {
+          hours: moduleData.tutorials?.hours || 0,
+        },
+        labs: {
+          hours: moduleData.labs?.hours || 0,
+        },
+        fieldworkPlacement: {
+          hours: moduleData.fieldworkPlacement?.hours || 0,
+        },
+        other: {
+          hours: moduleData.other?.hours || 0,
+        },
+        courseworks: moduleData.courseworks || [],
+      };
+      try {
+        await createModule(mappedModule);
+
+        // Display the success message
+        toast.success(
+          moduleData.id
+            ? 'Module updated successfully!'
+            : 'Module created successfully!',
+          {
+            autoClose: 3000, // Display the success message for 2 seconds
+          },
+        );
+
+        // Display the refresh message
+        toast.info('The page will refresh to reflect the changes.', {
+          autoClose: 3000, // Display the refresh message for 3 seconds
+          onClose: () => {
+            window.location.reload();
+            onCloseCallback?.();
+          },
+        });
+      } catch (error) {
+        console.error('Error saving module:', error);
+        toast.error('Failed to save module. Please try again.');
+      }
+    },
+    [],
+  );
+
   return {
     handleEditModule,
     handleRemoveFromProgramme,
     handleRemoveFromDatabase,
+    handleSubmit,
   };
+};
+
+const validateModuleData = (
+  moduleData: Partial<Module>,
+  toast: any,
+): boolean => {
+  // Check if all required fields are present and not empty strings
+  if (
+    !moduleData.id ||
+    !moduleData.name ||
+    !moduleData.year ||
+    !moduleData.type ||
+    !moduleData.programme ||
+    !moduleData.semester ||
+    !moduleData.credits ||
+    moduleData.credits <= 0 ||
+    moduleData.timetabledHours === undefined ||
+    moduleData.timetabledHours < 0
+  ) {
+    toast.error('Please fill in all required fields.');
+    return false;
+  }
+
+  // Calculate the sum of teaching hours
+  const teachingHoursSum =
+    (moduleData.lectures?.hours || 0) +
+    (moduleData.seminars?.hours || 0) +
+    (moduleData.tutorials?.hours || 0) +
+    (moduleData.labs?.hours || 0) +
+    (moduleData.fieldworkPlacement?.hours || 0) +
+    (moduleData.other?.hours || 0);
+
+  // Check if timetabled hours match the sum of teaching hours
+  if (moduleData.timetabledHours !== teachingHoursSum) {
+    toast.error('Timetabled hours must match the sum of teaching hours.');
+    return false;
+  }
+
+  // Check if timetabled hours are not greater than 10 times the module credit
+  if (moduleData.timetabledHours > moduleData.credits * 10) {
+    toast.error(
+      'Timetabled hours cannot be greater than 10 times the module credit.',
+    );
+    return false;
+  }
+
+  // Check if the sum of coursework weights is equal to 100
+  const courseworkWeightSum =
+    moduleData.courseworks?.reduce((sum, coursework) => {
+      const weight =
+        typeof coursework.weight === 'string'
+          ? parseFloat(coursework.weight)
+          : coursework.weight || 0;
+      return sum + weight;
+    }, 0) || 0;
+
+  if (courseworkWeightSum !== 100) {
+    toast.error('The sum of coursework weights must be equal to 100.');
+    return false;
+  }
+
+  // Check if any number is negative
+  if (
+    moduleData.credits < 0 ||
+    moduleData.timetabledHours < 0 ||
+    (moduleData.lectures?.hours || 0) < 0 ||
+    (moduleData.seminars?.hours || 0) < 0 ||
+    (moduleData.tutorials?.hours || 0) < 0 ||
+    (moduleData.labs?.hours || 0) < 0 ||
+    (moduleData.fieldworkPlacement?.hours || 0) < 0 ||
+    (moduleData.other?.hours || 0) < 0 ||
+    moduleData.courseworks?.some((coursework) => {
+      const weight =
+        typeof coursework.weight === 'string'
+          ? parseFloat(coursework.weight)
+          : coursework.weight;
+      return weight !== undefined && weight < 0;
+    })
+  ) {
+    toast.error('Negative numbers are not allowed.');
+    return false;
+  }
+
+  return true;
 };
 
 export const handleAddModuleClick = (
@@ -301,21 +453,6 @@ export const closeModuleModal = (
   setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   setIsModuleModalOpen(false);
-};
-
-export const handleModuleSubmit = (
-  module: Module,
-  modalMode: 'add' | 'edit',
-  closeModuleModal: () => void,
-  searchResults: Module[],
-  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
-) => {
-  if (modalMode === 'add') {
-    handleAddModule(module, searchResults, setSearchResults);
-  } else if (modalMode === 'edit') {
-    handleUpdateModule(module, searchResults, setSearchResults);
-  }
-  closeModuleModal();
 };
 
 export const handleAddModule = async (

@@ -12,7 +12,13 @@ export interface Distribution {
 export interface Coursework {
   cwTitle: string;
   weight: string;
-  type: 'assignment' | 'class test' | 'lab report' | 'presentation' | 'other';
+  type:
+    | 'exam'
+    | 'assignment'
+    | 'class test'
+    | 'lab report'
+    | 'presentation'
+    | 'other';
   deadlineWeek: string;
   releasedWeekEarlier: string;
   studyHours?: number;

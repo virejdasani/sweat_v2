@@ -12,18 +12,7 @@ import {
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Coursework } from '../../../shared/types';
-
-interface ModuleFormStep3Props {
-  courseworks: Coursework[];
-  handleChange: (
-    index: number,
-    field: keyof Coursework,
-    value: string | number,
-  ) => void;
-  addCoursework: () => void;
-  removeCoursework: (index: number) => void;
-}
+import { ModuleFormStep3Props } from '../../../types/admin/ProgrammeDesigner';
 
 const ModuleFormStep3: React.FC<ModuleFormStep3Props> = ({
   courseworks,

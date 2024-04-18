@@ -15,7 +15,6 @@ import {
   handleSearchChange,
   openAddModuleModal,
   closeModuleModal,
-  handleModuleSubmit,
   fetchData,
 } from '../../../utils/admin/ProgrammeDesigner';
 import ModuleList from './ModuleCard';
@@ -47,7 +46,7 @@ function ProgrammeDesigner() {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
   }, []);
 
-  const { handleEditModule } = useModuleActions(
+  const { handleEditModule, handleSubmit } = useModuleActions(
     moduleInstances,
     setModuleInstances,
     programmeState,
@@ -192,15 +191,11 @@ function ProgrammeDesigner() {
           mode={modalMode}
           module={selectedModule}
           onClose={() => closeModuleModal(setIsModuleModalOpen)}
-          onSubmit={(module) =>
-            handleModuleSubmit(
-              module,
-              modalMode,
-              () => closeModuleModal(setIsModuleModalOpen),
-              searchResults,
-              setSearchResults,
-            )
-          }
+          onSubmit={handleSubmit}
+          moduleInstances={moduleInstances}
+          setModuleInstances={setModuleInstances}
+          programmeState={programmeState}
+          setProgrammeState={setProgrammeState}
         />
       )}
     </div>

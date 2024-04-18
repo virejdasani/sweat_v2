@@ -352,9 +352,8 @@ function DateSetter() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="colored"
       />
-      <ToastContainer />
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>

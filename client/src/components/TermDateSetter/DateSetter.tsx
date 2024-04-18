@@ -12,12 +12,9 @@ import './DateSetter.css';
 import AWN, { AwnOptions } from 'awesome-notifications';
 import 'awesome-notifications/dist/style.css';
 import Modal from './Modal';
-import { Event } from '../shared/types/';
+import { CalendarKeyDateEvent } from '../shared/types/';
 
-const locales = {
-  // require not defined
-  //   'en-US': require('date-fns/locale/en-US'),
-};
+const locales = {};
 
 const localizer = dateFnsLocalizer({
   format,
@@ -27,7 +24,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const eventsOnCalendar: Event[] = [
+const eventsOnCalendar: CalendarKeyDateEvent[] = [
   // note: months are 0 indexed, days are 1 indexed
   // note: end date is 11:59pm of the day before the end date
   // {
@@ -38,14 +35,9 @@ const eventsOnCalendar: Event[] = [
   // },
 ];
 
-// TODO: would it be better to have all bank holidays in mongodb and fetch them from there or fetch them from api and store them in the local state only:
-// if it's in mongodb, it can be edited/deleted by the admin, but if it's in the local state, it can't be edited/deleted, it will always be displayed.
-
-// TODO: add notifs for when an event is added, edited, or deleted to show the user that the action was successful because right now it's not clear if anything even happened
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
-// TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing)
-// TODO: (LOW PRIORITY) push all date pickers in .datePickerContainer divs because this prevents the overlap in UI bug
+// TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing package)
 
 function DateSetter() {
   const [holidayEvent, setHolidayEvent] = useState({
@@ -77,9 +69,10 @@ function DateSetter() {
   });
 
   // state that will be used to render the calendar
-  const [events, setEvents] = useState<Event[]>(eventsOnCalendar);
+  const [events, setEvents] =
+    useState<CalendarKeyDateEvent[]>(eventsOnCalendar);
 
-  const [fetchedItems, setFetchedItems] = useState<Event[]>([]);
+  const [fetchedItems, setFetchedItems] = useState<CalendarKeyDateEvent[]>([]);
   // fetch events from the server and set the events state
   useEffect(() => {
     const fetchData = async () => {
@@ -94,7 +87,7 @@ function DateSetter() {
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
   useEffect(() => {
-    const localNewEvents = fetchedItems.map((item: Event) => ({
+    const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
       _id: item._id,
       title: item.title,
       start: new Date(item.start),
@@ -117,7 +110,7 @@ function DateSetter() {
   // this replaces the existing events with the fetched items so only events from the server are displayed
   // Update events state with fetched items
   // useEffect(() => {
-  //   const localNewEvents = fetchedItems.map((item: Event) => ({
+  //   const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
   //     _id: item._id,
   //     title: item.title,
   //     start: new Date(item.start),
@@ -129,7 +122,9 @@ function DateSetter() {
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
-  const [selectEvent, setSelectEvent] = useState<Event | null>(null);
+  const [selectEvent, setSelectEvent] = useState<CalendarKeyDateEvent | null>(
+    null,
+  );
 
   // state to store the start and end dates of the selected event
   const [selectedEventStartDate, setSelectedEventStartDate] = useState<Date>(
@@ -163,7 +158,7 @@ function DateSetter() {
   const notifier = new AWN(globalOptions);
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
-  const handleAddEvent = (event: Event) => {
+  const handleAddEvent = (event: CalendarKeyDateEvent) => {
     // check that event title is not empty (so bank holidays can't be added without a title)
     if (!event.title) {
       notifier.alert('Please enter a title for the event');
@@ -176,7 +171,7 @@ function DateSetter() {
     // Make POST request to add the event to MongoDB
     axios
       .post('http://localhost:8000/add-event', event)
-      .then((res: { data: Event }) => {
+      .then((res: { data: CalendarKeyDateEvent }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
 
@@ -185,7 +180,7 @@ function DateSetter() {
         // Add the new event to the events array in the local state
         setEvents([...events, newEvent]);
       })
-      .catch((err: { data: Event }) => {
+      .catch((err: { data: CalendarKeyDateEvent }) => {
         console.error('Error adding event to MongoDB: ', err);
       });
 
@@ -205,11 +200,11 @@ function DateSetter() {
       // Make DELETE request to backend API endpoint to delete the event from MongoDB
       axios
         .delete(`http://localhost:8000/delete-event/${selectEvent._id}`)
-        .then((res: { data: Event }) => {
+        .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event deleted from MongoDB: ', selectEvent);
           console.log(res);
         })
-        .catch((err: { data: Event }) => {
+        .catch((err: { data: CalendarKeyDateEvent }) => {
           console.error('Error deleting event from MongoDB: ', err);
         });
 
@@ -234,7 +229,7 @@ function DateSetter() {
   }
 
   // called when a user clicks on an existing event
-  function handleSelectedEvent(event: Event) {
+  function handleSelectedEvent(event: CalendarKeyDateEvent) {
     // Prevent editing or deleting bank holidays
     // Bank holidays have '(BH)' in their title
     // an alternative way to check if it's a bank holiday is to check if the event has an _id because only mongodb events have an _id
@@ -277,11 +272,11 @@ function DateSetter() {
           `http://localhost:8000/update-event/${selectEvent._id}`,
           updatedEvent,
         )
-        .then((res: { data: Event }) => {
+        .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event updated in MongoDB: ', updatedEvent);
           console.log(res);
         })
-        .catch((err: { data: Event }) => {
+        .catch((err: { data: CalendarKeyDateEvent }) => {
           console.error('Error updating event in MongoDB: ', err);
         });
 
@@ -303,7 +298,10 @@ function DateSetter() {
     setShowModal(false);
   }
 
-  function checkClash(newEvent: Event, allEvents: Event[]): boolean {
+  function checkClash(
+    newEvent: CalendarKeyDateEvent,
+    allEvents: CalendarKeyDateEvent[],
+  ): boolean {
     // Iterate over all existing events
     for (const event of allEvents) {
       // Extract the date part of the start and end times of the events

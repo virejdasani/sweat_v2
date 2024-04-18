@@ -1,4 +1,4 @@
-export interface Event {
+export interface CalendarKeyDateEvent {
   _id?: string;
   title: string;
   start: Date;

@@ -9,7 +9,8 @@ import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
-import AWN, { AwnOptions } from 'awesome-notifications';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import 'awesome-notifications/dist/style.css';
 import Modal from './Modal';
 import { CalendarKeyDateEvent } from '../shared/types/';
@@ -135,33 +136,11 @@ function DateSetter() {
     new Date(),
   );
 
-  const globalOptions: AwnOptions<Error> = {
-    position: 'top-right',
-    labels: {
-      success: 'Added',
-      info: 'Updated',
-      alert: 'Alert',
-      warning: 'Warning',
-      tip: 'Deleted',
-    },
-    maxNotifications: 4,
-    durations: {
-      success: 2000,
-      info: 2000,
-      alert: 2000,
-      warning: 2000,
-      tip: 2000,
-    },
-  };
-
-  // Initialize instance of AWN
-  const notifier = new AWN(globalOptions);
-
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: CalendarKeyDateEvent) => {
     // check that event title is not empty (so bank holidays can't be added without a title)
     if (!event.title) {
-      notifier.alert('Please enter a title for the event');
+      toast('Please enter a name for the date');
       return;
     }
 
@@ -188,10 +167,10 @@ function DateSetter() {
     setEvents([...events, event]);
 
     if (clashDetected) {
-      notifier.warning('Clash with another event detected');
+      toast('Clash with another event detected'); // warning
     }
 
-    notifier.success(event.title);
+    toast(event.title + ' added');
   };
 
   // deletes from mongodb and updates the events state locally
@@ -213,7 +192,7 @@ function DateSetter() {
       setEvents(newEvents);
       setShowModal(false);
 
-      notifier.tip(selectEvent.title);
+      toast(selectEvent.title + ' deleted');
     }
   }
 
@@ -234,7 +213,7 @@ function DateSetter() {
     // Bank holidays have '(BH)' in their title
     // an alternative way to check if it's a bank holiday is to check if the event has an _id because only mongodb events have an _id
     if (event.title.includes('(BH)')) {
-      notifier.alert('Bank holidays cannot be edited or deleted');
+      toast('Bank holidays cannot be edited or deleted'); // alert
       return;
     }
 
@@ -252,7 +231,7 @@ function DateSetter() {
   function saveEvent() {
     // Check if the event title is empty
     if (!eventTitle) {
-      notifier.alert('Please enter a title for the event');
+      toast('Please enter a title for the event');
       return;
     }
 
@@ -261,7 +240,7 @@ function DateSetter() {
 
     // check if there is a clash only if saving a new event not editing an existing event
     if (!selectEvent && checkClash(updatedEvent, events)) {
-      notifier.alert('Clash with another event');
+      toast('Clash with another event');
     }
 
     // If it's an existing event (selectEvent is defined), update the event
@@ -286,7 +265,7 @@ function DateSetter() {
       );
       setEvents(updatedEvents);
 
-      notifier.info(eventTitle);
+      toast(eventTitle + ' updated');
     }
     // If it's a new event, add it to the events array
     else {
@@ -363,6 +342,19 @@ function DateSetter() {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <ToastContainer />
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>

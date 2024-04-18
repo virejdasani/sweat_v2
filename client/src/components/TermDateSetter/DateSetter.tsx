@@ -25,16 +25,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const eventsOnCalendar: CalendarKeyDateEvent[] = [
-  // note: months are 0 indexed, days are 1 indexed
-  // note: end date is 11:59pm of the day before the end date
-  // {
-  //   title: 'COMP222 Assignment 1',
-  //   allDay: true,
-  //   start: new Date(2024, 2, 6),
-  //   end: new Date(2024, 2, 10),
-  // },
-];
+const eventsOnCalendar: CalendarKeyDateEvent[] = [];
 
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components

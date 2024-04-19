@@ -11,7 +11,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import 'awesome-notifications/dist/style.css';
 import Modal from './Modal';
 import { CalendarKeyDateEvent } from '../shared/types/';
 
@@ -26,6 +25,8 @@ const localizer = dateFnsLocalizer({
 });
 
 const eventsOnCalendar: CalendarKeyDateEvent[] = [];
+
+const baseURL = 'http://localhost:8000/';
 
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
@@ -68,7 +69,7 @@ function DateSetter() {
   // fetch events from the server and set the events state
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch('http://localhost:8000/');
+      const res = await fetch(baseURL);
       const data = await res.json();
       setFetchedItems(data);
       console.log('Fetched items: ', data);
@@ -140,7 +141,7 @@ function DateSetter() {
 
     // Make POST request to add the event to MongoDB
     axios
-      .post('http://localhost:8000/add-event', event)
+      .post(baseURL + 'add-event', event)
       .then((res: { data: CalendarKeyDateEvent }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
@@ -169,7 +170,7 @@ function DateSetter() {
     if (selectEvent) {
       // Make DELETE request to backend API endpoint to delete the event from MongoDB
       axios
-        .delete(`http://localhost:8000/delete-event/${selectEvent._id}`)
+        .delete(baseURL + `delete-event/${selectEvent._id}`)
         .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event deleted from MongoDB: ', selectEvent);
           console.log(res);
@@ -238,10 +239,7 @@ function DateSetter() {
     if (selectEvent) {
       // Make PUT request to update the event in MongoDB
       axios
-        .put(
-          `http://localhost:8000/update-event/${selectEvent._id}`,
-          updatedEvent,
-        )
+        .put(baseURL + `update-event/${selectEvent._id}`, updatedEvent)
         .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event updated in MongoDB: ', updatedEvent);
           console.log(res);

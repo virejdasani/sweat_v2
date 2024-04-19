@@ -9,14 +9,14 @@ import {
 import {
   ModuleCardProps,
   ModuleListProps,
-} from '../../../types/admin/ProgrammeDesigner';
+} from '../../../../types/admin/ProgrammeDesigner';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DeleteModal from './DeleteModal';
+import DeleteModal from '../Modals/DeleteModal';
 import './ModuleCard.css';
-import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
-import { Module } from '../../../shared/types';
+import { useModuleActions } from '../../../../utils/admin/ProgrammeDesigner';
+import { Module } from '../../../../shared/types';
 
 const ModuleCard: React.FC<ModuleCardProps> = ({
   module,

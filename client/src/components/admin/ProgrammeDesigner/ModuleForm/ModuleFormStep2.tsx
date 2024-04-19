@@ -8,7 +8,7 @@ import {
   TableBody,
   TextField,
 } from '@mui/material';
-import { ModuleFormStep2Props } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleFormStep2Props } from '../../../../types/admin/ProgrammeDesigner';
 
 const ModuleFormStep2: React.FC<ModuleFormStep2Props> = ({
   teachingSchedule,

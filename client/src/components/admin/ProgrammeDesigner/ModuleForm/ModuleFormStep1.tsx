@@ -10,7 +10,7 @@ import {
   OutlinedInput,
   SelectChangeEvent,
 } from '@mui/material';
-import { ModuleFormStep1Props } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleFormStep1Props } from '../../../../types/admin/ProgrammeDesigner';
 
 const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
   moduleData,

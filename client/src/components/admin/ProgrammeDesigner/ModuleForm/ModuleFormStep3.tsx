@@ -12,7 +12,8 @@ import {
   IconButton,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ModuleFormStep3Props } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleFormStep3Props } from '../../../../types/admin/ProgrammeDesigner';
+import { handleNumberChange } from '../../../../utils/admin/ProgrammeDesigner';
 
 const ModuleFormStep3: React.FC<ModuleFormStep3Props> = ({
   courseworks,
@@ -51,7 +52,12 @@ const ModuleFormStep3: React.FC<ModuleFormStep3Props> = ({
                     type="number"
                     value={coursework.weight}
                     onChange={(e) =>
-                      handleChange(index, 'weight', Number(e.target.value))
+                      handleNumberChange(
+                        index,
+                        'weight',
+                        e.target.value,
+                        handleChange,
+                      )
                     }
                     InputProps={{
                       endAdornment: <span>%</span>,
@@ -78,10 +84,11 @@ const ModuleFormStep3: React.FC<ModuleFormStep3Props> = ({
                     type="number"
                     value={coursework.deadlineWeek}
                     onChange={(e) =>
-                      handleChange(
+                      handleNumberChange(
                         index,
                         'deadlineWeek',
-                        Number(e.target.value),
+                        e.target.value,
+                        handleChange,
                       )
                     }
                   />
@@ -91,10 +98,11 @@ const ModuleFormStep3: React.FC<ModuleFormStep3Props> = ({
                     type="number"
                     value={coursework.releasedWeekEarlier}
                     onChange={(e) =>
-                      handleChange(
+                      handleNumberChange(
                         index,
                         'releasedWeekEarlier',
-                        Number(e.target.value),
+                        e.target.value,
+                        handleChange,
                       )
                     }
                   />

@@ -1,5 +1,5 @@
 import { Button as MuiButton } from '@mui/material';
-import { ModuleTypeFilterButtonsProps } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleTypeFilterButtonsProps } from '../../../../types/admin/ProgrammeDesigner';
 
 function ModuleTypeFilterButtons({
   onFilterChange,

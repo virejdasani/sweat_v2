@@ -45,6 +45,29 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
 }
 
+.module-container {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.module-tabs {
+  flex-shrink: 0;
+}
+
+.module-list-container {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: 800px; 
+}
+
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .programme-box {

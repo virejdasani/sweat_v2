@@ -8,7 +8,7 @@ import {
   Typography,
   styled,
 } from '@mui/material';
-import { DeleteModalProps } from '../../../types/admin/ProgrammeDesigner';
+import { DeleteModalProps } from '../../../../types/admin/ProgrammeDesigner';
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,

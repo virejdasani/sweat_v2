@@ -1,6 +1,7 @@
 .module-card {
   width: 100%;
   max-width: 350px;
+  margin-right: 16px;
   margin-bottom: 16px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 2rem;
@@ -23,6 +24,8 @@
 
 .module-list {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
 }

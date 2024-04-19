@@ -1,22 +1,20 @@
 import React, { ChangeEvent, useState } from 'react';
 import {
-  Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button as MuiButton,
   IconButton,
-  styled,
   Box,
   SelectChangeEvent,
 } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Module } from '../../../shared/types';
+import { Module } from '../../../../shared/types';
 import ModuleFormStep1 from './ModuleFormStep1';
 import ModuleFormStep2 from './ModuleFormStep2';
 import ModuleFormStep3 from './ModuleFormStep3';
-import { ModuleModalProps } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleModalProps } from '../../../../types/admin/ProgrammeDesigner';
 import {
   handleChangeStep1,
   handleChangeStep2,
@@ -26,22 +24,8 @@ import {
   addCoursework,
   removeCoursework,
   useModuleActions,
-} from '../../../utils/admin/ProgrammeDesigner';
-
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-container': {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  '& .MuiDialog-paper': {
-    width: '70%',
-    maxWidth: '800px',
-    maxHeight: '80vh',
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(4),
-    borderRadius: theme.shape.borderRadius,
-  },
-}));
+} from '../../../../utils/admin/ProgrammeDesigner';
+import { BoxStyles, StyledDialog } from './ModuleForm.styles.ts';
 
 const ModuleForm: React.FC<ModuleModalProps> = ({
   mode,
@@ -137,13 +121,7 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
     <StyledDialog open onClose={onClose}>
       <DialogTitle>{mode === 'add' ? 'Add Module' : 'Edit Module'}</DialogTitle>
       <DialogContent>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            marginBottom: '16px',
-          }}
-        >
+        <Box sx={BoxStyles}>
           <IconButton
             disabled={activeStep === 0}
             onClick={handleBack(setActiveStep)}

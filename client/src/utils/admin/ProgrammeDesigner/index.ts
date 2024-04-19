@@ -662,3 +662,13 @@ export const removeCoursework = (
     courseworks: prevData.courseworks?.filter((_, i) => i !== index),
   }));
 };
+
+export const handleNumberChange = (
+  index: number,
+  field: keyof Coursework,
+  value: string,
+  handleChange: (index: number, field: keyof Coursework, value: number) => void,
+) => {
+  const parsedValue = Math.max(0, parseInt(value, 10));
+  handleChange(index, field, parsedValue);
+};

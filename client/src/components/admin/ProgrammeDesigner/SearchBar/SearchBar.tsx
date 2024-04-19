@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextField } from '@mui/material';
-import { SearchBarProps } from '../../../types/admin/ProgrammeDesigner';
+import { SearchBarProps } from '../../../../types/admin/ProgrammeDesigner';
 
 const SearchBar: React.FC<SearchBarProps> = ({
   searchQuery,

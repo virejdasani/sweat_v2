@@ -26,7 +26,7 @@ const localizer = dateFnsLocalizer({
 
 const eventsOnCalendar: CalendarKeyDateEvent[] = [];
 
-const baseURL = 'http://localhost:8000/';
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components

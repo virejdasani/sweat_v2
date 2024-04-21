@@ -1,16 +1,17 @@
 import React from 'react';
-import {
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Checkbox,
-  ListItemText,
-  OutlinedInput,
-  SelectChangeEvent,
-} from '@mui/material';
 import { ModuleFormStep1Props } from '../../../../types/admin/ProgrammeDesigner';
+import {
+  FormContainer,
+  FormTitle,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInput,
+  StyledSelect,
+  StyledNumberInput,
+  StyledCheckboxGroup,
+  StyledCheckbox,
+  StyledNumberInputField,
+} from './ModuleFormStep1.styles';
 
 const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
   moduleData,
@@ -20,117 +21,115 @@ const ModuleFormStep1: React.FC<ModuleFormStep1Props> = ({
   const semesters = ['first', 'second', 'whole session'];
 
   return (
-    <div>
-      <h2>Setup Module</h2>
-      <TextField
-        label="Module Code"
-        name="id"
-        value={moduleData.id || ''}
-        onChange={handleChange}
-        margin="normal"
-        fullWidth
-        required
-      />
-      <TextField
-        label="Module Title"
-        name="name"
-        value={moduleData.name || ''}
-        onChange={handleChange}
-        margin="normal"
-        fullWidth
-        required
-      />
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="module-credit-label">Module Credit</InputLabel>
-        <Select
-          labelId="module-credit-label"
+    <FormContainer>
+      <FormTitle>Setup Module</FormTitle>
+      <StyledFormControl id="module-code" isRequired>
+        <StyledFormLabel>Module Code</StyledFormLabel>
+        <StyledInput
+          type="text"
+          name="id"
+          value={moduleData.id || ''}
+          onChange={handleChange}
+        />
+      </StyledFormControl>
+      <StyledFormControl id="module-title" isRequired>
+        <StyledFormLabel>Module Title</StyledFormLabel>
+        <StyledInput
+          type="text"
+          name="name"
+          value={moduleData.name || ''}
+          onChange={handleChange}
+        />
+      </StyledFormControl>
+      <StyledFormControl id="module-credit" isRequired>
+        <StyledFormLabel>Module Credit</StyledFormLabel>
+        <StyledSelect
           name="credits"
           value={moduleData.credits || ''}
-          onChange={(event) => handleChange(event)}
-          required
+          onChange={handleChange}
+          placeholder="Select credit"
         >
-          <MenuItem value={7.5}>7.5</MenuItem>
-          <MenuItem value={15}>15</MenuItem>
-          <MenuItem value={30}>30</MenuItem>
-        </Select>
-      </FormControl>
-      <TextField
-        label="Timetabled Hours"
-        name="timetabledHours"
-        type="number"
-        value={moduleData.timetabledHours || ''}
-        onChange={handleChange}
-        margin="normal"
-        fullWidth
-        required
-      />
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="study-year-label">Study Year</InputLabel>
-        <Select
-          labelId="study-year-label"
+          <option value={7.5}>7.5</option>
+          <option value={15}>15</option>
+          <option value={30}>30</option>
+        </StyledSelect>
+      </StyledFormControl>
+      <StyledFormControl id="timetabled-hours" isRequired>
+        <StyledFormLabel>Timetabled Hours</StyledFormLabel>
+        <StyledNumberInput
+          name="timetabledHours"
+          value={moduleData.timetabledHours || ''}
+          onChange={(valueString) =>
+            handleChange({
+              target: {
+                name: 'timetabledHours',
+                value: valueString,
+              },
+            } as React.ChangeEvent<HTMLInputElement>)
+          }
+        >
+          <StyledNumberInputField />
+        </StyledNumberInput>
+      </StyledFormControl>
+      <StyledFormControl id="study-year" isRequired>
+        <StyledFormLabel>Study Year</StyledFormLabel>
+        <StyledSelect
           name="year"
           value={moduleData.year || ''}
-          onChange={(event) => handleChange(event)}
-          required
+          onChange={handleChange}
+          placeholder="Select year"
         >
-          <MenuItem value={1}>1</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
-          <MenuItem value={3}>3</MenuItem>
-          <MenuItem value={4}>4</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="programme-label">Programme</InputLabel>
-        <Select
-          labelId="programme-label"
-          name="programme"
-          multiple
+          <option value={1}>1</option>
+          <option value={2}>2</option>
+          <option value={3}>3</option>
+          <option value={4}>4</option>
+        </StyledSelect>
+      </StyledFormControl>
+      <StyledFormControl id="programme" isRequired>
+        <StyledFormLabel>Programme</StyledFormLabel>
+        <StyledCheckboxGroup
           value={moduleData.programme || []}
-          onChange={(event: SelectChangeEvent<string[]>) => handleChange(event)}
-          input={<OutlinedInput label="Programme" />}
-          renderValue={(selected) => selected.join(', ')}
-          required
+          onChange={(values) =>
+            handleChange({
+              target: { name: 'programme', value: values },
+            } as unknown as React.ChangeEvent<HTMLInputElement>)
+          }
         >
           {programmes.map((programme) => (
-            <MenuItem key={programme} value={programme}>
-              <Checkbox
-                checked={(moduleData.programme || []).includes(programme)}
-              />
-              <ListItemText primary={programme} />
-            </MenuItem>
+            <StyledCheckbox key={programme} value={programme}>
+              {programme}
+            </StyledCheckbox>
           ))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="semester-label">Semester</InputLabel>
-        <Select
-          labelId="semester-label"
+        </StyledCheckboxGroup>
+      </StyledFormControl>
+      <StyledFormControl id="semester" isRequired>
+        <StyledFormLabel>Semester</StyledFormLabel>
+        <StyledSelect
           name="semester"
           value={moduleData.semester || ''}
-          onChange={(event) => handleChange(event)}
-          required
+          onChange={handleChange}
+          placeholder="Select semester"
         >
           {semesters.map((semester) => (
-            <MenuItem key={semester} value={semester}>
+            <option key={semester} value={semester}>
               {semester.charAt(0).toUpperCase() + semester.slice(1)}
-            </MenuItem>
+            </option>
           ))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth margin="normal">
-        <InputLabel id="type-label">Type</InputLabel>
-        <Select
-          labelId="type-label"
+        </StyledSelect>
+      </StyledFormControl>
+      <StyledFormControl id="type" isRequired>
+        <StyledFormLabel>Type</StyledFormLabel>
+        <StyledSelect
           name="type"
           value={moduleData.type || ''}
-          onChange={(event) => handleChange(event)}
-          required
+          onChange={handleChange}
+          placeholder="Select type"
         >
-          <MenuItem value="core">Core</MenuItem>
-          <MenuItem value="optional">Optional</MenuItem>
-        </Select>
-      </FormControl>
-    </div>
+          <option value="core">Core</option>
+          <option value="optional">Optional</option>
+        </StyledSelect>
+      </StyledFormControl>
+    </FormContainer>
   );
 };
 

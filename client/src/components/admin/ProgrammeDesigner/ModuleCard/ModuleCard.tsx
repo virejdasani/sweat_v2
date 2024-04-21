@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
+  Card,
+  Heading,
+  Text,
   IconButton,
-} from '@mui/material';
+  Box,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  Grid,
+  GridItem,
+} from '@chakra-ui/react';
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
+import DeleteModal from '../Modals/DeleteModal';
+import { useModuleActions } from '../../../../utils/admin/ProgrammeDesigner';
 import {
   ModuleCardProps,
   ModuleListProps,
 } from '../../../../types/admin/ProgrammeDesigner';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import DeleteModal from '../Modals/DeleteModal';
-import './ModuleCard.css';
-import { useModuleActions } from '../../../../utils/admin/ProgrammeDesigner';
+import ModuleCardStyles from './ModuleCardStyles';
 import { Module } from '../../../../shared/types';
 
 const ModuleCard: React.FC<ModuleCardProps> = ({
@@ -37,37 +42,60 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
     );
 
   return (
-    <Accordion className="module-card">
-      <AccordionSummary
-        expandIcon={<ExpandCircleDownIcon />}
-        className="module-card-summary"
+    <Card sx={ModuleCardStyles.card}>
+      <Grid
+        templateColumns="1fr auto"
+        alignItems="center"
+        sx={ModuleCardStyles.cardHeader}
       >
-        <Typography variant="subtitle1" className="module-card-title">
-          <span className="module-id">{module.id}</span> - {module.name}
-        </Typography>
-        <div>
-          <IconButton
-            onClick={(event) => {
-              event.stopPropagation();
-              onEdit(module);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            onClick={(event) => {
-              event.stopPropagation();
-              setIsDeleteModalOpen(true);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </div>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Typography variant="body2">Credits: {module.credits}</Typography>
-      </AccordionDetails>
-
+        <GridItem>
+          <Heading size="xs">
+            <Box as="span" sx={ModuleCardStyles.moduleId}>
+              {module.id} - {module.name}
+            </Box>
+          </Heading>
+        </GridItem>
+        <GridItem>
+          <Box>
+            <IconButton
+              aria-label="Edit module"
+              icon={<EditIcon />}
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit(module);
+              }}
+              sx={ModuleCardStyles.iconButton}
+            />
+            <IconButton
+              aria-label="Delete module"
+              icon={<DeleteIcon />}
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsDeleteModalOpen(true);
+              }}
+              sx={ModuleCardStyles.iconButton}
+            />
+          </Box>
+        </GridItem>
+      </Grid>
+      <Accordion allowToggle>
+        <AccordionItem>
+          <AccordionButton sx={ModuleCardStyles.accordionButton}>
+            <Box flex="1" textAlign="left">
+              Module Details
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel sx={ModuleCardStyles.accordionPanel}>
+            <Text>Year: {module.year}</Text>
+            <Text>Type: {module.type}</Text>
+            <Text>Programme: {module.programme.join(', ')}</Text>
+            <Text>Semester: {module.semester}</Text>
+            <Text>Credits: {module.credits}</Text>
+            <Text>Timetabled Hours: {module.timetabledHours}</Text>
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
       <DeleteModal
         open={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -76,7 +104,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
         }
         onRemoveFromDatabase={() => handleRemoveFromDatabase(module.id)}
       />
-    </Accordion>
+    </Card>
   );
 };
 

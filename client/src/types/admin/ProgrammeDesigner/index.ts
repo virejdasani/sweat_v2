@@ -43,12 +43,12 @@ export interface ModuleInstance {
   uniqueId: string;
 }
 
-export interface ModuleFilterButtonsProps {
-  onFilterChange: (year: number | null) => void;
+export interface ModuleYearFilterProps {
+  onFilterChange: (year: string | null) => void;
   selectedYear: number | null;
 }
 
-export interface ModuleTypeFilterButtonsProps {
+export interface ModuleTypeFilterProps {
   onFilterChange: (moduleType: string | null) => void;
   selectedModuleType: string | null;
 }
@@ -64,16 +64,6 @@ export interface DeleteModalProps {
   onClose: () => void;
   onRemoveFromProgramme: () => void;
   onRemoveFromDatabase: () => void;
-}
-
-export interface ModuleModalProps {
-  mode: 'add' | 'edit';
-  module?: Module;
-  onClose: () => void;
-  moduleInstances: ModuleInstance[];
-  setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>;
-  programmeState: Programme[];
-  setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>;
 }
 
 export interface TeachingSchedule {

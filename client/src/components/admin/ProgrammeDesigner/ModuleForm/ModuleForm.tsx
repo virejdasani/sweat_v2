@@ -1,15 +1,6 @@
-import React, { ChangeEvent, useState } from 'react';
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button as MuiButton,
-  IconButton,
-  Box,
-  SelectChangeEvent,
-} from '@mui/material';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import React, { useState } from 'react';
+import { Box, Button, IconButton } from '@chakra-ui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { Module } from '../../../../shared/types';
 import ModuleFormStep1 from './ModuleFormStep1';
 import ModuleFormStep2 from './ModuleFormStep2';
@@ -25,7 +16,15 @@ import {
   removeCoursework,
   useModuleActions,
 } from '../../../../utils/admin/ProgrammeDesigner';
-import { BoxStyles, StyledDialog } from './ModuleForm.styles.ts';
+import {
+  StyledModal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  StepperContainer,
+  StyledModalContent,
+  ModalBackdrop,
+} from './ModuleForm.styles.ts';
 
 const ModuleForm: React.FC<ModuleModalProps> = ({
   mode,
@@ -64,11 +63,8 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
     setProgrammeState,
   );
 
-  const handleChangeStep1Wrapper = (
-    event:
-      | SelectChangeEvent<string | number | string[]>
-      | ChangeEvent<{ value: unknown; name?: string | undefined }>,
-  ) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChangeStep1Wrapper = (event: any) => {
     handleChangeStep1(event, setModuleData);
   };
 
@@ -118,39 +114,50 @@ const ModuleForm: React.FC<ModuleModalProps> = ({
   };
 
   return (
-    <StyledDialog open onClose={onClose}>
-      <DialogTitle>{mode === 'add' ? 'Add Module' : 'Edit Module'}</DialogTitle>
-      <DialogContent>
-        <Box sx={BoxStyles}>
-          <IconButton
-            disabled={activeStep === 0}
-            onClick={handleBack(setActiveStep)}
-          >
-            <ArrowBackIosIcon />
-          </IconButton>
-          {getStepContent(activeStep)}
-          <IconButton
-            disabled={activeStep === 2}
-            onClick={handleNext(setActiveStep)}
-          >
-            <ArrowForwardIosIcon />
-          </IconButton>
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <MuiButton onClick={onClose}>Cancel</MuiButton>
-        <MuiButton
-          onClick={() =>
-            activeStep === 2
-              ? handleSubmit(moduleData, onClose)
-              : handleNext(setActiveStep)()
-          }
-          color="primary"
-        >
-          {activeStep === 2 ? 'Submit' : 'Next'}
-        </MuiButton>
-      </DialogActions>
-    </StyledDialog>
+    <>
+      <StyledModal isOpen onClose={onClose}>
+        <StyledModalContent>
+          <ModalHeader>
+            {mode === 'add' ? 'Add Module' : 'Edit Module'}
+          </ModalHeader>
+          <ModalBody>
+            <StepperContainer>
+              <IconButton
+                aria-label="Previous"
+                icon={<ChevronLeftIcon />}
+                disabled={activeStep === 0}
+                onClick={handleBack(setActiveStep)}
+                variant="ghost"
+              />
+              <Box flex={1}>{getStepContent(activeStep)}</Box>
+              <IconButton
+                aria-label="Next"
+                icon={<ChevronRightIcon />}
+                disabled={activeStep === 2}
+                onClick={handleNext(setActiveStep)}
+                variant="ghost"
+              />
+            </StepperContainer>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose} mr={3}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() =>
+                activeStep === 2
+                  ? handleSubmit(moduleData, onClose)
+                  : handleNext(setActiveStep)()
+              }
+              colorScheme="blue"
+            >
+              {activeStep === 2 ? 'Submit' : 'Next'}
+            </Button>
+          </ModalFooter>
+        </StyledModalContent>
+      </StyledModal>
+      <ModalBackdrop isOpen />
+    </>
   );
 };
 

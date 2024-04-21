@@ -19,13 +19,13 @@ import {
 } from '../../../utils/admin/ProgrammeDesigner';
 import ModuleList from './ModuleCard/ModuleCard';
 import './ProgrammeDesigner.css';
-import { Button as MuiButton } from '@mui/material';
-import ModuleFilterButtons from './Buttons/ModuleFilterButtons';
-import SearchBar from './SearchBar/SearchBar';
-import ModuleTypeFilterButtons from './Buttons/ModuleTypeFilterButtons';
+import SearchBar from './ModuleFilters/SearchBar/SearchBar';
 import ModuleForm from './ModuleForm/ModuleForm';
 import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
 import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
+import { Button } from '@chakra-ui/react';
+import ModuleYearFilter from './ModuleFilters/YearFilter/YearFilter';
+import ModuleTypeFilter from './ModuleFilters/TypeFilter/TypeFilter';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
@@ -72,19 +72,21 @@ function ProgrammeDesigner() {
         />
       </div>
       <div className="filter-buttons-container">
-        <ModuleFilterButtons
-          onFilterChange={(year) => handleFilterChange(year, setSelectedYear)}
+        <ModuleYearFilter
+          onFilterChange={(yearString: string | null) => {
+            const year = yearString !== null ? parseInt(yearString, 10) : null;
+            handleFilterChange(year, setSelectedYear);
+          }}
           selectedYear={selectedYear}
         />
-        <ModuleTypeFilterButtons
+        <ModuleTypeFilter
           onFilterChange={(moduleType) =>
             handleModuleTypeFilterChange(moduleType, setSelectedModuleType)
           }
           selectedModuleType={selectedModuleType}
         />
-        <MuiButton
-          variant="contained"
-          color="primary"
+        <Button
+          colorScheme="blue"
           onClick={() =>
             openAddModuleModal(
               setModalMode,
@@ -94,7 +96,7 @@ function ProgrammeDesigner() {
           }
         >
           Add Module
-        </MuiButton>
+        </Button>
       </div>
       <DragDropContext
         onDragEnd={(result: DropResult) =>
@@ -177,14 +179,13 @@ function ProgrammeDesigner() {
         </div>
       </DragDropContext>
       <div className="save-button-container">
-        <MuiButton
-          variant="contained"
-          color="primary"
+        <Button
+          colorScheme="blue"
           onClick={(event) => handleSaveAllProgrammes(event, programmeState)}
           className="save-programme-button"
         >
           Save All Programmes
-        </MuiButton>
+        </Button>
       </div>
       {isModuleModalOpen && (
         <ModuleForm

@@ -3,18 +3,21 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import ProgrammeDesignPage from './pages/admin/ProgrammeDesign/ProgrammeDesign';
+import { ChakraProvider } from '@chakra-ui/react';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/admin/programme-design"
-          element={<ProgrammeDesignPage />}
-        />
-      </Routes>
-      <ToastContainer />
-    </Router>
+    <ChakraProvider>
+      <Router>
+        <Routes>
+          <Route
+            path="/admin/programme-design"
+            element={<ProgrammeDesignPage />}
+          />
+        </Routes>
+        <ToastContainer />
+      </Router>
+    </ChakraProvider>
   );
 }
 

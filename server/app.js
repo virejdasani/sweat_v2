@@ -50,9 +50,7 @@ app.put('/update-event/:eventId', async (req, res) => {
 
 // MongoDB connection
 mongoose
-  .connect(
-    'mongodb+srv://admin:1234@cluster0.b8ga8wv.mongodb.net/calendar?retryWrites=true&w=majority',
-  )
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('MongoDB connected');
 

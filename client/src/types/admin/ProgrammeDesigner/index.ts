@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SelectChangeEvent } from '@mui/material';
 import { Coursework, Module, Programme } from '../../../shared/types';
 
 export interface ModuleListProps {
@@ -78,9 +77,9 @@ export interface TeachingSchedule {
 export interface ModuleFormStep1Props {
   moduleData: Partial<Module>;
   handleChange: (
-    event:
-      | SelectChangeEvent<string | number | string[]>
-      | React.ChangeEvent<{ value: unknown; name?: string }>,
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => void;
 }
 

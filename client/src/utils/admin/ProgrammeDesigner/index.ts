@@ -15,7 +15,6 @@ import {
 } from '../../../services/admin/ProgrammeDesigner';
 import { getAllProgrammes, getAllModules } from '../../../shared/api';
 import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
-import { SelectChangeEvent } from '@mui/material';
 
 export function handleOnDragEnd(
   result: DropResult,
@@ -576,9 +575,9 @@ export const updateTeachingScheduleProperty = (
 };
 
 export const handleChangeStep1 = (
-  event:
-    | SelectChangeEvent<string | number | string[]>
-    | React.ChangeEvent<{ value: unknown; name?: string }>,
+  event: React.ChangeEvent<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  >,
   setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
 ) => {
   const { name, value } = event.target;
@@ -586,12 +585,12 @@ export const handleChangeStep1 = (
   if (name === 'timetabledHours') {
     setModuleData((prevData: Partial<Module>) => ({
       ...prevData,
-      timetabledHours: value === '' ? 0 : parseInt(value as string, 10),
+      timetabledHours: value === '' ? 0 : parseInt(value, 10),
     }));
   } else {
     setModuleData((prevData: Partial<Module>) => ({
       ...prevData,
-      [name as string]: value,
+      [name]: value,
     }));
   }
 };

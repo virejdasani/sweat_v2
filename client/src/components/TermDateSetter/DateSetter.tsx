@@ -11,7 +11,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './DateSetter.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Modal from './Modal';
+import EditTermDateModal from './EditTermDateModal';
 import { CalendarKeyDateEvent } from '../shared/types/';
 
 const locales = {};
@@ -462,7 +462,7 @@ function DateSetter() {
           }}
         />
 
-        <Modal
+        <EditTermDateModal
           eventTitle={eventTitle}
           showModal={showModal}
           selectEvent={selectEvent}

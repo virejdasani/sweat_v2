@@ -3,6 +3,7 @@ import { AddToCalendarButton } from 'add-to-calendar-button-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+// TODO: move interfaces to types/index.ts
 // Custom Event interface to match the event object
 interface CustomEvent {
   title: string;
@@ -19,7 +20,6 @@ interface ModalProps {
   newEvent: CustomEvent;
   selectedEventStartDate: Date;
   selectedEventEndDate: Date;
-  // React.Dispatch is a generic type that takes a type argument
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   setEventTitle: React.Dispatch<React.SetStateAction<string>>;
   setSelectEvent: React.Dispatch<React.SetStateAction<CustomEvent | null>>;
@@ -30,7 +30,7 @@ interface ModalProps {
 }
 
 // Modal component with props
-const Modal: React.FC<ModalProps> = ({
+const EditTermDateModal: React.FC<ModalProps> = ({
   eventTitle,
   showModal,
   selectEvent,
@@ -95,7 +95,6 @@ const Modal: React.FC<ModalProps> = ({
                 value={eventTitle}
                 onChange={(e) => setEventTitle(e.target.value)}
               />
-              {/* DatePickers need to be in their own <div> or else there is unexpected overlapping in modal style */}
               <div className="datePickerContainer">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -152,4 +151,4 @@ const Modal: React.FC<ModalProps> = ({
   );
 };
 
-export default Modal;
+export default EditTermDateModal;

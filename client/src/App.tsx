@@ -1,15 +1,14 @@
-import { useState } from 'react';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import DateSetter from './components/TermDateSetter/DateSetter';
 
 function App() {
-  //   const [count, setCount] = useState(0);
-
   return (
-    <>
-      <div>
-        <h1>Sweat_v2</h1>
-      </div>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/admin/set-key-dates" element={<DateSetter />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const calendarSchema = new mongoose.Schema({
+  id: String,
   title: String,
   allDay: Boolean,
   start: Date,

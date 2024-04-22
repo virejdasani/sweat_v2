@@ -1,10 +1,13 @@
+import { useState } from 'react';
+import './App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import DateSetter from './components/TermDateSetter/DateSetter';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import ProgrammeDesignPage from './pages/admin/ProgrammeDesign/ProgrammeDesign';
 import { ChakraProvider } from '@chakra-ui/react';
-
 function App() {
   return (
     <ChakraProvider>
@@ -14,6 +17,7 @@ function App() {
             path="/admin/programme-design"
             element={<ProgrammeDesignPage />}
           />
+                  <Route path="/admin/set-key-dates" element={<DateSetter />} />
         </Routes>
         <ToastContainer />
       </Router>

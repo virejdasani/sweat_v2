@@ -12,6 +12,7 @@ import {
   AccordionIcon,
   Grid,
   GridItem,
+  Flex,
 } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import DeleteModal from '../Modals/DeleteModal';
@@ -44,19 +45,18 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
   return (
     <Card sx={ModuleCardStyles.card}>
       <Grid
-        templateColumns="1fr auto"
+        templateColumns="auto 1fr"
         alignItems="center"
         sx={ModuleCardStyles.cardHeader}
       >
+        {' '}
         <GridItem>
-          <Heading size="xs">
-            <Box as="span" sx={ModuleCardStyles.moduleId}>
-              {module.id} - {module.name}
-            </Box>
+          <Heading sx={ModuleCardStyles.moduleId}>
+            {module.id} - {module.name}
           </Heading>
         </GridItem>
         <GridItem>
-          <Box>
+          <Flex direction="column" align="center">
             <IconButton
               aria-label="Edit module"
               icon={<EditIcon />}
@@ -75,7 +75,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
               }}
               sx={ModuleCardStyles.iconButton}
             />
-          </Box>
+          </Flex>
         </GridItem>
       </Grid>
       <Accordion allowToggle>

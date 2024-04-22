@@ -15,8 +15,9 @@ const ModuleCardStyles = {
   },
   moduleId: {
     fontWeight: 'bold',
-    fontSize: 'xs',
+    fontSize: '0.8rem !important',
     mr: 2,
+    py: 2,
   },
   accordionButton: {
     fontSize: 'xs',
@@ -31,7 +32,7 @@ const ModuleCardStyles = {
     px: 4,
   },
   iconButton: {
-    py: 0.5,
+    py: 1,
     px: 0.5,
   },
 };

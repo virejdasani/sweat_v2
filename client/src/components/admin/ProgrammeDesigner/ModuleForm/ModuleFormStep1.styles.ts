@@ -12,12 +12,10 @@ import {
 import styled from '@emotion/styled';
 
 export const FormContainer = styled(Stack)`
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
-  border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 2rem;
 `;
 
 export const FormTitle = styled.h2`

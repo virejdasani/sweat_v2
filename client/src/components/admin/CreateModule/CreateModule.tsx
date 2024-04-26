@@ -14,7 +14,7 @@ import {
   StepSeparator,
   useSteps,
 } from '@chakra-ui/react';
-import { ModuleSetupFormData, steps } from '../../../types/admin/CreateModule';
+import { steps } from '../../../types/admin/CreateModule';
 import {
   handlePrev,
   handleNext,
@@ -24,6 +24,8 @@ import {
 } from '../../../utils/admin/CreateModule';
 import ModuleSetup from './ModuleSetup/ModuleSetup';
 import { createModuleStyles } from './CreateModuleStyles';
+import TeachingSchedule from './TeachingSchedule/TeachingSchedule';
+import { ModuleSetupFormData } from '../../../types/admin/CreateModule/ModuleSetup';
 
 const MAX_STEPS = 5;
 
@@ -49,8 +51,13 @@ const CreateModule: React.FC = () => {
     switch (activeStep) {
       case 0:
         return <ModuleSetup formData={formData} setFormData={setFormData} />;
-      // case 1:
-      //   return <ModuleTemplate />;
+      case 1:
+        return (
+          <TeachingSchedule
+            moduleCredit={formData.moduleCredit}
+            semester={formData.semester}
+          />
+        );
       // case 2:
       //   return <ModuleRows />;
       // case 3:

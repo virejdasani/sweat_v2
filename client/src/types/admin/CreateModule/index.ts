@@ -16,20 +16,3 @@ export const steps: Step[] = [
   },
   { title: 'Review', description: 'Review module details' },
 ];
-
-export interface ModuleSetupFormData {
-  moduleCode: string;
-  moduleTitle: string;
-  moduleCredit: number;
-  courseworkPercentage: number;
-  examPercentage: number;
-  studyYear: number;
-  programme: string[];
-  semester: string;
-  type: string;
-}
-
-export interface ModuleSetupProps {
-  formData: ModuleSetupFormData;
-  setFormData: React.Dispatch<React.SetStateAction<ModuleSetupFormData>>;
-}

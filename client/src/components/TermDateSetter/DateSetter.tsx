@@ -34,6 +34,10 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing package)
 
 function DateSetter() {
+  const [course, setCourse] = useState('CS'); // State for selected course
+  const [readingWeekStart, setReadingWeekStart] = useState(new Date());
+  const [readingWeekEnd, setReadingWeekEnd] = useState(new Date());
+
   const [holidayEvent, setHolidayEvent] = useState({
     title: '',
     allDay: true,
@@ -159,6 +163,12 @@ function DateSetter() {
       start: new Date(),
       end: new Date(),
     });
+  };
+
+  // Function to handle course selection
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCourse = e.target.value;
+    setCourse(selectedCourse);
   };
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
@@ -379,6 +389,12 @@ function DateSetter() {
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>
+          {/* Dropdown for selecting course */}
+          <span>Select Course: </span>
+          <select className="mb-4" value={course} onChange={handleCourseChange}>
+            <option value="CS">CS</option>
+            <option value="EE">EE</option>
+          </select>
 
           {/* Input field for adding semester 1 start date */}
           <div className="formInput">
@@ -455,6 +471,50 @@ function DateSetter() {
               Add Easter Break
             </button>
           </div>
+
+          {/* Easter break section with conditional rendering */}
+          {course === 'EE' && (
+            <>
+              <hr className="lightRounded"></hr>
+              <div>
+                <div className="datePickers">
+                  <span>Reading Week Start Date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="Start Date"
+                      selected={readingWeekStart}
+                      onChange={(start: Date) => setReadingWeekStart(start)}
+                    />
+                  </div>
+                </div>
+                <div className="datePickers">
+                  <span>Reading Week End Date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="End Date"
+                      selected={readingWeekEnd}
+                      onChange={(end: Date) => setReadingWeekEnd(end)}
+                    />
+                  </div>
+                </div>
+                <button
+                  className="eventButton"
+                  onClick={() =>
+                    handleAddEvent({
+                      title: 'Reading Week',
+                      allDay: true,
+                      start: readingWeekStart,
+                      end: readingWeekEnd,
+                    })
+                  }
+                >
+                  Add Reading Week
+                </button>
+              </div>
+            </>
+          )}
 
           <hr className="lightRounded"></hr>
 

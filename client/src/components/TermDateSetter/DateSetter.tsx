@@ -100,16 +100,30 @@ function DateSetter() {
       allDay: item.allDay,
     }));
 
+    // Filter out "Reading Week" event if the course is CS
+    const filteredEvents =
+      course === 'CS'
+        ? localNewEvents.filter((event) => event.title !== 'Reading Week')
+        : localNewEvents;
+
     setEvents((prevEvents) => {
       // Filter out events that already exist in the events array
-      const uniqueNewEvents = localNewEvents.filter((newEvent) =>
+      const uniqueNewEvents = filteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
       // Concatenate unique new events with existing events
+      const updatedEvents = [...prevEvents, ...uniqueNewEvents];
+
+      // If switching from EE to CS, remove the Reading Week event locally
+      if (course === 'CS') {
+        return updatedEvents.filter((event) => event.title !== 'Reading Week');
+      }
+
+      // Concatenate unique new events with existing events
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems]);
+  }, [fetchedItems, course]);
 
   // this is if we have added all bank holidays to MongoDB
   // this replaces the existing events with the fetched items so only events from the server are displayed

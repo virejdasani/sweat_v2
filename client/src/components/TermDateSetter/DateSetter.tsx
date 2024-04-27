@@ -54,6 +54,13 @@ function DateSetter() {
     end: new Date(),
   });
 
+  const [easterBreakEvent, setEasterBreakEvent] = useState({
+    title: 'Easter Break',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
   const [newEvent, setNewEvent] = useState({
     title: '',
     allDay: true,
@@ -127,6 +134,31 @@ function DateSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
+
+  const handleAddEasterBreak = () => {
+    // Check that both start and end dates are selected
+    if (!easterBreakEvent.start || !easterBreakEvent.end) {
+      toast('Please select both start and end dates for the Easter break');
+      return;
+    }
+
+    // Make sure start date is before end date
+    if (easterBreakEvent.start >= easterBreakEvent.end) {
+      toast('Easter break start date must be before end date');
+      return;
+    }
+
+    // Add the Easter break event
+    handleAddEvent(easterBreakEvent);
+
+    // Reset the Easter break input fields
+    setEasterBreakEvent({
+      title: 'Easter Break',
+      allDay: true,
+      start: new Date(),
+      end: new Date(),
+    });
+  };
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: CalendarKeyDateEvent) => {
@@ -390,10 +422,44 @@ function DateSetter() {
               Add Semester 2 Start Date
             </button>
           </div>
+          <hr className="lightRounded"></hr>
+          <div>
+            <div className="datePickers">
+              <span>Easter start date: </span>
+              <div className="d-inline">
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Start Date"
+                  selected={easterBreakEvent.start}
+                  onChange={(start: Date) =>
+                    setEasterBreakEvent({ ...easterBreakEvent, start })
+                  }
+                />
+              </div>
+            </div>
+            <div className="datePickers">
+              <span>Easter end date: </span>
+              <div className="d-inline">
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="End Date"
+                  selected={easterBreakEvent.end}
+                  onChange={(end: Date) =>
+                    setEasterBreakEvent({ ...easterBreakEvent, end })
+                  }
+                />
+              </div>
+            </div>
+            <button className="eventButton mb-2" onClick={handleAddEasterBreak}>
+              Add Easter Break
+            </button>
+          </div>
+
+          <hr className="lightRounded"></hr>
+
+          {/* Input field for adding holidays */}
           <div>
             <span>Add holiday: </span>
-
-            {/* Input field for adding holidays */}
             <input
               type="text"
               placeholder="Holiday name"

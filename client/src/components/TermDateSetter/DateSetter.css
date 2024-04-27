@@ -9,7 +9,13 @@
 .rounded {
   border-top: 2px solid #000000 !important;
   width: 90%;
-  /* make it centered */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lightRounded {
+  border-top: 2px solid #a0a0a0 !important;
+  width: 80%;
   margin-left: auto;
   margin-right: auto;
 }

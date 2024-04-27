@@ -28,6 +28,7 @@ const eventsOnCalendar: CalendarKeyDateEvent[] = [];
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
+// Add all to calendar does not work because it will open a new tab with the calendar event for each event
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing package)

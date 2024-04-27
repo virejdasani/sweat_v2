@@ -28,11 +28,16 @@ const eventsOnCalendar: CalendarKeyDateEvent[] = [];
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
+// Add all to calendar does not work because it will open a new tab with the calendar event for each event
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 // TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing package)
 
 function DateSetter() {
+  const [course, setCourse] = useState('CS'); // State for selected course
+  const [readingWeekStart, setReadingWeekStart] = useState(new Date());
+  const [readingWeekEnd, setReadingWeekEnd] = useState(new Date());
+
   const [holidayEvent, setHolidayEvent] = useState({
     title: '',
     allDay: true,
@@ -49,6 +54,13 @@ function DateSetter() {
 
   const [semester2Event, setSemester2Event] = useState({
     title: 'Semester 2 Start Date', // hardcoded to prevent changing the title to anything else
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [easterBreakEvent, setEasterBreakEvent] = useState({
+    title: 'Easter Break',
     allDay: true,
     start: new Date(),
     end: new Date(),
@@ -88,16 +100,30 @@ function DateSetter() {
       allDay: item.allDay,
     }));
 
+    // Filter out "Reading Week" event if the course is CS
+    const filteredEvents =
+      course === 'CS'
+        ? localNewEvents.filter((event) => event.title !== 'Reading Week')
+        : localNewEvents;
+
     setEvents((prevEvents) => {
       // Filter out events that already exist in the events array
-      const uniqueNewEvents = localNewEvents.filter((newEvent) =>
+      const uniqueNewEvents = filteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
       // Concatenate unique new events with existing events
+      const updatedEvents = [...prevEvents, ...uniqueNewEvents];
+
+      // If switching from EE to CS, remove the Reading Week event locally
+      if (course === 'CS') {
+        return updatedEvents.filter((event) => event.title !== 'Reading Week');
+      }
+
+      // Concatenate unique new events with existing events
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems]);
+  }, [fetchedItems, course]);
 
   // this is if we have added all bank holidays to MongoDB
   // this replaces the existing events with the fetched items so only events from the server are displayed
@@ -127,6 +153,37 @@ function DateSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
+
+  const handleAddEasterBreak = () => {
+    // Check that both start and end dates are selected
+    if (!easterBreakEvent.start || !easterBreakEvent.end) {
+      toast('Please select both start and end dates for the Easter break');
+      return;
+    }
+
+    // Make sure start date is before end date
+    if (easterBreakEvent.start >= easterBreakEvent.end) {
+      toast('Easter break start date must be before end date');
+      return;
+    }
+
+    // Add the Easter break event
+    handleAddEvent(easterBreakEvent);
+
+    // Reset the Easter break input fields
+    setEasterBreakEvent({
+      title: 'Easter Break',
+      allDay: true,
+      start: new Date(),
+      end: new Date(),
+    });
+  };
+
+  // Function to handle course selection
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCourse = e.target.value;
+    setCourse(selectedCourse);
+  };
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: CalendarKeyDateEvent) => {
@@ -346,6 +403,12 @@ function DateSetter() {
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>
+          {/* Dropdown for selecting course */}
+          <span>Select Course: </span>
+          <select className="mb-4" value={course} onChange={handleCourseChange}>
+            <option value="CS">CS</option>
+            <option value="EE">EE</option>
+          </select>
 
           {/* Input field for adding semester 1 start date */}
           <div className="formInput">
@@ -390,10 +453,88 @@ function DateSetter() {
               Add Semester 2 Start Date
             </button>
           </div>
+          <hr className="lightRounded"></hr>
+          <div>
+            <div className="datePickers">
+              <span>Easter start date: </span>
+              <div className="d-inline">
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Start Date"
+                  selected={easterBreakEvent.start}
+                  onChange={(start: Date) =>
+                    setEasterBreakEvent({ ...easterBreakEvent, start })
+                  }
+                />
+              </div>
+            </div>
+            <div className="datePickers">
+              <span>Easter end date: </span>
+              <div className="d-inline">
+                <DatePicker
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="End Date"
+                  selected={easterBreakEvent.end}
+                  onChange={(end: Date) =>
+                    setEasterBreakEvent({ ...easterBreakEvent, end })
+                  }
+                />
+              </div>
+            </div>
+            <button className="eventButton mb-2" onClick={handleAddEasterBreak}>
+              Add Easter Break
+            </button>
+          </div>
+
+          {/* Easter break section with conditional rendering */}
+          {course === 'EE' && (
+            <>
+              <hr className="lightRounded"></hr>
+              <div>
+                <div className="datePickers">
+                  <span>Reading Week Start Date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="Start Date"
+                      selected={readingWeekStart}
+                      onChange={(start: Date) => setReadingWeekStart(start)}
+                    />
+                  </div>
+                </div>
+                <div className="datePickers">
+                  <span>Reading Week End Date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="End Date"
+                      selected={readingWeekEnd}
+                      onChange={(end: Date) => setReadingWeekEnd(end)}
+                    />
+                  </div>
+                </div>
+                <button
+                  className="eventButton"
+                  onClick={() =>
+                    handleAddEvent({
+                      title: 'Reading Week',
+                      allDay: true,
+                      start: readingWeekStart,
+                      end: readingWeekEnd,
+                    })
+                  }
+                >
+                  Add Reading Week
+                </button>
+              </div>
+            </>
+          )}
+
+          <hr className="lightRounded"></hr>
+
+          {/* Input field for adding holidays */}
           <div>
             <span>Add holiday: </span>
-
-            {/* Input field for adding holidays */}
             <input
               type="text"
               placeholder="Holiday name"

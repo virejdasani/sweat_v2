@@ -1,10 +1,13 @@
 {
+  "homepage": "https://AbuIqbal123.github.io/sweat_v2",
   "name": "sweat_v2_client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "build": "tsc && vite build",
     "lint": "eslint './**/*.{js,jsx,ts,tsx}'",
     "preview": "vite preview",
@@ -42,6 +45,7 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "gh-pages": "^6.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.6"
   }

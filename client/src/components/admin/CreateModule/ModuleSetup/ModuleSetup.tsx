@@ -17,8 +17,8 @@ import {
 } from '@chakra-ui/react';
 
 import { moduleSetupStyles } from './ModuleSetupStyles';
-import { ModuleSetupProps } from '../../../../types/admin/CreateModule';
-import { handleInputChange } from '../../../../utils/admin/CreateModule';
+import { ModuleSetupProps } from '../../../../types/admin/CreateModule/ModuleSetup';
+import { handleInputChange } from '../../../../utils/admin/CreateModule/ModuleSetup';
 
 const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
   const programmes = ['CSEE', 'AVS', 'MCR', 'EEE'];

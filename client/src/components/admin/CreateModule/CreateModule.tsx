@@ -20,12 +20,15 @@ import {
   handleNext,
   prevStep,
   nextStep,
-  handleSubmit,
 } from '../../../utils/admin/CreateModule';
 import ModuleSetup from './ModuleSetup/ModuleSetup';
 import { createModuleStyles } from './CreateModuleStyles';
 import TeachingSchedule from './TeachingSchedule/TeachingSchedule';
 import { ModuleSetupFormData } from '../../../types/admin/CreateModule/ModuleSetup';
+import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
+import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
+import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
+import { handleSubmit } from '../../../utils/admin/CreateModule/ModuleSetup';
 
 const MAX_STEPS = 5;
 
@@ -41,6 +44,28 @@ const CreateModule: React.FC = () => {
     semester: '',
     type: '',
   });
+
+  const [courseworkList, setCourseworkList] = React.useState<Coursework[]>([]);
+
+  const handleCourseworkListChange = (updatedCourseworkList: Coursework[]) => {
+    setCourseworkList(updatedCourseworkList);
+  };
+
+  const handleScheduleChange = (
+    index: number,
+    field: keyof Omit<
+      Coursework,
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    >,
+    value: number,
+  ) => {
+    const updatedCourseworkList = [...courseworkList];
+    updatedCourseworkList[index] = {
+      ...updatedCourseworkList[index],
+      [field]: value,
+    };
+    setCourseworkList(updatedCourseworkList);
+  };
 
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
@@ -58,10 +83,21 @@ const CreateModule: React.FC = () => {
             semester={formData.semester}
           />
         );
-      // case 2:
-      //   return <ModuleRows />;
-      // case 3:
-      //   return <ModuleDependentTable />;
+      case 2:
+        return (
+          <CourseworkSetup
+            courseworkList={courseworkList}
+            onCourseworkListChange={handleCourseworkListChange}
+          />
+        );
+      case 3:
+        return (
+          <CourseworkSchedule
+            courseworkList={courseworkList}
+            moduleCredit={formData.moduleCredit}
+            handleScheduleChange={handleScheduleChange}
+          />
+        );
       // case 4:
       //   return <ModuleReview />;
       default:

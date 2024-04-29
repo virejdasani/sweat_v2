@@ -32,11 +32,13 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
   setTemplateData,
 }) => {
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchTemplateData(moduleCredit, semester, setTemplateData);
-    };
-    fetchData();
-  }, [moduleCredit, semester, setTemplateData]);
+    if (templateData.length === 0) {
+      const fetchData = async () => {
+        await fetchTemplateData(moduleCredit, semester, setTemplateData);
+      };
+      fetchData();
+    }
+  }, [moduleCredit, semester, templateData, setTemplateData]);
 
   const handleInputChange = (
     tableIndex: number,

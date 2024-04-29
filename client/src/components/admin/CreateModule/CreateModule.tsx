@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -30,6 +30,7 @@ import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import { handleSubmit } from '../../../utils/admin/CreateModule/ModuleSetup';
 import ModuleReview from './Review/ModuleReview';
+import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
 
 const MAX_STEPS = 5;
 
@@ -48,6 +49,17 @@ const CreateModule: React.FC = () => {
 
   const [courseworkList, setCourseworkList] = React.useState<Coursework[]>([]);
   const [templateData, setTemplateData] = React.useState<number[][][]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchTemplateData(
+        formData.moduleCredit,
+        formData.semester,
+        setTemplateData,
+      );
+    };
+    fetchData();
+  }, [formData.moduleCredit, formData.semester]);
 
   const handleCourseworkListChange = (updatedCourseworkList: Coursework[]) => {
     setCourseworkList(updatedCourseworkList);

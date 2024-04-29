@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Table,
@@ -28,15 +28,15 @@ import {
 const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
   moduleCredit,
   semester,
+  templateData,
+  setTemplateData,
 }) => {
-  const [templateData, setTemplateData] = useState<number[][][]>([]);
-
   useEffect(() => {
     const fetchData = async () => {
       await fetchTemplateData(moduleCredit, semester, setTemplateData);
     };
     fetchData();
-  }, [moduleCredit, semester]);
+  }, [moduleCredit, semester, setTemplateData]);
 
   const handleInputChange = (
     tableIndex: number,

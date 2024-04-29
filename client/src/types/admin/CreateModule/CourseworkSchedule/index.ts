@@ -11,4 +11,5 @@ export interface CourseworkScheduleProps {
     >,
     value: number,
   ) => void;
+  templateData: number[][][];
 }

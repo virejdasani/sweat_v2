@@ -12,6 +12,24 @@ export const calculateTotalTime = (coursework: Coursework) => {
   return totalTime;
 };
 
-export const expectedTotalTime = (weight: number, moduleCredit: number) => {
-  return moduleCredit * 10 * (weight / 100);
+export const expectedTotalTime = (
+  weight: number,
+  moduleCredit: number,
+  templateData: number[][][],
+) => {
+  const totalContactTimeFromStep2 = templateData.reduce(
+    (total, table) =>
+      total +
+      table.reduce(
+        (tableTotal, row) =>
+          tableTotal + row.reduce((rowTotal, value) => rowTotal + value, 0),
+        0,
+      ),
+    0,
+  );
+  return parseFloat(
+    ((moduleCredit * 10 - totalContactTimeFromStep2) * (weight / 100)).toFixed(
+      2,
+    ),
+  );
 };

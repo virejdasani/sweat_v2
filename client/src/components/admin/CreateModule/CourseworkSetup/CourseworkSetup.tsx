@@ -132,8 +132,30 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
           ))}
         </Tbody>
       </Table>
-      <Text style={courseworkSetupStyles.totalWeight}>
+      <Text
+        style={{
+          ...courseworkSetupStyles.totalWeight,
+          color:
+            totalWeight === 100
+              ? 'green'
+              : totalWeight > 100
+                ? 'red'
+                : 'inherit',
+        }}
+      >
         Total Weight: {totalWeight}
+        {totalWeight > 100 && (
+          <Text style={{ color: 'red' }}>
+            {' '}
+            (Warning: Total weight exceeds 100%)
+          </Text>
+        )}
+        {totalWeight < 100 && (
+          <Text style={{ color: 'red' }}>
+            {' '}
+            (Warning: Total weight is less than 100%)
+          </Text>
+        )}
       </Text>
       <Button
         onClick={handleAddCoursework}

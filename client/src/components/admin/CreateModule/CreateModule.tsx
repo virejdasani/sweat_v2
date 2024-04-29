@@ -29,6 +29,7 @@ import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import { handleSubmit } from '../../../utils/admin/CreateModule/ModuleSetup';
+import ModuleReview from './Review/ModuleReview';
 
 const MAX_STEPS = 5;
 
@@ -46,6 +47,7 @@ const CreateModule: React.FC = () => {
   });
 
   const [courseworkList, setCourseworkList] = React.useState<Coursework[]>([]);
+  const [templateData, setTemplateData] = React.useState<number[][][]>([]);
 
   const handleCourseworkListChange = (updatedCourseworkList: Coursework[]) => {
     setCourseworkList(updatedCourseworkList);
@@ -81,6 +83,8 @@ const CreateModule: React.FC = () => {
           <TeachingSchedule
             moduleCredit={formData.moduleCredit}
             semester={formData.semester}
+            templateData={templateData}
+            setTemplateData={setTemplateData}
           />
         );
       case 2:
@@ -96,10 +100,17 @@ const CreateModule: React.FC = () => {
             courseworkList={courseworkList}
             moduleCredit={formData.moduleCredit}
             handleScheduleChange={handleScheduleChange}
+            templateData={templateData}
           />
         );
-      // case 4:
-      //   return <ModuleReview />;
+      case 4:
+        return (
+          <ModuleReview
+            formData={formData}
+            courseworkList={courseworkList}
+            templateData={templateData}
+          />
+        );
       default:
         return null;
     }

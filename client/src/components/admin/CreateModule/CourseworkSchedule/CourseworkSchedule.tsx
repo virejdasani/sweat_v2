@@ -11,6 +11,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   courseworkList,
   moduleCredit,
   handleScheduleChange,
+  templateData,
 }) => {
   return (
     <Table style={courseworkScheduleStyles.table}>
@@ -172,9 +173,54 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
           <Td style={courseworkScheduleStyles.td}>Total time</Td>
           {courseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
-              <Text>
+              <Text
+                style={{
+                  color:
+                    calculateTotalTime(coursework) ===
+                    expectedTotalTime(
+                      coursework.weight || 0,
+                      moduleCredit,
+                      templateData,
+                    )
+                      ? 'green'
+                      : calculateTotalTime(coursework) >
+                          expectedTotalTime(
+                            coursework.weight || 0,
+                            moduleCredit,
+                            templateData,
+                          )
+                        ? 'red'
+                        : 'inherit',
+                }}
+              >
                 {calculateTotalTime(coursework)} /{' '}
-                {expectedTotalTime(coursework.weight, moduleCredit)}
+                {expectedTotalTime(
+                  coursework.weight || 0,
+                  moduleCredit,
+                  templateData,
+                )}
+                {calculateTotalTime(coursework) >
+                  expectedTotalTime(
+                    coursework.weight || 0,
+                    moduleCredit,
+                    templateData,
+                  ) && (
+                  <Text style={{ color: 'red' }}>
+                    {' '}
+                    (Warning: Exceeds expected time!)
+                  </Text>
+                )}
+                {calculateTotalTime(coursework) <
+                  expectedTotalTime(
+                    coursework.weight || 0,
+                    moduleCredit,
+                    templateData,
+                  ) && (
+                  <Text style={{ color: 'red' }}>
+                    {' '}
+                    (Warning: Below expected time!)
+                  </Text>
+                )}
               </Text>
             </Td>
           ))}

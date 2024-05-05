@@ -78,11 +78,31 @@ function DateSetter() {
     useState<CalendarKeyDateEvent[]>(eventsOnCalendar);
 
   const [fetchedItems, setFetchedItems] = useState<CalendarKeyDateEvent[]>([]);
+
   // fetch events from the server and set the events state
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(baseURL);
       const data = await res.json();
+
+      // Search for events with titles "Semester 1 Start Date" and "Semester 2 Start Date"
+      const semester1StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Semester 1 Start Date'),
+      );
+      const semester2StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Semester 2 Start Date'),
+      );
+
+      // Log the dates of these events and assign them to global variables
+      if (semester1StartDateEvent) {
+        const sem1StartDate = semester1StartDateEvent.start;
+        console.log('Sem 1 start date:', sem1StartDate);
+      }
+      if (semester2StartDateEvent) {
+        const sem2StartDate = semester2StartDateEvent.start;
+        console.log('Sem 2 start date:', sem2StartDate);
+      }
+
       setFetchedItems(data);
       console.log('Fetched items: ', data);
     };
@@ -185,6 +205,50 @@ function DateSetter() {
     setCourse(selectedCourse);
   };
 
+  const getSemesterWeekNumber = (date: Date) => {
+    console.log('Semester 1 start date:', semester1Event.start);
+    console.log('Semester 2 start date:', semester2Event.start);
+
+    const semester1StartDate = semester1Event.start;
+    const semester2StartDate = semester2Event.start;
+
+    // Check if the date is in semester 1
+    if (date >= semester1StartDate && date < semester2StartDate) {
+      // Calculate the difference in milliseconds between the date and the semester 1 start date
+      const millisecondsDifference =
+        date.getTime() - semester1StartDate.getTime();
+
+      // Calculate the number of full weeks elapsed
+      const fullWeeksElapsed = Math.floor(
+        millisecondsDifference / (7 * 24 * 60 * 60 * 1000),
+      );
+
+      // Add 1 to start counting from week 1
+      const weekNumber = fullWeeksElapsed + 1;
+
+      return weekNumber;
+    }
+
+    // Check if the date is in semester 2
+    if (date >= semester2StartDate) {
+      // Calculate the difference in milliseconds between the date and the semester 2 start date
+      const millisecondsDifference =
+        date.getTime() - semester2StartDate.getTime();
+
+      // Calculate the number of full weeks elapsed
+      const fullWeeksElapsed = Math.floor(
+        millisecondsDifference / (7 * 24 * 60 * 60 * 1000),
+      );
+
+      // Add 1 to start counting from week 1
+      const weekNumber = fullWeeksElapsed + 1;
+
+      return weekNumber;
+    }
+
+    return 0;
+  };
+
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: CalendarKeyDateEvent) => {
     // check that event title is not empty (so bank holidays can't be added without a title)
@@ -192,6 +256,12 @@ function DateSetter() {
       toast('Please enter a name for the date');
       return;
     }
+
+    // Calculate week number based on difference between event start date and Semester 1 start date
+    const weekNumber = getSemesterWeekNumber(event.start);
+
+    // Add week number to the event title
+    event.title += ` (Week ${weekNumber})`;
 
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);

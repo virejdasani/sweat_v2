@@ -209,6 +209,8 @@ function DateSetter() {
     console.log('Semester 1 start date:', semester1Event.start);
     console.log('Semester 2 start date:', semester2Event.start);
 
+    // TODO: get the semester start dates from the database
+
     const semester1StartDate = semester1Event.start;
     const semester2StartDate = semester2Event.start;
 

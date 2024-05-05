@@ -28,7 +28,7 @@ export const courseworkSetupStyles = {
     },
   },
   select: {
-    width: '100%',
+    width: '150px',
     padding: '0.5rem',
     border: '1px solid #e0e0e0',
     borderRadius: '4px',
@@ -63,5 +63,16 @@ export const courseworkSetupStyles = {
     marginTop: '1rem',
     fontSize: '1.1rem',
     fontWeight: 'bold',
+  },
+  datePicker: {
+    width: '100%',
+    padding: '0.5rem',
+    border: '1px solid #e0e0e0',
+    borderRadius: '4px',
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#3182ce',
+      boxShadow: '0 0 0 1px #3182ce',
+    },
   },
 };

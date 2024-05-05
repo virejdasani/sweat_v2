@@ -3,8 +3,10 @@ export interface Coursework {
   weight: number;
   type: string;
   deadlineWeek: number;
+  deadlineDate?: Date;
   releasedWeekEarlier: number;
-  contactTimeLectureTutorial?: number;
+  contactTimeLecture?: number;
+  contactTimeTutorial?: number;
   contactTimeLab?: number;
   contactTimeBriefing?: number;
   formativeAssessment?: number;
@@ -14,6 +16,13 @@ export interface Coursework {
 }
 
 export interface CourseworkSetupProps {
+  courseworkList: Coursework[];
+  onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
+  semester: string;
+  examPercentage: number;
+}
+
+export interface CourseworkSetupFunctionsProps {
   courseworkList: Coursework[];
   onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
 }

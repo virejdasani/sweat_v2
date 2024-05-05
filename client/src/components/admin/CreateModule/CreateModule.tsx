@@ -104,6 +104,8 @@ const CreateModule: React.FC = () => {
           <CourseworkSetup
             courseworkList={courseworkList}
             onCourseworkListChange={handleCourseworkListChange}
+            semester={formData.semester}
+            examPercentage={100 - formData.courseworkPercentage}
           />
         );
       case 3:

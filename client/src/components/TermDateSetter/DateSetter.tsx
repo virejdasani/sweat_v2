@@ -93,14 +93,30 @@ function DateSetter() {
         event.title.includes('Semester 2 Start Date'),
       );
 
-      // Log the dates of these events and assign them to global variables
+      // Extract semester start dates
+      let semester1Start: Date | null = null;
+      let semester2Start: Date | null = null;
       if (semester1StartDateEvent) {
-        const sem1StartDate = semester1StartDateEvent.start;
-        console.log('Sem 1 start date:', sem1StartDate);
+        semester1Start = new Date(semester1StartDateEvent.start);
       }
       if (semester2StartDateEvent) {
-        const sem2StartDate = semester2StartDateEvent.start;
-        console.log('Sem 2 start date:', sem2StartDate);
+        semester2Start = new Date(semester2StartDateEvent.start);
+      }
+
+      // Log the dates of these events and assign them to global variables
+      if (semester1Start) {
+        console.log('Semester 1 start date:', semester1Start);
+        setSemester1Event({
+          ...semester1Event,
+          start: semester1Start,
+        });
+      }
+      if (semester2Start) {
+        console.log('Semester 2 start date:', semester2Start);
+        setSemester2Event({
+          ...semester2Event,
+          start: semester2Start,
+        });
       }
 
       setFetchedItems(data);
@@ -210,14 +226,15 @@ function DateSetter() {
     sem1Start: Date,
     sem2Start: Date,
   ) => {
-    console.log('Semester 1 start date:', semester1Event.start);
-    console.log('Semester 2 start date:', semester2Event.start);
     console.log('Date:', date);
 
     // TODO: get the semester start dates from the database
 
     const semester1StartDate = sem1Start;
     const semester2StartDate = sem2Start;
+
+    console.log('Semester 1 start date:', semester1StartDate);
+    console.log('Semester 2 start date:', semester2StartDate);
 
     // Check if the date is in semester 1
     if (date >= semester1StartDate && date < semester2StartDate) {

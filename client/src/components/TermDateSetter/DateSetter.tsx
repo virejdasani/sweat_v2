@@ -212,6 +212,7 @@ function DateSetter() {
   ) => {
     console.log('Semester 1 start date:', semester1Event.start);
     console.log('Semester 2 start date:', semester2Event.start);
+    console.log('Date:', date);
 
     // TODO: get the semester start dates from the database
 
@@ -220,6 +221,7 @@ function DateSetter() {
 
     // Check if the date is in semester 1
     if (date >= semester1StartDate && date < semester2StartDate) {
+      console.log('Date is in semester 1');
       // Calculate the difference in milliseconds between the date and the semester 1 start date
       const millisecondsDifference =
         date.getTime() - semester1StartDate.getTime();
@@ -237,6 +239,7 @@ function DateSetter() {
 
     // Check if the date is in semester 2
     if (date >= semester2StartDate) {
+      console.log('Date is in semester 2');
       // Calculate the difference in milliseconds between the date and the semester 2 start date
       const millisecondsDifference =
         date.getTime() - semester2StartDate.getTime();
@@ -659,6 +662,27 @@ function DateSetter() {
             </button>
           </div>
         </div>
+
+        {/* delete all events from mongodb */}
+        <button
+          className="eventButton"
+          onClick={() => {
+            axios
+              .delete(baseURL + 'delete-all-events')
+              .then((res: { data: CalendarKeyDateEvent }) => {
+                console.log('All events deleted from MongoDB');
+                console.log(res);
+              })
+              .catch((err: { data: CalendarKeyDateEvent }) => {
+                console.error('Error deleting all events from MongoDB: ', err);
+              });
+
+            setEvents([]); // Update local state to reflect the event deletion
+            toast('All events deleted');
+          }}
+        >
+          Delete All Events
+        </button>
 
         {/* divider */}
         <hr className="rounded"></hr>

@@ -205,14 +205,18 @@ function DateSetter() {
     setCourse(selectedCourse);
   };
 
-  const getSemesterWeekNumber = (date: Date) => {
+  const getSemesterWeekNumber = (
+    date: Date,
+    sem1Start: Date,
+    sem2Start: Date,
+  ) => {
     console.log('Semester 1 start date:', semester1Event.start);
     console.log('Semester 2 start date:', semester2Event.start);
 
     // TODO: get the semester start dates from the database
 
-    const semester1StartDate = semester1Event.start;
-    const semester2StartDate = semester2Event.start;
+    const semester1StartDate = sem1Start;
+    const semester2StartDate = sem2Start;
 
     // Check if the date is in semester 1
     if (date >= semester1StartDate && date < semester2StartDate) {
@@ -260,7 +264,11 @@ function DateSetter() {
     }
 
     // Calculate week number based on difference between event start date and Semester 1 start date
-    const weekNumber = getSemesterWeekNumber(event.start);
+    const weekNumber = getSemesterWeekNumber(
+      event.start,
+      semester1Event.start,
+      semester2Event.start,
+    );
 
     // Add week number to the event title
     event.title += ` (Week ${weekNumber})`;

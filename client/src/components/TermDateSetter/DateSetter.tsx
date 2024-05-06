@@ -228,8 +228,6 @@ function DateSetter() {
   ) => {
     console.log('Date:', date);
 
-    // TODO: get the semester start dates from the database
-
     const semester1StartDate = sem1Start;
     const semester2StartDate = sem2Start;
 

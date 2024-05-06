@@ -78,11 +78,47 @@ function DateSetter() {
     useState<CalendarKeyDateEvent[]>(eventsOnCalendar);
 
   const [fetchedItems, setFetchedItems] = useState<CalendarKeyDateEvent[]>([]);
+
   // fetch events from the server and set the events state
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(baseURL);
       const data = await res.json();
+
+      // Search for events with titles "Semester 1 Start Date" and "Semester 2 Start Date"
+      const semester1StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Semester 1 Start Date'),
+      );
+      const semester2StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Semester 2 Start Date'),
+      );
+
+      // Extract semester start dates
+      let semester1Start: Date | null = null;
+      let semester2Start: Date | null = null;
+      if (semester1StartDateEvent) {
+        semester1Start = new Date(semester1StartDateEvent.start);
+      }
+      if (semester2StartDateEvent) {
+        semester2Start = new Date(semester2StartDateEvent.start);
+      }
+
+      // Log the dates of these events and assign them to global variables
+      if (semester1Start) {
+        console.log('Semester 1 start date:', semester1Start);
+        setSemester1Event({
+          ...semester1Event,
+          start: semester1Start,
+        });
+      }
+      if (semester2Start) {
+        console.log('Semester 2 start date:', semester2Start);
+        setSemester2Event({
+          ...semester2Event,
+          start: semester2Start,
+        });
+      }
+
       setFetchedItems(data);
       console.log('Fetched items: ', data);
     };
@@ -185,6 +221,58 @@ function DateSetter() {
     setCourse(selectedCourse);
   };
 
+  const getSemesterWeekNumber = (
+    date: Date,
+    sem1Start: Date,
+    sem2Start: Date,
+  ) => {
+    console.log('Date:', date);
+
+    const semester1StartDate = sem1Start;
+    const semester2StartDate = sem2Start;
+
+    console.log('Semester 1 start date:', semester1StartDate);
+    console.log('Semester 2 start date:', semester2StartDate);
+
+    // Check if the date is in semester 1
+    if (date >= semester1StartDate && date < semester2StartDate) {
+      console.log('Date is in semester 1');
+      // Calculate the difference in milliseconds between the date and the semester 1 start date
+      const millisecondsDifference =
+        date.getTime() - semester1StartDate.getTime();
+
+      // Calculate the number of full weeks elapsed
+      const fullWeeksElapsed = Math.floor(
+        millisecondsDifference / (7 * 24 * 60 * 60 * 1000),
+      );
+
+      // Add 1 to start counting from week 1
+      const weekNumber = fullWeeksElapsed + 1;
+
+      return weekNumber;
+    }
+
+    // Check if the date is in semester 2
+    if (date >= semester2StartDate) {
+      console.log('Date is in semester 2');
+      // Calculate the difference in milliseconds between the date and the semester 2 start date
+      const millisecondsDifference =
+        date.getTime() - semester2StartDate.getTime();
+
+      // Calculate the number of full weeks elapsed
+      const fullWeeksElapsed = Math.floor(
+        millisecondsDifference / (7 * 24 * 60 * 60 * 1000),
+      );
+
+      // Add 1 to start counting from week 1
+      const weekNumber = fullWeeksElapsed + 1;
+
+      return weekNumber;
+    }
+
+    return 0;
+  };
+
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: CalendarKeyDateEvent) => {
     // check that event title is not empty (so bank holidays can't be added without a title)
@@ -192,6 +280,16 @@ function DateSetter() {
       toast('Please enter a name for the date');
       return;
     }
+
+    // Calculate week number based on difference between event start date and Semester 1 start date
+    const weekNumber = getSemesterWeekNumber(
+      event.start,
+      semester1Event.start,
+      semester2Event.start,
+    );
+
+    // Add week number to the event title
+    event.title += ` (Week ${weekNumber})`;
 
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
@@ -579,6 +677,27 @@ function DateSetter() {
             </button>
           </div>
         </div>
+
+        {/* delete all events from mongodb */}
+        <button
+          className="eventButton"
+          onClick={() => {
+            axios
+              .delete(baseURL + 'delete-all-events')
+              .then((res: { data: CalendarKeyDateEvent }) => {
+                console.log('All events deleted from MongoDB');
+                console.log(res);
+              })
+              .catch((err: { data: CalendarKeyDateEvent }) => {
+                console.error('Error deleting all events from MongoDB: ', err);
+              });
+
+            setEvents([]); // Update local state to reflect the event deletion
+            toast('All events deleted');
+          }}
+        >
+          Delete All Events
+        </button>
 
         {/* divider */}
         <hr className="rounded"></hr>

@@ -48,6 +48,13 @@ app.put('/update-event/:eventId', async (req, res) => {
     });
 });
 
+// delete all events
+app.delete('/delete-all-events', async (req, res) => {
+  calendarModel.deleteMany().then((calendar) => {
+    res.json(calendar);
+  });
+});
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGODB_URI)

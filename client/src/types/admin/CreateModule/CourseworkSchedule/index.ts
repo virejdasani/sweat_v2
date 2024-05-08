@@ -12,4 +12,5 @@ export interface CourseworkScheduleProps {
     value: number,
   ) => void;
   templateData: number[][][];
+  handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
 }

@@ -14,7 +14,7 @@ export const CourseworkSetupFunctions = ({
       type: 'assignment',
       deadlineWeek: 1,
       releasedWeekEarlier: 1,
-      deadlineDate: undefined,
+      feedbackTime: 1,
     };
     onCourseworkListChange([...courseworkList, newCoursework]);
   };
@@ -81,6 +81,7 @@ export const addExamCoursework = (
       type: 'exam',
       deadlineWeek: 15,
       releasedWeekEarlier: 1,
+      feedbackTime: 1,
     };
     onCourseworkListChange([...courseworkList, examCoursework]);
   }

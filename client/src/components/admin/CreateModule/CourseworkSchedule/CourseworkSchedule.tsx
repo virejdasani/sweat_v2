@@ -13,11 +13,18 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   moduleCredit,
   handleScheduleChange,
   templateData,
+  handleCourseworkListChange,
 }) => {
   // Set default feedback time to 1 for each coursework and pre-populate contact time fields
   React.useEffect(() => {
-    updateCourseworkList(courseworkList, templateData, handleScheduleChange);
-  }, [templateData, courseworkList, handleScheduleChange]);
+    const { updatedCourseworkList, shouldUpdate } = updateCourseworkList(
+      courseworkList,
+      templateData,
+    );
+    if (shouldUpdate) {
+      handleCourseworkListChange(updatedCourseworkList);
+    }
+  }, [templateData, courseworkList, handleCourseworkListChange]);
 
   return (
     <Table style={courseworkScheduleStyles.table}>

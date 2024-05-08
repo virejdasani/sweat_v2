@@ -20,86 +20,93 @@ export const expectedTotalTime = (weight: number, moduleCredit: number) => {
 export const updateCourseworkList = (
   courseworkList: Coursework[],
   templateData: number[][][],
-  handleScheduleChange: (
-    index: number,
-    field: keyof Omit<
-      Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
-    >,
-    value: number,
-  ) => void,
-) => {
-  const updatedCourseworkList = courseworkList.map((coursework, index) => {
-    const { deadlineWeek } = coursework;
-    const previousCoursework = courseworkList[index - 1];
-    const previousDeadlineWeek = previousCoursework
-      ? previousCoursework.deadlineWeek
-      : 0;
-
-    const contactTimeFields = {
-      contactTimeLecture: templateData.reduce((total, semesterData) => {
-        const lecturesData = semesterData[0].slice(
-          previousDeadlineWeek,
-          deadlineWeek,
-        );
-        return total + lecturesData.reduce((acc, val) => acc + val, 0);
-      }, 0),
-
-      contactTimeTutorial: templateData.reduce((total, semesterData) => {
-        const tutorialsData = semesterData[1].slice(
-          previousDeadlineWeek,
-          deadlineWeek,
-        );
-        return total + tutorialsData.reduce((acc, val) => acc + val, 0);
-      }, 0),
-
-      contactTimeLab: templateData.reduce((total, semesterData) => {
-        const labsData = semesterData[2].slice(
-          previousDeadlineWeek,
-          deadlineWeek,
-        );
-        return total + labsData.reduce((acc, val) => acc + val, 0);
-      }, 0),
-
-      contactTimeBriefing: templateData.reduce((total, semesterData) => {
-        const briefingData = semesterData
-          .slice(3, 6)
-          .map((activityData) =>
-            activityData
-              .slice(previousDeadlineWeek, deadlineWeek)
-              .reduce((acc, val) => acc + val, 0),
-          );
-        return total + briefingData.reduce((acc, val) => acc + val, 0);
-      }, 0),
-    };
-
-    const updatedCoursework = {
-      ...coursework,
-      feedbackTime: coursework.feedbackTime || 1,
-      ...contactTimeFields,
-    };
-
-    Object.entries(updatedCoursework).forEach(([field, value]) => {
-      if (
-        field !== 'title' &&
-        field !== 'weight' &&
-        field !== 'type' &&
-        field !== 'deadlineWeek' &&
-        field !== 'releasedWeekEarlier'
-      ) {
-        handleScheduleChange(
-          index,
-          field as keyof Omit<
-            Coursework,
-            'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
-          >,
-          value as number,
-        );
-      }
-    });
-
-    return updatedCoursework;
+): { updatedCourseworkList: Coursework[]; shouldUpdate: boolean } => {
+  const sortedCourseworkList = [...courseworkList].sort((a, b) => {
+    const getNumericDeadlineWeek = (deadlineWeek: number | string) =>
+      typeof deadlineWeek === 'string'
+        ? parseInt(deadlineWeek, 10)
+        : deadlineWeek;
+    return (
+      getNumericDeadlineWeek(a.deadlineWeek) -
+      getNumericDeadlineWeek(b.deadlineWeek)
+    );
   });
 
-  return updatedCourseworkList;
+  let shouldUpdate = false;
+
+  const updatedCourseworkList = sortedCourseworkList.map(
+    (coursework, index) => {
+      const numericDeadlineWeek =
+        typeof coursework.deadlineWeek === 'string'
+          ? parseInt(coursework.deadlineWeek, 10)
+          : coursework.deadlineWeek;
+
+      const previousCoursework = sortedCourseworkList[index - 1];
+      const previousDeadlineWeek = previousCoursework
+        ? previousCoursework.deadlineWeek
+        : 0;
+
+      const startWeek =
+        typeof previousDeadlineWeek === 'string'
+          ? parseInt(previousDeadlineWeek, 10)
+          : previousDeadlineWeek;
+
+      const calculateContactTime = (activityData: number[]) =>
+        activityData
+          .slice(startWeek, numericDeadlineWeek)
+          .reduce((acc, val) => acc + val, 0);
+
+      const contactTimeFields = {
+        contactTimeLecture: templateData.reduce(
+          (total, semesterData) =>
+            total + calculateContactTime(semesterData[0]),
+          0,
+        ),
+        contactTimeTutorial: templateData.reduce(
+          (total, semesterData) =>
+            total + calculateContactTime(semesterData[1]),
+          0,
+        ),
+        contactTimeLab: templateData.reduce(
+          (total, semesterData) =>
+            total + calculateContactTime(semesterData[2]),
+          0,
+        ),
+        contactTimeBriefing: templateData.reduce(
+          (total, semesterData) =>
+            total +
+            semesterData
+              .slice(3, 6)
+              .reduce(
+                (acc, activityData) => acc + calculateContactTime(activityData),
+                0,
+              ),
+          0,
+        ),
+      };
+
+      const updatedCoursework = {
+        ...coursework,
+        deadlineWeek: numericDeadlineWeek,
+        feedbackTime: coursework.feedbackTime || 1,
+        ...contactTimeFields,
+      };
+
+      shouldUpdate =
+        shouldUpdate ||
+        JSON.stringify(updatedCoursework) !== JSON.stringify(coursework);
+
+      return updatedCoursework;
+    },
+  );
+
+  const examIndex = updatedCourseworkList.findIndex(
+    (coursework) => coursework.type === 'exam',
+  );
+  if (examIndex !== -1 && !updatedCourseworkList[examIndex].feedbackTime) {
+    updatedCourseworkList[examIndex].feedbackTime = 1;
+    shouldUpdate = true;
+  }
+
+  return { updatedCourseworkList, shouldUpdate };
 };

@@ -115,6 +115,7 @@ const CreateModule: React.FC = () => {
             moduleCredit={formData.moduleCredit}
             handleScheduleChange={handleScheduleChange}
             templateData={templateData}
+            handleCourseworkListChange={handleCourseworkListChange}
           />
         );
       case 4:

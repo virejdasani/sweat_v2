@@ -12,7 +12,10 @@ export const handlePrev = (
   prevStep: (currentStep: number) => number,
   setCurrentStep: (step: number) => void,
 ) => {
-  setCurrentStep(prevStep(currentStep));
+  const prevStepIndex = prevStep(currentStep);
+  if (prevStepIndex >= 0) {
+    setCurrentStep(prevStepIndex);
+  }
 };
 
 export const nextStep = (currentStep: number): number => {

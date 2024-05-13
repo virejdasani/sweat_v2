@@ -36,8 +36,6 @@ function DateSetter() {
   // course CS means no reading week, EE means reading week.
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
-  const [readingWeekStart, setReadingWeekStart] = useState(new Date());
-  const [readingWeekEnd, setReadingWeekEnd] = useState(new Date());
 
   const [holidayEvent, setHolidayEvent] = useState({
     title: '',
@@ -69,6 +67,13 @@ function DateSetter() {
 
   const [christmasBreakEvent, setChristmasBreakEvent] = useState({
     title: 'Christmas Break',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [readingWeekEvent, setReadingWeekEvent] = useState({
+    title: 'Reading Week',
     allDay: true,
     start: new Date(),
     end: new Date(),
@@ -157,6 +162,21 @@ function DateSetter() {
         });
       }
 
+      // extract reading week start and end dates
+      const readingWeekEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Reading Week'),
+      );
+
+      if (readingWeekEvent) {
+        console.log('Reading week start date:', readingWeekEvent.start);
+        console.log('Reading week end date:', readingWeekEvent.end);
+        setReadingWeekEvent({
+          ...readingWeekEvent,
+          start: new Date(readingWeekEvent.start),
+          end: new Date(readingWeekEvent.end),
+        });
+      }
+
       setFetchedItems(data);
       console.log('Fetched items: ', data);
     };
@@ -177,7 +197,9 @@ function DateSetter() {
     // Filter out "Reading Week" event if the course is CS
     const filteredEvents =
       course === 'CS'
-        ? localNewEvents.filter((event) => event.title !== 'Reading Week')
+        ? localNewEvents.filter(
+            (event) => !event.title.includes('Reading Week'),
+          )
         : localNewEvents;
 
     setEvents((prevEvents) => {
@@ -191,7 +213,9 @@ function DateSetter() {
 
       // If switching from EE to CS, remove the Reading Week event locally
       if (course === 'CS') {
-        return updatedEvents.filter((event) => event.title !== 'Reading Week');
+        return updatedEvents.filter(
+          (event) => !event.title.includes('Reading Week'),
+        );
       }
 
       // Concatenate unique new events with existing events
@@ -789,8 +813,10 @@ function DateSetter() {
                     <DatePicker
                       dateFormat="dd/MM/yyyy"
                       placeholderText="Start Date"
-                      selected={readingWeekStart}
-                      onChange={(start: Date) => setReadingWeekStart(start)}
+                      selected={readingWeekEvent.start}
+                      onChange={(start: Date) =>
+                        setReadingWeekEvent({ ...readingWeekEvent, start })
+                      }
                     />
                   </div>
                 </div>
@@ -800,8 +826,10 @@ function DateSetter() {
                     <DatePicker
                       dateFormat="dd/MM/yyyy"
                       placeholderText="End Date"
-                      selected={readingWeekEnd}
-                      onChange={(end: Date) => setReadingWeekEnd(end)}
+                      selected={readingWeekEvent.end}
+                      onChange={(end: Date) => {
+                        setReadingWeekEvent({ ...readingWeekEvent, end });
+                      }}
                     />
                   </div>
                 </div>
@@ -811,12 +839,12 @@ function DateSetter() {
                     handleAddEvent({
                       title: 'Reading Week',
                       allDay: true,
-                      start: readingWeekStart,
-                      end: readingWeekEnd,
+                      start: readingWeekEvent.start,
+                      end: readingWeekEvent.end,
                     })
                   }
                 >
-                  Add Reading Week
+                  Set Reading Week
                 </button>
               </div>
             </>

@@ -119,6 +119,21 @@ function DateSetter() {
         });
       }
 
+      // extract easter start and end dates
+      const easterBreakEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Easter Break'),
+      );
+
+      if (easterBreakEvent) {
+        console.log('Easter break start date:', easterBreakEvent.start);
+        console.log('Easter break end date:', easterBreakEvent.end);
+        setEasterBreakEvent({
+          ...easterBreakEvent,
+          start: new Date(easterBreakEvent.start),
+          end: new Date(easterBreakEvent.end),
+        });
+      }
+
       setFetchedItems(data);
       console.log('Fetched items: ', data);
     };
@@ -225,25 +240,30 @@ function DateSetter() {
     date: Date,
     sem1Start: Date,
     sem2Start: Date,
+    easterBreakStart: Date,
+    easterBreakEnd: Date,
   ) => {
     console.log('Date:', date);
 
     const semester1StartDate = sem1Start;
     const semester2StartDate = sem2Start;
+    const easterBreakStartDate = easterBreakStart;
+    const easterBreakEndDate = easterBreakEnd;
 
-    console.log('Semester 1 start date:', semester1StartDate);
-    console.log('Semester 2 start date:', semester2StartDate);
+    // Calculate the difference in milliseconds between the date and the semester 1 start date
+    const millisecondsDifferenceSem1 =
+      date.getTime() - semester1StartDate.getTime();
+
+    // Calculate the difference in milliseconds between the date and the semester 2 start date
+    const millisecondsDifferenceSem2 =
+      date.getTime() - semester2StartDate.getTime();
 
     // Check if the date is in semester 1
     if (date >= semester1StartDate && date < semester2StartDate) {
       console.log('Date is in semester 1');
-      // Calculate the difference in milliseconds between the date and the semester 1 start date
-      const millisecondsDifference =
-        date.getTime() - semester1StartDate.getTime();
-
       // Calculate the number of full weeks elapsed
       const fullWeeksElapsed = Math.floor(
-        millisecondsDifference / (7 * 24 * 60 * 60 * 1000),
+        millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
       );
 
       // Add 1 to start counting from week 1
@@ -252,25 +272,52 @@ function DateSetter() {
       return weekNumber;
     }
 
-    // Check if the date is in semester 2
-    if (date >= semester2StartDate) {
-      console.log('Date is in semester 2');
-      // Calculate the difference in milliseconds between the date and the semester 2 start date
-      const millisecondsDifference =
-        date.getTime() - semester2StartDate.getTime();
-
+    // Check if the date is in semester 2 and not in Easter break
+    if (
+      date >= semester2StartDate &&
+      !(date >= easterBreakStartDate && date <= easterBreakEndDate)
+    ) {
+      console.log('Date is in semester 2, not in Easter break');
       // Calculate the number of full weeks elapsed
       const fullWeeksElapsed = Math.floor(
-        millisecondsDifference / (7 * 24 * 60 * 60 * 1000),
+        millisecondsDifferenceSem2 / (7 * 24 * 60 * 60 * 1000) + 0.01,
       );
+
+      console.log('weeks elapsed: ' + fullWeeksElapsed);
 
       // Add 1 to start counting from week 1
       const weekNumber = fullWeeksElapsed + 1;
 
+      // Subtract 3 to account for the Easter break weeks
+      if (date > easterBreakEndDate) {
+        return weekNumber - 3;
+      }
+
       return weekNumber;
     }
 
-    return 0;
+    // Calculate the number of days between the date and the Easter break start date
+    // Math.ceil because daysDifference give numbers like 6.9 which should be 7
+    const daysDifference = Math.ceil(
+      (date.getTime() - easterBreakStartDate.getTime()) / (24 * 60 * 60 * 1000),
+    );
+
+    console.log('Days difference:', daysDifference);
+
+    // if date is in week 1 of Easter break
+    if (daysDifference >= 0 && daysDifference < 7) {
+      return 'E1';
+    }
+
+    // if date is in week 2 of Easter break
+    if (daysDifference >= 7 && daysDifference < 14) {
+      return 'E2';
+    }
+
+    // if date is in week 3 of Easter break
+    if (daysDifference >= 14 && daysDifference < 21) {
+      return 'E3';
+    }
   };
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
@@ -281,15 +328,22 @@ function DateSetter() {
       return;
     }
 
+    event.start.setHours(0, 0, 0, 0);
+
     // Calculate week number based on difference between event start date and Semester 1 start date
     const weekNumber = getSemesterWeekNumber(
       event.start,
       semester1Event.start,
       semester2Event.start,
+      easterBreakEvent.start,
+      easterBreakEvent.end,
     );
 
-    // Add week number to the event title
-    event.title += ` (Week ${weekNumber})`;
+    // when adding easter break, don't add week number to the title
+    if (!event.title.includes('Easter Break')) {
+      // Add week number to the event title
+      event.title += ` (Week ${weekNumber})`;
+    }
 
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);

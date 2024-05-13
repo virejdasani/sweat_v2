@@ -66,6 +66,13 @@ function DateSetter() {
     end: new Date(),
   });
 
+  const [christmasBreakEvent, setChristmasBreakEvent] = useState({
+    title: 'Christmas Break',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
   const [newEvent, setNewEvent] = useState({
     title: '',
     allDay: true,
@@ -131,6 +138,21 @@ function DateSetter() {
           ...easterBreakEvent,
           start: new Date(easterBreakEvent.start),
           end: new Date(easterBreakEvent.end),
+        });
+      }
+
+      // extract christmas start and end dates
+      const christmasBreakEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Christmas Break'),
+      );
+
+      if (christmasBreakEvent) {
+        console.log('Christmas break start date:', christmasBreakEvent.start);
+        console.log('Christmas break end date:', christmasBreakEvent.end);
+        setChristmasBreakEvent({
+          ...christmasBreakEvent,
+          start: new Date(christmasBreakEvent.start),
+          end: new Date(christmasBreakEvent.end),
         });
       }
 
@@ -205,6 +227,24 @@ function DateSetter() {
     new Date(),
   );
 
+  const handleAddChristmasBreak = () => {
+    if (!christmasBreakEvent.start || !christmasBreakEvent.end) {
+      toast('Please select both start and end dates for the Christmas break');
+      return;
+    }
+    if (christmasBreakEvent.start >= christmasBreakEvent.end) {
+      toast('Christmas break start date must be before end date');
+      return;
+    }
+    handleAddEvent(christmasBreakEvent);
+    setChristmasBreakEvent({
+      title: 'Christmas Break',
+      allDay: true,
+      start: new Date(),
+      end: new Date(),
+    });
+  };
+
   const handleAddEasterBreak = () => {
     // Check that both start and end dates are selected
     if (!easterBreakEvent.start || !easterBreakEvent.end) {
@@ -243,6 +283,8 @@ function DateSetter() {
     sem2Start: Date,
     easterBreakStart: Date,
     easterBreakEnd: Date,
+    christmasBreakStart: Date,
+    christmasBreakEnd: Date,
   ) => {
     console.log('Date:', date);
 
@@ -250,6 +292,8 @@ function DateSetter() {
     const semester2StartDate = sem2Start;
     const easterBreakStartDate = easterBreakStart;
     const easterBreakEndDate = easterBreakEnd;
+    const christmasBreakStartDate = christmasBreakStart;
+    const christmasBreakEndDate = christmasBreakEnd;
 
     // Calculate the difference in milliseconds between the date and the semester 1 start date
     const millisecondsDifferenceSem1 =
@@ -259,18 +303,67 @@ function DateSetter() {
     const millisecondsDifferenceSem2 =
       date.getTime() - semester2StartDate.getTime();
 
-    // Check if the date is in semester 1
-    if (date >= semester1StartDate && date < semester2StartDate) {
-      console.log('Date is in semester 1');
+    // // Check if the date is in semester 1
+    // if (date >= semester1StartDate && date < semester2StartDate) {
+    //   console.log('Date is in semester 1');
+    //   // Calculate the number of full weeks elapsed
+    //   const fullWeeksElapsed = Math.floor(
+    //     millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
+    //   );
+
+    //   // Add 1 to start counting from week 1
+    //   const weekNumber = fullWeeksElapsed + 1;
+
+    //   return weekNumber;
+    // }
+
+    // Check if the date is in semester 1 and not in christmas break
+    if (
+      date >= semester1StartDate &&
+      !(date >= christmasBreakStartDate && date <= christmasBreakEndDate)
+    ) {
+      console.log('Date is in semester 1, not in Christmas break');
       // Calculate the number of full weeks elapsed
       const fullWeeksElapsed = Math.floor(
         millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
       );
 
+      console.log('weeks elapsed: ' + fullWeeksElapsed);
+
       // Add 1 to start counting from week 1
       const weekNumber = fullWeeksElapsed + 1;
 
+      // Subtract 3 to account for the Christmas break weeks
+      if (date > christmasBreakEndDate) {
+        return weekNumber - 3;
+      }
+
       return weekNumber;
+    }
+
+    // calculate the number of days between the date and the christmas break start date
+    // Math.ceil because daysDifference give numbers like 6.9 which should be 7
+    const christmasDaysDifference = Math.ceil(
+      (date.getTime() - christmasBreakStartDate.getTime()) /
+        (24 * 60 * 60 * 1000),
+    );
+
+    console.log('Days difference:', christmasDaysDifference);
+
+    // if date is in week 1 of christmas break
+    if (christmasDaysDifference >= 0 && christmasDaysDifference < 7) {
+      return 'C1';
+    }
+
+    // if date is in week 2 of christmas break
+    if (christmasDaysDifference >= 7 && christmasDaysDifference < 14) {
+      return 'C2';
+    }
+
+    // if date is in week 3 of christmas break
+
+    if (christmasDaysDifference >= 14 && christmasDaysDifference < 21) {
+      return 'C3';
     }
 
     // Check if the date is in semester 2 and not in Easter break
@@ -299,24 +392,24 @@ function DateSetter() {
 
     // Calculate the number of days between the date and the Easter break start date
     // Math.ceil because daysDifference give numbers like 6.9 which should be 7
-    const daysDifference = Math.ceil(
+    const easterDaysDifference = Math.ceil(
       (date.getTime() - easterBreakStartDate.getTime()) / (24 * 60 * 60 * 1000),
     );
 
-    console.log('Days difference:', daysDifference);
+    console.log('Days difference:', easterDaysDifference);
 
     // if date is in week 1 of Easter break
-    if (daysDifference >= 0 && daysDifference < 7) {
+    if (easterDaysDifference >= 0 && easterDaysDifference < 7) {
       return 'E1';
     }
 
     // if date is in week 2 of Easter break
-    if (daysDifference >= 7 && daysDifference < 14) {
+    if (easterDaysDifference >= 7 && easterDaysDifference < 14) {
       return 'E2';
     }
 
     // if date is in week 3 of Easter break
-    if (daysDifference >= 14 && daysDifference < 21) {
+    if (easterDaysDifference >= 14 && easterDaysDifference < 21) {
       return 'E3';
     }
   };
@@ -338,6 +431,8 @@ function DateSetter() {
       semester2Event.start,
       easterBreakEvent.start,
       easterBreakEvent.end,
+      christmasBreakEvent.start,
+      christmasBreakEvent.end,
     );
 
     // when adding easter break, don't add week number to the title
@@ -606,6 +701,43 @@ function DateSetter() {
               Set Semester 2 Start Date
             </button>
           </div>
+          <hr className="lightRounded"></hr>
+
+          {/* Christmas break section */}
+          <div className="datePickers">
+            <span>Christmas start date: </span>
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Start Date"
+                selected={christmasBreakEvent.start}
+                onChange={(start: Date) =>
+                  setChristmasBreakEvent({ ...christmasBreakEvent, start })
+                }
+              />
+            </div>
+          </div>
+          <div className="datePickers">
+            <span>Christmas end date: </span>
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="End Date"
+                selected={christmasBreakEvent.end}
+                onChange={(end: Date) =>
+                  setChristmasBreakEvent({ ...christmasBreakEvent, end })
+                }
+              />
+            </div>
+          </div>
+          <button
+            className="eventButton mb-2"
+            onClick={handleAddChristmasBreak}
+          >
+            Set Christmas Break
+          </button>
+
+          {/* Easter break section */}
           <hr className="lightRounded"></hr>
           <div>
             <div className="datePickers">

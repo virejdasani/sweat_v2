@@ -29,7 +29,7 @@ import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import { handleSubmit } from '../../../utils/admin/CreateModule/ModuleSetup';
-import ModuleReview from './Review/ModuleReview';
+import ModuleReview from './ModuleReview/ModuleReview';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
 
 const MAX_STEPS = 5;
@@ -71,14 +71,16 @@ const CreateModule: React.FC = () => {
       Coursework,
       'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
     >,
-    value: number,
+    value: number | undefined,
   ) => {
+    if (value === undefined) return; // Handle the case where value is undefined
+
     const updatedCourseworkList = [...courseworkList];
     updatedCourseworkList[index] = {
       ...updatedCourseworkList[index],
       [field]: value,
     };
-    setCourseworkList(updatedCourseworkList);
+    handleCourseworkListChange(updatedCourseworkList);
   };
 
   const { activeStep, setActiveStep } = useSteps({

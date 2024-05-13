@@ -2,12 +2,15 @@ import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup
 
 export const calculateTotalTime = (coursework: Coursework) => {
   const totalTime =
-    (coursework.contactTimeLecture || 0) +
-    (coursework.contactTimeTutorial || 0) +
-    (coursework.contactTimeLab || 0) +
-    (coursework.contactTimeBriefing || 0) +
+    (coursework.contactTimeLectures || 0) +
+    (coursework.contactTimeTutorials || 0) +
+    (coursework.contactTimeLabs || 0) +
+    (coursework.contactTimeSeminars || 0) +
+    (coursework.contactTimeFieldworkPlacement || 0) +
+    (coursework.contactTimeOthers || 0) +
     (coursework.formativeAssessment || 0) +
-    (coursework.privateStudyPreparation || 0) +
+    (coursework.privateStudy || 0) +
+    (coursework.preparationTime || 0) +
     (coursework.keyboardTime || 0) +
     (coursework.feedbackTime || 0);
   return totalTime;
@@ -20,6 +23,7 @@ export const expectedTotalTime = (weight: number, moduleCredit: number) => {
 export const updateCourseworkList = (
   courseworkList: Coursework[],
   templateData: number[][][],
+  moduleCredit: number,
 ): { updatedCourseworkList: Coursework[]; shouldUpdate: boolean } => {
   const sortedCourseworkList = [...courseworkList].sort((a, b) => {
     const getNumericDeadlineWeek = (deadlineWeek: number | string) =>
@@ -57,30 +61,34 @@ export const updateCourseworkList = (
           .reduce((acc, val) => acc + val, 0);
 
       const contactTimeFields = {
-        contactTimeLecture: templateData.reduce(
+        contactTimeLectures: templateData.reduce(
           (total, semesterData) =>
             total + calculateContactTime(semesterData[0]),
           0,
         ),
-        contactTimeTutorial: templateData.reduce(
+        contactTimeTutorials: templateData.reduce(
           (total, semesterData) =>
             total + calculateContactTime(semesterData[1]),
           0,
         ),
-        contactTimeLab: templateData.reduce(
+        contactTimeLabs: templateData.reduce(
           (total, semesterData) =>
             total + calculateContactTime(semesterData[2]),
           0,
         ),
-        contactTimeBriefing: templateData.reduce(
+        contactTimeSeminars: templateData.reduce(
           (total, semesterData) =>
-            total +
-            semesterData
-              .slice(3, 6)
-              .reduce(
-                (acc, activityData) => acc + calculateContactTime(activityData),
-                0,
-              ),
+            total + calculateContactTime(semesterData[3]),
+          0,
+        ),
+        contactTimeFieldworkPlacement: templateData.reduce(
+          (total, semesterData) =>
+            total + calculateContactTime(semesterData[4]),
+          0,
+        ),
+        contactTimeOthers: templateData.reduce(
+          (total, semesterData) =>
+            total + calculateContactTime(semesterData[5]),
           0,
         ),
       };
@@ -88,7 +96,13 @@ export const updateCourseworkList = (
       const updatedCoursework = {
         ...coursework,
         deadlineWeek: numericDeadlineWeek,
-        feedbackTime: coursework.feedbackTime || 1,
+        feedbackTime:
+          coursework.type === 'exam' ? 0 : coursework.feedbackTime || 1,
+        formativeAssessment:
+          coursework.type === 'exam' ? 0 : coursework.formativeAssessment || 1,
+        keyboardTime: getKeyboardTime(coursework, moduleCredit),
+        preparationTime: getPreparationTime(coursework, moduleCredit),
+        privateStudy: getPrivateStudyTime(coursework, moduleCredit),
         ...contactTimeFields,
       };
 
@@ -100,13 +114,99 @@ export const updateCourseworkList = (
     },
   );
 
-  const examIndex = updatedCourseworkList.findIndex(
-    (coursework) => coursework.type === 'exam',
-  );
-  if (examIndex !== -1 && !updatedCourseworkList[examIndex].feedbackTime) {
-    updatedCourseworkList[examIndex].feedbackTime = 1;
-    shouldUpdate = true;
+  return { updatedCourseworkList, shouldUpdate };
+};
+
+export const getKeyboardTime = (
+  coursework: Coursework,
+  moduleCredit: number,
+): number => {
+  const moduleCreditNumber = Number(moduleCredit);
+
+  if (moduleCreditNumber === 15) {
+    switch (coursework.type) {
+      case 'class test':
+        return 1;
+      case 'other':
+        return 1;
+      case 'exam':
+        return 3;
+      case 'lab report':
+        return 3;
+      case 'presentation':
+        return 2;
+      case 'assignment':
+        return 8;
+      default:
+        return 0;
+    }
+  } else if (moduleCreditNumber === 7.5) {
+    switch (coursework.type) {
+      case 'class test':
+        return 1;
+      case 'other':
+        return 1;
+      case 'exam':
+        return 2;
+      case 'lab report':
+        return 2;
+      case 'presentation':
+        return 1;
+      case 'assignment':
+        return 4;
+      default:
+        return 0;
+    }
+  }
+  return 0;
+};
+
+export const getPreparationTime = (
+  coursework: Coursework,
+  moduleCredit: number,
+): number => {
+  if (coursework.type === 'exam') {
+    return 0;
   }
 
-  return { updatedCourseworkList, shouldUpdate };
+  const totalTime =
+    (coursework.contactTimeLectures || 0) +
+    (coursework.contactTimeTutorials || 0) +
+    (coursework.contactTimeLabs || 0) +
+    (coursework.contactTimeSeminars || 0) +
+    (coursework.contactTimeFieldworkPlacement || 0) +
+    (coursework.contactTimeOthers || 0) +
+    (coursework.formativeAssessment || 0) +
+    (coursework.keyboardTime || 0) +
+    (coursework.feedbackTime || 0);
+
+  return Math.max(
+    expectedTotalTime(coursework.weight || 0, moduleCredit) - totalTime,
+    0,
+  );
+};
+
+export const getPrivateStudyTime = (
+  coursework: Coursework,
+  moduleCredit: number,
+): number => {
+  if (coursework.type !== 'exam') {
+    return 0;
+  }
+
+  const totalTime =
+    (coursework.contactTimeLectures || 0) +
+    (coursework.contactTimeTutorials || 0) +
+    (coursework.contactTimeLabs || 0) +
+    (coursework.contactTimeSeminars || 0) +
+    (coursework.contactTimeFieldworkPlacement || 0) +
+    (coursework.contactTimeOthers || 0) +
+    (coursework.formativeAssessment || 0) +
+    (coursework.keyboardTime || 0) +
+    (coursework.feedbackTime || 0);
+
+  return Math.max(
+    expectedTotalTime(coursework.weight || 0, moduleCredit) - totalTime,
+    0,
+  );
 };

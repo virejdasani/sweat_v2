@@ -9,7 +9,7 @@ export interface CourseworkScheduleProps {
       Coursework,
       'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
     >,
-    value: number,
+    value: number | undefined,
   ) => void;
   templateData: number[][][];
   handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;

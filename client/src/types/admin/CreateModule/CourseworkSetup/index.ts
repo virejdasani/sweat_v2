@@ -5,12 +5,15 @@ export interface Coursework {
   deadlineWeek: number;
   deadlineDate?: Date;
   releasedWeekEarlier: number;
-  contactTimeLecture?: number;
-  contactTimeTutorial?: number;
-  contactTimeLab?: number;
-  contactTimeBriefing?: number;
+  contactTimeLectures?: number;
+  contactTimeTutorials?: number;
+  contactTimeLabs?: number;
+  contactTimeSeminars?: number;
+  contactTimeFieldworkPlacement?: number;
+  contactTimeOthers?: number;
   formativeAssessment?: number;
-  privateStudyPreparation?: number;
+  privateStudy?: number;
+  preparationTime?: number;
   keyboardTime?: number;
   feedbackTime?: number;
 }

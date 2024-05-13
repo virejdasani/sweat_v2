@@ -34,27 +34,40 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
         ),
       0,
     );
-    const contactTimeFromStep4 = courseworkList.reduce(
-      (total, coursework) =>
-        total +
-        (coursework.contactTimeLectureTutorial || 0) +
-        (coursework.contactTimeLab || 0) +
-        (coursework.contactTimeBriefing || 0),
+    return contactTimeFromStep2;
+  };
+
+  const calculateFormativeAssessmentTime = () => {
+    return courseworkList.reduce(
+      (total, coursework) => total + (coursework.formativeAssessment || 0),
       0,
     );
-    return contactTimeFromStep2 + contactTimeFromStep4;
   };
 
   const calculatePrivateStudyTime = () => {
     return courseworkList.reduce(
-      (total, coursework) => total + (coursework.privateStudyPreparation || 0),
+      (total, coursework) => total + (coursework.privateStudy || 0),
       0,
     );
   };
 
-  const calculateAssessmentTime = () => {
+  const calculatePreparationTime = () => {
+    return courseworkList.reduce(
+      (total, coursework) => total + (coursework.preparationTime || 0),
+      0,
+    );
+  };
+
+  const calculateKeyboardTime = () => {
     return courseworkList.reduce(
       (total, coursework) => total + (coursework.keyboardTime || 0),
+      0,
+    );
+  };
+
+  const calculateFeedbackTime = () => {
+    return courseworkList.reduce(
+      (total, coursework) => total + (coursework.feedbackTime || 0),
       0,
     );
   };
@@ -81,12 +94,24 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
             <Td>{calculateContactTime()}</Td>
           </Tr>
           <Tr>
+            <Td>Formative Assessment Time</Td>
+            <Td>{calculateFormativeAssessmentTime()}</Td>
+          </Tr>
+          <Tr>
             <Td>Private Study Time</Td>
             <Td>{calculatePrivateStudyTime()}</Td>
           </Tr>
           <Tr>
-            <Td>Assessment Time</Td>
-            <Td>{calculateAssessmentTime()}</Td>
+            <Td>Preparation Time</Td>
+            <Td>{calculatePreparationTime()}</Td>
+          </Tr>
+          <Tr>
+            <Td>Keyboard Time</Td>
+            <Td>{calculateKeyboardTime()}</Td>
+          </Tr>
+          <Tr>
+            <Td>Feedback Time</Td>
+            <Td>{calculateFeedbackTime()}</Td>
           </Tr>
           <Tr>
             <Td>Total Time</Td>
@@ -94,16 +119,22 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
               style={{
                 color:
                   calculateContactTime() +
+                    calculateFormativeAssessmentTime() +
                     calculatePrivateStudyTime() +
-                    calculateAssessmentTime() ===
+                    calculatePreparationTime() +
+                    calculateKeyboardTime() +
+                    calculateFeedbackTime() ===
                   calculateTotalTime()
                     ? 'green'
                     : 'red',
               }}
             >
               {calculateContactTime() +
+                calculateFormativeAssessmentTime() +
                 calculatePrivateStudyTime() +
-                calculateAssessmentTime()}{' '}
+                calculatePreparationTime() +
+                calculateKeyboardTime() +
+                calculateFeedbackTime()}{' '}
               / {calculateTotalTime()}
             </Td>
           </Tr>

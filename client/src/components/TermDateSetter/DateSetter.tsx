@@ -236,6 +236,7 @@ function DateSetter() {
     setCourse(selectedCourse);
   };
 
+  // todo: christmas break, c1, c2, c3
   const getSemesterWeekNumber = (
     date: Date,
     sem1Start: Date,

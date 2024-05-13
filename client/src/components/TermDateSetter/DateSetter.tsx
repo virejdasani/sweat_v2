@@ -33,6 +33,8 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 // TODO: move code to respective components
 
 function DateSetter() {
+  // course CS means no reading week, EE means reading week.
+  // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
   const [readingWeekStart, setReadingWeekStart] = useState(new Date());
   const [readingWeekEnd, setReadingWeekEnd] = useState(new Date());
@@ -657,10 +659,10 @@ function DateSetter() {
           <hr className="lightRounded"></hr>
 
           {/* Dropdown for selecting course */}
-          <span>Select Course: </span>
+          <span>Show reading week </span>
           <select className="mb-4" value={course} onChange={handleCourseChange}>
-            <option value="CS">CS</option>
-            <option value="EE">EE</option>
+            <option value="CS">No</option>
+            <option value="EE">Yes</option>
           </select>
 
           {/* Input field for adding semester 1 start date */}

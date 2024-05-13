@@ -526,7 +526,7 @@ function DateSetter() {
               className="eventButton"
               onClick={() => handleAddEvent(semester1Event)}
             >
-              Add Semester 1 Start Date
+              Set Semester 1 Start Date
             </button>
           </div>
 
@@ -548,7 +548,7 @@ function DateSetter() {
               className="eventButton"
               onClick={() => handleAddEvent(semester2Event)}
             >
-              Add Semester 2 Start Date
+              Set Semester 2 Start Date
             </button>
           </div>
           <hr className="lightRounded"></hr>
@@ -580,7 +580,7 @@ function DateSetter() {
               </div>
             </div>
             <button className="eventButton mb-2" onClick={handleAddEasterBreak}>
-              Add Easter Break
+              Set Easter Break
             </button>
           </div>
 
@@ -673,7 +673,7 @@ function DateSetter() {
               className="eventButton"
               onClick={() => handleAddEvent(holidayEvent)}
             >
-              Add Holiday
+              Set new Holiday
             </button>
           </div>
         </div>

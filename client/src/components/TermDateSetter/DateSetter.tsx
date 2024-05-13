@@ -645,6 +645,17 @@ function DateSetter() {
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>
+
+          <a
+            href="https://www.liverpool.ac.uk/term-dates/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            University of Liverpool Term Dates
+          </a>
+
+          <hr className="lightRounded"></hr>
+
           {/* Dropdown for selecting course */}
           <span>Select Course: </span>
           <select className="mb-4" value={course} onChange={handleCourseChange}>

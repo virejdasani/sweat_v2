@@ -31,7 +31,6 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 // Add all to calendar does not work because it will open a new tab with the calendar event for each event
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
-// TODO: (MAYBE) make input take input like 'week 1 thursday' and auto populate the date (maybe natural language processing package)
 
 function DateSetter() {
   const [course, setCourse] = useState('CS'); // State for selected course
@@ -276,7 +275,6 @@ function DateSetter() {
     setCourse(selectedCourse);
   };
 
-  // todo: christmas break, c1, c2, c3
   const getSemesterWeekNumber = (
     date: Date,
     sem1Start: Date,
@@ -303,114 +301,110 @@ function DateSetter() {
     const millisecondsDifferenceSem2 =
       date.getTime() - semester2StartDate.getTime();
 
-    // // Check if the date is in semester 1
-    // if (date >= semester1StartDate && date < semester2StartDate) {
-    //   console.log('Date is in semester 1');
-    //   // Calculate the number of full weeks elapsed
-    //   const fullWeeksElapsed = Math.floor(
-    //     millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
-    //   );
+    // if date is semester 1
+    if (date >= semester1StartDate && date < semester2StartDate) {
+      console.log('Date is in semester 1');
 
-    //   // Add 1 to start counting from week 1
-    //   const weekNumber = fullWeeksElapsed + 1;
+      // Check if the date is in semester 1 and not in christmas break
+      if (
+        date >= semester1StartDate &&
+        !(date >= christmasBreakStartDate && date <= christmasBreakEndDate)
+      ) {
+        console.log('Date is in semester 1, not in Christmas break');
+        // Calculate the number of full weeks elapsed
+        const fullWeeksElapsed = Math.floor(
+          millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
+        );
 
-    //   return weekNumber;
-    // }
+        console.log('weeks elapsed: ' + fullWeeksElapsed);
 
-    // Check if the date is in semester 1 and not in christmas break
-    if (
-      date >= semester1StartDate &&
-      !(date >= christmasBreakStartDate && date <= christmasBreakEndDate)
-    ) {
-      console.log('Date is in semester 1, not in Christmas break');
-      // Calculate the number of full weeks elapsed
-      const fullWeeksElapsed = Math.floor(
-        millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
-      );
+        // Add 1 to start counting from week 1
+        const weekNumber = fullWeeksElapsed + 1;
 
-      console.log('weeks elapsed: ' + fullWeeksElapsed);
+        // Subtract 3 to account for the Christmas break weeks
+        if (date > christmasBreakEndDate) {
+          return weekNumber - 3;
+        }
 
-      // Add 1 to start counting from week 1
-      const weekNumber = fullWeeksElapsed + 1;
-
-      // Subtract 3 to account for the Christmas break weeks
-      if (date > christmasBreakEndDate) {
-        return weekNumber - 3;
+        return weekNumber;
       }
 
-      return weekNumber;
-    }
-
-    // calculate the number of days between the date and the christmas break start date
-    // Math.ceil because daysDifference give numbers like 6.9 which should be 7
-    const christmasDaysDifference = Math.ceil(
-      (date.getTime() - christmasBreakStartDate.getTime()) /
-        (24 * 60 * 60 * 1000),
-    );
-
-    console.log('Days difference:', christmasDaysDifference);
-
-    // if date is in week 1 of christmas break
-    if (christmasDaysDifference >= 0 && christmasDaysDifference < 7) {
-      return 'C1';
-    }
-
-    // if date is in week 2 of christmas break
-    if (christmasDaysDifference >= 7 && christmasDaysDifference < 14) {
-      return 'C2';
-    }
-
-    // if date is in week 3 of christmas break
-
-    if (christmasDaysDifference >= 14 && christmasDaysDifference < 21) {
-      return 'C3';
-    }
-
-    // Check if the date is in semester 2 and not in Easter break
-    if (
-      date >= semester2StartDate &&
-      !(date >= easterBreakStartDate && date <= easterBreakEndDate)
-    ) {
-      console.log('Date is in semester 2, not in Easter break');
-      // Calculate the number of full weeks elapsed
-      const fullWeeksElapsed = Math.floor(
-        millisecondsDifferenceSem2 / (7 * 24 * 60 * 60 * 1000) + 0.01,
+      // calculate the number of days between the date and the christmas break start date
+      // Math.ceil because daysDifference give numbers like 6.9 which should be 7
+      const christmasDaysDifference = Math.ceil(
+        (date.getTime() - christmasBreakStartDate.getTime()) /
+          (24 * 60 * 60 * 1000),
       );
 
-      console.log('weeks elapsed: ' + fullWeeksElapsed);
+      console.log('Days difference:', christmasDaysDifference);
 
-      // Add 1 to start counting from week 1
-      const weekNumber = fullWeeksElapsed + 1;
-
-      // Subtract 3 to account for the Easter break weeks
-      if (date > easterBreakEndDate) {
-        return weekNumber - 3;
+      // if date is in week 1 of christmas break
+      if (christmasDaysDifference >= 0 && christmasDaysDifference < 7) {
+        return 'C1';
       }
 
-      return weekNumber;
+      // if date is in week 2 of christmas break
+      if (christmasDaysDifference >= 7 && christmasDaysDifference < 14) {
+        return 'C2';
+      }
+
+      // if date is in week 3 of christmas break
+
+      if (christmasDaysDifference >= 14 && christmasDaysDifference < 21) {
+        return 'C3';
+      }
     }
 
-    // Calculate the number of days between the date and the Easter break start date
-    // Math.ceil because daysDifference give numbers like 6.9 which should be 7
-    const easterDaysDifference = Math.ceil(
-      (date.getTime() - easterBreakStartDate.getTime()) / (24 * 60 * 60 * 1000),
-    );
+    if (date >= semester2StartDate) {
+      console.log('Date is in semester 2');
 
-    console.log('Days difference:', easterDaysDifference);
+      // Check if the date is in semester 2 and not in Easter break
+      if (
+        date >= semester2StartDate &&
+        !(date >= easterBreakStartDate && date <= easterBreakEndDate)
+      ) {
+        console.log('Date is in semester 2, not in Easter break');
+        // Calculate the number of full weeks elapsed
+        const fullWeeksElapsed = Math.floor(
+          millisecondsDifferenceSem2 / (7 * 24 * 60 * 60 * 1000) + 0.01,
+        );
 
-    // if date is in week 1 of Easter break
-    if (easterDaysDifference >= 0 && easterDaysDifference < 7) {
-      return 'E1';
-    }
+        console.log('weeks elapsed: ' + fullWeeksElapsed);
 
-    // if date is in week 2 of Easter break
-    if (easterDaysDifference >= 7 && easterDaysDifference < 14) {
-      return 'E2';
-    }
+        // Add 1 to start counting from week 1
+        const weekNumber = fullWeeksElapsed + 1;
 
-    // if date is in week 3 of Easter break
-    if (easterDaysDifference >= 14 && easterDaysDifference < 21) {
-      return 'E3';
+        // Subtract 3 to account for the Easter break weeks
+        if (date > easterBreakEndDate) {
+          return weekNumber - 3;
+        }
+
+        return weekNumber;
+      }
+
+      // Calculate the number of days between the date and the Easter break start date
+      // Math.ceil because daysDifference give numbers like 6.9 which should be 7
+      const easterDaysDifference = Math.ceil(
+        (date.getTime() - easterBreakStartDate.getTime()) /
+          (24 * 60 * 60 * 1000),
+      );
+
+      console.log('Days difference:', easterDaysDifference);
+
+      // if date is in week 1 of Easter break
+      if (easterDaysDifference >= 0 && easterDaysDifference < 7) {
+        return 'E1';
+      }
+
+      // if date is in week 2 of Easter break
+      if (easterDaysDifference >= 7 && easterDaysDifference < 14) {
+        return 'E2';
+      }
+
+      // if date is in week 3 of Easter break
+      if (easterDaysDifference >= 14 && easterDaysDifference < 21) {
+        return 'E3';
+      }
     }
   };
 

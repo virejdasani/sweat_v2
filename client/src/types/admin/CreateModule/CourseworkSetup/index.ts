@@ -11,11 +11,12 @@ export interface Coursework {
   contactTimeSeminars?: number;
   contactTimeFieldworkPlacement?: number;
   contactTimeOthers?: number;
-  formativeAssessment?: number;
-  privateStudy?: number;
+  formativeAssessmentTime?: number;
+  privateStudyTime?: number;
   preparationTime?: number;
   keyboardTime?: number;
   feedbackTime?: number;
+  [key: string]: number | string | Date | undefined;
 }
 
 export interface CourseworkSetupProps {
@@ -23,6 +24,8 @@ export interface CourseworkSetupProps {
   onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
   semester: string;
   examPercentage: number;
+  formFactor: number;
+  onFormFactorChange: (formFactor: number) => void;
 }
 
 export interface CourseworkSetupFunctionsProps {

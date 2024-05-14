@@ -58,6 +58,9 @@ export const courseworkSetupStyles = {
   },
   addButton: {
     marginTop: '1rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   totalWeight: {
     marginTop: '1rem',
@@ -74,5 +77,9 @@ export const courseworkSetupStyles = {
       borderColor: '#3182ce',
       boxShadow: '0 0 0 1px #3182ce',
     },
+  },
+  formFactorInput: {
+    width: '120px',
+    marginLeft: '1rem',
   },
 };

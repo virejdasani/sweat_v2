@@ -10,7 +10,12 @@ import {
   Select,
   Button,
   Text,
+  Tooltip,
+  Icon,
+  Flex,
+  Box,
 } from '@chakra-ui/react';
+import { QuestionOutlineIcon } from '@chakra-ui/icons';
 import {
   CourseworkSetupFunctions,
   addExamCoursework,
@@ -29,6 +34,8 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   onCourseworkListChange,
   semester,
   examPercentage,
+  formFactor,
+  onFormFactorChange,
 }) => {
   const {
     handleAddCoursework,
@@ -208,16 +215,34 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
           </Text>
         )}
       </Text>
-      <Button
-        onClick={handleAddCoursework}
-        disabled={!isFormValid}
-        style={{
-          ...courseworkSetupStyles.button,
-          ...courseworkSetupStyles.addButton,
-        }}
-      >
-        Add Coursework
-      </Button>
+      <Flex direction="column" align="center" mt={4}>
+        <Button
+          onClick={handleAddCoursework}
+          disabled={!isFormValid}
+          style={courseworkSetupStyles.button}
+          mb={4}
+        >
+          Add Coursework
+        </Button>
+        <Box>
+          <Tooltip
+            label="Form Factor is the percentage of contact time that will be dedicated to all courseworks."
+            aria-label="Form Factor Tooltip"
+            hasArrow
+          >
+            <Flex align="center">
+              <Text mr={2}>Form Factor (%):</Text>
+              <Icon as={QuestionOutlineIcon} mr={2} />
+              <Input
+                type="number"
+                value={formFactor}
+                onChange={(e) => onFormFactorChange(parseInt(e.target.value))}
+                style={{ ...courseworkSetupStyles.input, width: '80px' }}
+              />
+            </Flex>
+          </Tooltip>
+        </Box>
+      </Flex>
     </div>
   );
 };

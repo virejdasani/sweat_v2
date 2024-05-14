@@ -1,19 +1,33 @@
 import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
 
 export const calculateTotalTime = (coursework: Coursework) => {
-  const totalTime =
-    (coursework.contactTimeLectures || 0) +
-    (coursework.contactTimeTutorials || 0) +
-    (coursework.contactTimeLabs || 0) +
-    (coursework.contactTimeSeminars || 0) +
-    (coursework.contactTimeFieldworkPlacement || 0) +
-    (coursework.contactTimeOthers || 0) +
-    (coursework.formativeAssessment || 0) +
-    (coursework.privateStudy || 0) +
-    (coursework.preparationTime || 0) +
-    (coursework.keyboardTime || 0) +
-    (coursework.feedbackTime || 0);
-  return totalTime;
+  const {
+    contactTimeLectures,
+    contactTimeTutorials,
+    contactTimeLabs,
+    contactTimeSeminars,
+    contactTimeFieldworkPlacement,
+    contactTimeOthers,
+    formativeAssessmentTime,
+    privateStudyTime,
+    preparationTime,
+    keyboardTime,
+    feedbackTime,
+  } = coursework;
+
+  return (
+    (contactTimeLectures || 0) +
+    (contactTimeTutorials || 0) +
+    (contactTimeLabs || 0) +
+    (contactTimeSeminars || 0) +
+    (contactTimeFieldworkPlacement || 0) +
+    (contactTimeOthers || 0) +
+    (formativeAssessmentTime || 0) +
+    (privateStudyTime || 0) +
+    (preparationTime || 0) +
+    (keyboardTime || 0) +
+    (feedbackTime || 0)
+  );
 };
 
 export const expectedTotalTime = (weight: number, moduleCredit: number) => {
@@ -24,8 +38,11 @@ export const updateCourseworkList = (
   courseworkList: Coursework[],
   templateData: number[][][],
   moduleCredit: number,
-): { updatedCourseworkList: Coursework[]; shouldUpdate: boolean } => {
-  const sortedCourseworkList = [...courseworkList].sort((a, b) => {
+  formFactor: number,
+): Coursework[] => {
+  console.log('Initial coursework list:', courseworkList);
+
+  const sortedCourseworkList = courseworkList.sort((a, b) => {
     const getNumericDeadlineWeek = (deadlineWeek: number | string) =>
       typeof deadlineWeek === 'string'
         ? parseInt(deadlineWeek, 10)
@@ -36,7 +53,7 @@ export const updateCourseworkList = (
     );
   });
 
-  let shouldUpdate = false;
+  console.log('Sorted coursework list:', sortedCourseworkList);
 
   const updatedCourseworkList = sortedCourseworkList.map(
     (coursework, index) => {
@@ -61,60 +78,90 @@ export const updateCourseworkList = (
           .reduce((acc, val) => acc + val, 0);
 
       const contactTimeFields = {
-        contactTimeLectures: templateData.reduce(
-          (total, semesterData) =>
-            total + calculateContactTime(semesterData[0]),
-          0,
+        contactTimeLectures: Math.round(
+          (templateData.reduce(
+            (total, semesterData) =>
+              total + calculateContactTime(semesterData[0]),
+            0,
+          ) *
+            formFactor) /
+            100,
         ),
-        contactTimeTutorials: templateData.reduce(
-          (total, semesterData) =>
-            total + calculateContactTime(semesterData[1]),
-          0,
+        contactTimeTutorials: Math.round(
+          (templateData.reduce(
+            (total, semesterData) =>
+              total + calculateContactTime(semesterData[1]),
+            0,
+          ) *
+            formFactor) /
+            100,
         ),
-        contactTimeLabs: templateData.reduce(
-          (total, semesterData) =>
-            total + calculateContactTime(semesterData[2]),
-          0,
+        contactTimeLabs: Math.round(
+          (templateData.reduce(
+            (total, semesterData) =>
+              total + calculateContactTime(semesterData[2]),
+            0,
+          ) *
+            formFactor) /
+            100,
         ),
-        contactTimeSeminars: templateData.reduce(
-          (total, semesterData) =>
-            total + calculateContactTime(semesterData[3]),
-          0,
+        contactTimeSeminars: Math.round(
+          (templateData.reduce(
+            (total, semesterData) =>
+              total + calculateContactTime(semesterData[3]),
+            0,
+          ) *
+            formFactor) /
+            100,
         ),
-        contactTimeFieldworkPlacement: templateData.reduce(
-          (total, semesterData) =>
-            total + calculateContactTime(semesterData[4]),
-          0,
+        contactTimeFieldworkPlacement: Math.round(
+          (templateData.reduce(
+            (total, semesterData) =>
+              total + calculateContactTime(semesterData[4]),
+            0,
+          ) *
+            formFactor) /
+            100,
         ),
-        contactTimeOthers: templateData.reduce(
-          (total, semesterData) =>
-            total + calculateContactTime(semesterData[5]),
-          0,
+        contactTimeOthers: Math.round(
+          (templateData.reduce(
+            (total, semesterData) =>
+              total + calculateContactTime(semesterData[5]),
+            0,
+          ) *
+            formFactor) /
+            100,
         ),
       };
 
-      const updatedCoursework = {
+      console.log(
+        `Coursework: ${coursework.title}, Contact Time Fields:`,
+        contactTimeFields,
+      );
+
+      const {
+        feedbackTime,
+        formativeAssessmentTime,
+        keyboardTime,
+        preparationTime,
+        privateStudyTime,
+      } = getTimeFields(coursework, moduleCredit);
+
+      return {
         ...coursework,
         deadlineWeek: numericDeadlineWeek,
-        feedbackTime:
-          coursework.type === 'exam' ? 0 : coursework.feedbackTime || 1,
-        formativeAssessment:
-          coursework.type === 'exam' ? 0 : coursework.formativeAssessment || 1,
-        keyboardTime: getKeyboardTime(coursework, moduleCredit),
-        preparationTime: getPreparationTime(coursework, moduleCredit),
-        privateStudy: getPrivateStudyTime(coursework, moduleCredit),
+        feedbackTime,
+        formativeAssessmentTime,
+        keyboardTime,
+        preparationTime,
+        privateStudyTime,
         ...contactTimeFields,
       };
-
-      shouldUpdate =
-        shouldUpdate ||
-        JSON.stringify(updatedCoursework) !== JSON.stringify(coursework);
-
-      return updatedCoursework;
     },
   );
 
-  return { updatedCourseworkList, shouldUpdate };
+  console.log('Updated coursework list:', updatedCourseworkList);
+  return updatedCourseworkList;
 };
 
 export const getKeyboardTime = (
@@ -161,52 +208,99 @@ export const getKeyboardTime = (
   return 0;
 };
 
-export const getPreparationTime = (
+const getTimeFields = (
   coursework: Coursework,
   moduleCredit: number,
-): number => {
-  if (coursework.type === 'exam') {
-    return 0;
-  }
+): {
+  feedbackTime: number;
+  formativeAssessmentTime: number;
+  keyboardTime: number;
+  preparationTime: number;
+  privateStudyTime: number;
+} => {
+  const { preparationTime, privateStudyTime } =
+    getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
 
-  const totalTime =
-    (coursework.contactTimeLectures || 0) +
-    (coursework.contactTimeTutorials || 0) +
-    (coursework.contactTimeLabs || 0) +
-    (coursework.contactTimeSeminars || 0) +
-    (coursework.contactTimeFieldworkPlacement || 0) +
-    (coursework.contactTimeOthers || 0) +
-    (coursework.formativeAssessment || 0) +
-    (coursework.keyboardTime || 0) +
-    (coursework.feedbackTime || 0);
+  const feedbackTime =
+    coursework.type === 'exam' ? 0 : coursework.feedbackTime || 1;
+  const formativeAssessmentTime =
+    coursework.type === 'exam' ? 0 : coursework.formativeAssessmentTime || 1;
+  const keyboardTime = getKeyboardTime(coursework, moduleCredit);
 
-  return Math.max(
-    expectedTotalTime(coursework.weight || 0, moduleCredit) - totalTime,
-    0,
-  );
+  return {
+    feedbackTime,
+    formativeAssessmentTime,
+    keyboardTime,
+    preparationTime,
+    privateStudyTime,
+  };
 };
 
-export const getPrivateStudyTime = (
+export const getPreparationTimeAndPrivateStudyTime = (
   coursework: Coursework,
   moduleCredit: number,
-): number => {
-  if (coursework.type !== 'exam') {
-    return 0;
-  }
+): { preparationTime: number; privateStudyTime: number } => {
+  // Exclude preparationTime and privateStudyTime initially
+  const {
+    contactTimeLectures,
+    contactTimeTutorials,
+    contactTimeLabs,
+    contactTimeSeminars,
+    contactTimeFieldworkPlacement,
+    contactTimeOthers,
+    formativeAssessmentTime,
+    keyboardTime,
+    feedbackTime,
+  } = coursework;
 
-  const totalTime =
-    (coursework.contactTimeLectures || 0) +
-    (coursework.contactTimeTutorials || 0) +
-    (coursework.contactTimeLabs || 0) +
-    (coursework.contactTimeSeminars || 0) +
-    (coursework.contactTimeFieldworkPlacement || 0) +
-    (coursework.contactTimeOthers || 0) +
-    (coursework.formativeAssessment || 0) +
-    (coursework.keyboardTime || 0) +
-    (coursework.feedbackTime || 0);
+  const initialTotalTime =
+    (contactTimeLectures || 0) +
+    (contactTimeTutorials || 0) +
+    (contactTimeLabs || 0) +
+    (contactTimeSeminars || 0) +
+    (contactTimeFieldworkPlacement || 0) +
+    (contactTimeOthers || 0) +
+    (formativeAssessmentTime || 0) +
+    (keyboardTime || 0) +
+    (feedbackTime || 0);
 
-  return Math.max(
-    expectedTotalTime(coursework.weight || 0, moduleCredit) - totalTime,
-    0,
+  const expectedTotalTimeForCoursework = expectedTotalTime(
+    coursework.weight || 0,
+    moduleCredit,
   );
+
+  console.log(
+    `Coursework: ${coursework.title}, Initial Total Time: ${initialTotalTime}, Expected Total Time: ${expectedTotalTimeForCoursework}`,
+  );
+
+  const preparationTime =
+    coursework.type === 'exam'
+      ? 0
+      : Math.max(expectedTotalTimeForCoursework - initialTotalTime, 0);
+
+  const privateStudyTime =
+    coursework.type !== 'exam'
+      ? 0
+      : Math.max(expectedTotalTimeForCoursework - initialTotalTime, 0);
+
+  console.log(
+    `Calculated Preparation Time: ${preparationTime}, Private Study Time: ${privateStudyTime}`,
+  );
+
+  return { preparationTime, privateStudyTime };
+};
+
+export const handleInputChange = (
+  editableCourseworkList: Coursework[],
+  index: number,
+  field: string,
+  value: number,
+  handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void,
+) => {
+  const updatedCourseworkList = [...editableCourseworkList];
+  updatedCourseworkList[index] = {
+    ...updatedCourseworkList[index],
+    [field]: value,
+  };
+  handleCourseworkListChange(updatedCourseworkList);
 };

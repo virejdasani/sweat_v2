@@ -5,8 +5,7 @@ import { CourseworkScheduleProps } from '../../../../types/admin/CreateModule/Co
 import {
   calculateTotalTime,
   expectedTotalTime,
-  getPreparationTime,
-  getPrivateStudyTime,
+  getPreparationTimeAndPrivateStudyTime,
   updateCourseworkList,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
 
@@ -16,34 +15,42 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   handleScheduleChange,
   templateData,
   handleCourseworkListChange,
+  formFactor,
 }) => {
   const [isPrePopulated, setIsPrePopulated] = React.useState(false);
 
   React.useEffect(() => {
     if (!isPrePopulated) {
-      const { updatedCourseworkList, shouldUpdate } = updateCourseworkList(
+      console.log('Running useEffect to populate coursework list');
+      const updatedCourseworkList = updateCourseworkList(
         courseworkList,
         templateData,
         moduleCredit,
+        formFactor,
       );
 
-      if (shouldUpdate) {
-        const updatedCourseworkListWithPreparationTime =
-          updatedCourseworkList.map((coursework) => {
-            const preparationTime = getPreparationTime(
-              coursework,
-              moduleCredit,
-            );
-            const privateStudyTime = getPrivateStudyTime(
-              coursework,
-              moduleCredit,
-            );
-            return { ...coursework, preparationTime, privateStudyTime };
-          });
+      console.log(
+        'Updated coursework list from updateCourseworkList:',
+        updatedCourseworkList,
+      );
 
-        handleCourseworkListChange(updatedCourseworkListWithPreparationTime);
-        setIsPrePopulated(true);
-      }
+      const updatedCourseworkListWithPreparationTime =
+        updatedCourseworkList.map((coursework) => {
+          const { preparationTime, privateStudyTime } =
+            getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
+          console.log(
+            `Coursework: ${coursework.title}, Preparation Time: ${preparationTime}, Private Study Time: ${privateStudyTime}`,
+          );
+          return { ...coursework, preparationTime, privateStudyTime };
+        });
+
+      console.log(
+        'Updated coursework list with preparation and private study time:',
+        updatedCourseworkListWithPreparationTime,
+      );
+
+      handleCourseworkListChange(updatedCourseworkListWithPreparationTime);
+      setIsPrePopulated(true);
     }
   }, [
     templateData,
@@ -51,6 +58,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
     moduleCredit,
     handleCourseworkListChange,
     isPrePopulated,
+    formFactor,
   ]);
 
   return (
@@ -213,7 +221,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
               <Input
                 type="number"
                 value={
-                  isPrePopulated ? coursework.formativeAssessment || '' : ''
+                  isPrePopulated ? coursework.formativeAssessmentTime || '' : ''
                 }
                 onChange={(e) => {
                   if (isPrePopulated) {
@@ -235,12 +243,18 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={isPrePopulated ? coursework.privateStudy || '' : ''}
+                value={
+                  isPrePopulated
+                    ? typeof coursework.privateStudyTime === 'number'
+                      ? coursework.privateStudyTime
+                      : ''
+                    : ''
+                }
                 onChange={(e) => {
                   if (isPrePopulated) {
                     handleScheduleChange(
                       index,
-                      'privateStudy',
+                      'privateStudyTime',
                       Number(e.target.value),
                     );
                   }
@@ -257,7 +271,13 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={isPrePopulated ? coursework.preparationTime || '' : ''}
+                value={
+                  isPrePopulated
+                    ? typeof coursework.preparationTime === 'number'
+                      ? coursework.preparationTime
+                      : ''
+                    : ''
+                }
                 onChange={(e) => {
                   if (isPrePopulated) {
                     handleScheduleChange(

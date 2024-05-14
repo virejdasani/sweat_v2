@@ -39,14 +39,14 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
 
   const calculateFormativeAssessmentTime = () => {
     return courseworkList.reduce(
-      (total, coursework) => total + (coursework.formativeAssessment || 0),
+      (total, coursework) => total + (coursework.formativeAssessmentTime || 0),
       0,
     );
   };
 
   const calculatePrivateStudyTime = () => {
     return courseworkList.reduce(
-      (total, coursework) => total + (coursework.privateStudy || 0),
+      (total, coursework) => total + (coursework.privateStudyTime || 0),
       0,
     );
   };

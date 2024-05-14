@@ -49,6 +49,7 @@ const CreateModule: React.FC = () => {
 
   const [courseworkList, setCourseworkList] = React.useState<Coursework[]>([]);
   const [templateData, setTemplateData] = React.useState<number[][][]>([]);
+  const [formFactor, setFormFactor] = React.useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,6 +109,8 @@ const CreateModule: React.FC = () => {
             onCourseworkListChange={handleCourseworkListChange}
             semester={formData.semester}
             examPercentage={100 - formData.courseworkPercentage}
+            formFactor={formFactor}
+            onFormFactorChange={setFormFactor}
           />
         );
       case 3:
@@ -118,6 +121,7 @@ const CreateModule: React.FC = () => {
             handleScheduleChange={handleScheduleChange}
             templateData={templateData}
             handleCourseworkListChange={handleCourseworkListChange}
+            formFactor={formFactor}
           />
         );
       case 4:

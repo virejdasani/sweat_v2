@@ -72,13 +72,6 @@ function DateSetter() {
     end: new Date(),
   });
 
-  const [readingWeekEvent, setReadingWeekEvent] = useState({
-    title: 'Reading Week',
-    allDay: true,
-    start: new Date(),
-    end: new Date(),
-  });
-
   const [newEvent, setNewEvent] = useState({
     title: '',
     allDay: true,
@@ -170,11 +163,11 @@ function DateSetter() {
       if (readingWeekEvent) {
         console.log('Reading week start date:', readingWeekEvent.start);
         console.log('Reading week end date:', readingWeekEvent.end);
-        setReadingWeekEvent({
-          ...readingWeekEvent,
-          start: new Date(readingWeekEvent.start),
-          end: new Date(readingWeekEvent.end),
-        });
+        // setReadingWeekEvent({
+        //   ...readingWeekEvent,
+        //   start: new Date(readingWeekEvent.start),
+        //   end: new Date(readingWeekEvent.end),
+        // });
       }
 
       setFetchedItems(data);
@@ -223,20 +216,6 @@ function DateSetter() {
     });
   }, [fetchedItems, course]);
 
-  // this is if we have added all bank holidays to MongoDB
-  // this replaces the existing events with the fetched items so only events from the server are displayed
-  // Update events state with fetched items
-  // useEffect(() => {
-  //   const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
-  //     _id: item._id,
-  //     title: item.title,
-  //     start: new Date(item.start),
-  //     end: new Date(item.end),
-  //     allDay: item.allDay,
-  //   }));
-  //   setEvents(localNewEvents); // Update events directly with fetched items
-  // }, [fetchedItems]);
-
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [selectEvent, setSelectEvent] = useState<CalendarKeyDateEvent | null>(
@@ -251,49 +230,6 @@ function DateSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
-
-  const handleAddChristmasBreak = () => {
-    if (!christmasBreakEvent.start || !christmasBreakEvent.end) {
-      toast('Please select both start and end dates for the Christmas break');
-      return;
-    }
-    if (christmasBreakEvent.start >= christmasBreakEvent.end) {
-      toast('Christmas break start date must be before end date');
-      return;
-    }
-    handleAddEvent(christmasBreakEvent);
-    setChristmasBreakEvent({
-      title: 'Christmas Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-  };
-
-  const handleAddEasterBreak = () => {
-    // Check that both start and end dates are selected
-    if (!easterBreakEvent.start || !easterBreakEvent.end) {
-      toast('Please select both start and end dates for the Easter break');
-      return;
-    }
-
-    // Make sure start date is before end date
-    if (easterBreakEvent.start >= easterBreakEvent.end) {
-      toast('Easter break start date must be before end date');
-      return;
-    }
-
-    // Add the Easter break event
-    handleAddEvent(easterBreakEvent);
-
-    // Reset the Easter break input fields
-    setEasterBreakEvent({
-      title: 'Easter Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-  };
 
   // Function to handle course selection
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

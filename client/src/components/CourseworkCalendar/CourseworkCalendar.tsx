@@ -205,14 +205,15 @@ function DateSetter() {
           )
         : localNewEvents;
 
+    // TODO: make it so that non CV* events show on all versions of the calendar
     const versionFilteredEvents = filteredEvents.filter((event) => {
       const titleSuffix = `CV${currentVersion}`;
       // Filter out events that don't have the current version suffix
       if (currentVersion === 1) {
         // Filter out events that have "CV" in the title but don't have the current version suffix
-        return !event.title.includes('CV') || event.title.endsWith(titleSuffix);
+        return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
       } else {
-        return event.title.endsWith(titleSuffix);
+        return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
       }
     });
 

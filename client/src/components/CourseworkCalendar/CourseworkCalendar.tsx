@@ -14,6 +14,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import EditTermDateModal from './EditCourseworkCalendarModal';
 import { CalendarKeyDateEvent } from '../shared/types';
 
+// IDEA: maybe theres a "v1, v2,...,vn" added for each event, the vs are the version of the calendar that the event should be shown on.
+// so if v1 in event.(title/description) then it should be shown on the calendar with version 1, this can be switched - so this way there is 1 centeralised db but we pick and choose what to show on the calendar
+
 const locales = {};
 
 const localizer = dateFnsLocalizer({

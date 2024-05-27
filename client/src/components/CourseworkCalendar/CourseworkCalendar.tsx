@@ -88,8 +88,15 @@ function DateSetter() {
 
   const [fetchedItems, setFetchedItems] = useState<CalendarKeyDateEvent[]>([]);
 
+  // State for managing calendar versions
+  const [currentVersion, setCurrentVersion] = useState(1);
+  const [versions, setVersions] = useState<number[]>([1]);
+
   // fetch events from the server and set the events state
   useEffect(() => {
+    // Clear existing events when changing the calendar version
+    setEvents([]);
+
     const fetchData = async () => {
       const res = await fetch(baseURL);
       const data = await res.json();
@@ -177,14 +184,14 @@ function DateSetter() {
       console.log('Fetched items: ', data);
     };
     fetchData();
-  }, []);
+  }, [currentVersion]);
 
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
   useEffect(() => {
     const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
       _id: item._id,
-      title: item.title,
+      title: `${item.title}`,
       start: new Date(item.start),
       end: new Date(item.end),
       allDay: item.allDay,
@@ -198,26 +205,33 @@ function DateSetter() {
           )
         : localNewEvents;
 
+    const versionFilteredEvents = filteredEvents.filter((event) => {
+      const titleSuffix = `CV${currentVersion}`;
+      // Filter out events that don't have the current version suffix
+      if (currentVersion === 1) {
+        // Filter out events that have "CV" in the title but don't have the current version suffix
+        return !event.title.includes('CV') || event.title.endsWith(titleSuffix);
+      } else {
+        return event.title.endsWith(titleSuffix);
+      }
+    });
+
     setEvents((prevEvents) => {
-      // Filter out events that already exist in the events array
-      const uniqueNewEvents = filteredEvents.filter((newEvent) =>
+      const uniqueNewEvents = versionFilteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
-      // Concatenate unique new events with existing events
       const updatedEvents = [...prevEvents, ...uniqueNewEvents];
 
-      // If switching from EE to CS, remove the Reading Week event locally
       if (course === 'CS') {
         return updatedEvents.filter(
           (event) => !event.title.includes('Reading Week'),
         );
       }
 
-      // Concatenate unique new events with existing events
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems, course]);
+  }, [fetchedItems, course, currentVersion]);
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
@@ -400,6 +414,8 @@ function DateSetter() {
       event.title += ` (Week ${weekNumber})`;
     }
 
+    event.title += ` CV${currentVersion}`;
+
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
 
@@ -558,6 +574,14 @@ function DateSetter() {
     return false; // No clash detected
   }
 
+  const archiveCurrentCalendar = () => {
+    const newVersion = currentVersion + 1;
+    setCurrentVersion(newVersion);
+    setVersions([...versions, newVersion]);
+    setEvents([]); // Clear current events
+    toast(`Archived current calendar. Now viewing version ${newVersion}`);
+  };
+
   // fetch bank holidays from api and add to calendar
   useEffect(() => {
     fetch('https://www.gov.uk/bank-holidays.json')
@@ -617,6 +641,23 @@ function DateSetter() {
             <option value="CS">No</option>
             <option value="EE">Yes</option>
           </select>
+
+          <div>
+            <label>Calendar Version: </label>
+            <select
+              value={currentVersion}
+              onChange={(e) => setCurrentVersion(Number(e.target.value))}
+            >
+              {versions.map((version) => (
+                <option key={version} value={version}>
+                  CV{version}
+                </option>
+              ))}
+            </select>
+            <button onClick={archiveCurrentCalendar}>
+              Archive Current Calendar
+            </button>
+          </div>
 
           <hr className="lightRounded"></hr>
 

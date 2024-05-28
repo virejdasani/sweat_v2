@@ -35,7 +35,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 
-function DateSetter() {
+function CourseworkCalendarSetter() {
   // course CS means no reading week, EE means reading week.
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
@@ -173,18 +173,31 @@ function DateSetter() {
       if (readingWeekEvent) {
         console.log('Reading week start date:', readingWeekEvent.start);
         console.log('Reading week end date:', readingWeekEvent.end);
-        // setReadingWeekEvent({
-        //   ...readingWeekEvent,
-        //   start: new Date(readingWeekEvent.start),
-        //   end: new Date(readingWeekEvent.end),
-        // });
       }
 
       setFetchedItems(data);
       console.log('Fetched items: ', data);
+
+      // Extract all version numbers from the fetched events
+      const versionNumbers = new Set<number>();
+      data.forEach((event: CalendarKeyDateEvent) => {
+        const match = event.title.match(/CV(\d+)/);
+        if (match) {
+          versionNumbers.add(Number(match[1]));
+        }
+      });
+
+      // Sort the version numbers in ascending order
+      const versionsArray = Array.from(versionNumbers).sort((a, b) => a - b);
+      setVersions(versionsArray);
+
+      // Set default version to 1 if it exists, otherwise use the last version
+      setCurrentVersion(
+        versionsArray.includes(1) ? 1 : versionsArray[versionsArray.length - 1],
+      );
     };
     fetchData();
-  }, [currentVersion]);
+  }, []);
 
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
@@ -205,17 +218,20 @@ function DateSetter() {
           )
         : localNewEvents;
 
-    // TODO: make it so that non CV* events show on all versions of the calendar
     const versionFilteredEvents = filteredEvents.filter((event) => {
       const titleSuffix = `CV${currentVersion}`;
       // Filter out events that don't have the current version suffix
       if (currentVersion === 1) {
+        // TODO: here make it so that bank holidays are not filtered out
         // Filter out events that have "CV" in the title but don't have the current version suffix
         return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
       } else {
         return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
       }
     });
+
+    // set the events state to the fetched items ONLY
+    setEvents(versionFilteredEvents);
 
     setEvents((prevEvents) => {
       const uniqueNewEvents = versionFilteredEvents.filter((newEvent) =>
@@ -576,10 +592,20 @@ function DateSetter() {
   }
 
   const archiveCurrentCalendar = () => {
-    const newVersion = currentVersion + 1;
+    // Determine the maximum version number from the existing versions array
+    const maxVersion = Math.max(...versions);
+
+    // Create a new version that is one higher than the maximum version number
+    const newVersion = maxVersion + 1;
+
+    // Update the current version and versions state
     setCurrentVersion(newVersion);
     setVersions([...versions, newVersion]);
-    setEvents([]); // Clear current events
+
+    // Clear current events (if that's intended)
+    setEvents([]);
+
+    // Show a toast notification to inform the user
     toast(`Archived current calendar. Now viewing version ${newVersion}`);
   };
 
@@ -645,6 +671,7 @@ function DateSetter() {
 
           <div>
             <label>Calendar Version: </label>
+            {/* Dropdown for selecting calendar version */}
             <select
               value={currentVersion}
               onChange={(e) => setCurrentVersion(Number(e.target.value))}
@@ -752,4 +779,4 @@ function DateSetter() {
   );
 }
 
-export default DateSetter;
+export default CourseworkCalendarSetter;

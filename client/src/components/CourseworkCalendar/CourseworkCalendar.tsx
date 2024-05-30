@@ -199,6 +199,14 @@ function CourseworkCalendarSetter() {
     fetchData();
   }, []);
 
+  // Ensure currentVersion defaults to 1 if it's not set
+  // this is because if there are no events with CV* in the title, the currentVersion will be undefined, so we set it to 1 (CV1)
+  useEffect(() => {
+    if (!currentVersion) {
+      setCurrentVersion(1);
+    }
+  }, [currentVersion]);
+
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
   useEffect(() => {
@@ -405,6 +413,12 @@ function CourseworkCalendarSetter() {
     // check that event title is not empty (so bank holidays can't be added without a title)
     if (!event.title) {
       toast('Please enter a name for the date');
+      return;
+    }
+
+    // Ensure currentVersion is defined - should always be defined this is for testing
+    if (!currentVersion) {
+      toast('Current version is not set');
       return;
     }
 

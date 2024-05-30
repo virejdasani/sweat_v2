@@ -189,7 +189,7 @@ function CourseworkCalendarSetter() {
 
       // Sort the version numbers in ascending order
       const versionsArray = Array.from(versionNumbers).sort((a, b) => a - b);
-      setVersions(versionsArray);
+      setVersions(versionsArray.length > 0 ? versionsArray : [1]);
 
       // Set default version to 1 if it exists, otherwise use the last version
       setCurrentVersion(
@@ -596,7 +596,7 @@ function CourseworkCalendarSetter() {
 
     // Update the current version and versions state
     setCurrentVersion(newVersion);
-    setVersions([...versions, newVersion]);
+    setVersions((prevVersions) => [...prevVersions, newVersion]);
 
     // Clear current events (if that's intended)
     setEvents([]);

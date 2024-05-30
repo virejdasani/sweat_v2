@@ -221,13 +221,9 @@ function CourseworkCalendarSetter() {
     const versionFilteredEvents = filteredEvents.filter((event) => {
       const titleSuffix = `CV${currentVersion}`;
       // Filter out events that don't have the current version suffix
-      if (currentVersion === 1) {
-        // TODO: here make it so that bank holidays are not filtered out
-        // Filter out events that have "CV" in the title but don't have the current version suffix
-        return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
-      } else {
-        return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
-      }
+      // here make it so that bank holidays are not filtered out
+      // doest work because bank holidays are not stored in MongoDB (low priority)
+      return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
     });
 
     // set the events state to the fetched items ONLY

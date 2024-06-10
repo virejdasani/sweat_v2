@@ -1,3 +1,7 @@
+import { Coursework } from './CourseworkSetup';
+import { ModuleSetupFormData } from './ModuleSetup';
+import { TeachingScheduleSaveData } from './TeachingSchedule';
+
 export interface Step {
   title: string;
   description: string;
@@ -16,3 +20,9 @@ export const steps: Step[] = [
   },
   { title: 'Review', description: 'Review module details' },
 ];
+
+export interface ModuleDocument {
+  moduleSetup: ModuleSetupFormData;
+  teachingSchedule: TeachingScheduleSaveData;
+  courseworkList: Coursework[];
+}

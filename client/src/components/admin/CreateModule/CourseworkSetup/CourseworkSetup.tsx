@@ -120,7 +120,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                       i + 1 === 8
                     ) {
                       return (
-                        <>
+                        <React.Fragment key={i}>
                           <option key={i + 1} value={i + 1}>
                             {i + 1}
                           </option>
@@ -133,7 +133,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                           <option key="easterBreak3" value="easterBreak3">
                             Easter Break Week 3
                           </option>
-                        </>
+                        </React.Fragment>
                       );
                     } else {
                       return (
@@ -177,7 +177,11 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               {coursework.type !== 'exam' && (
                 <Td style={courseworkSetupStyles.td}>
                   <DatePicker
-                    selected={coursework.deadlineDate}
+                    selected={
+                      coursework.deadlineDate
+                        ? new Date(coursework.deadlineDate)
+                        : null
+                    }
                     onChange={(date: Date | null) =>
                       handleInputChange(index, 'deadlineDate', date)
                     }

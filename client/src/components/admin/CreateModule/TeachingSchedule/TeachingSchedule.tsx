@@ -19,7 +19,10 @@ import {
   inputStyle,
   buttonStyle,
 } from './TeachingScheduleStyles';
-import { TeachingScheduleProps } from '../../../../types/admin/CreateModule/TeachingSchedule';
+import {
+  TeachingScheduleProps,
+  TeachingScheduleSaveData,
+} from '../../../../types/admin/CreateModule/TeachingSchedule';
 import {
   fetchTemplateData,
   getSemesterHeading,
@@ -51,8 +54,63 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
     setTemplateData(updatedData);
   };
 
+  const transformTemplateDataToSaveData = (
+    templateData: number[][][],
+  ): TeachingScheduleSaveData => {
+    const teachingScheduleSaveData: TeachingScheduleSaveData = {
+      lectures: { hours: 0, distribution: [] },
+      tutorials: { hours: 0, distribution: [] },
+      labs: { hours: 0, distribution: [] },
+      seminars: { hours: 0, distribution: [] },
+      fieldworkPlacement: { hours: 0, distribution: [] },
+      other: { hours: 0, distribution: [] },
+    };
+
+    templateData.forEach((table) => {
+      table.forEach((row, rowIndex) => {
+        let activityKey: keyof TeachingScheduleSaveData;
+
+        switch (rowIndex) {
+          case 0:
+            activityKey = 'lectures';
+            break;
+          case 1:
+            activityKey = 'tutorials';
+            break;
+          case 2:
+            activityKey = 'labs';
+            break;
+          case 3:
+            activityKey = 'seminars';
+            break;
+          case 4:
+            activityKey = 'fieldworkPlacement';
+            break;
+          case 5:
+            activityKey = 'other';
+            break;
+          default:
+            return;
+        }
+
+        const distribution = row
+          .map((hours, week) => ({ week: week + 1, hours }))
+          .filter((item) => item.hours > 0);
+
+        teachingScheduleSaveData[activityKey] = {
+          hours: distribution.reduce((total, dist) => total + dist.hours, 0),
+          distribution,
+        };
+      });
+    });
+
+    return teachingScheduleSaveData;
+  };
+
   const handleSave = () => {
-    // Implement save functionality
+    const saveData = transformTemplateDataToSaveData(templateData);
+    console.log('Saved Data:', JSON.stringify(saveData, null, 2));
+    // Implement the actual save logic here (e.g., API call to save the data)
   };
 
   const renderTableHeader = () => (

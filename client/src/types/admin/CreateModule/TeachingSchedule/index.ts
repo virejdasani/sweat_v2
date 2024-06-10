@@ -4,3 +4,35 @@ export interface TeachingScheduleProps {
   templateData: number[][][];
   setTemplateData: React.Dispatch<React.SetStateAction<number[][][]>>;
 }
+
+export interface Distribution {
+  week: number;
+  hours: number;
+}
+
+export interface TeachingScheduleSaveData {
+  lectures: {
+    hours: number;
+    distribution?: Distribution[];
+  };
+  seminars: {
+    hours: number;
+    distribution?: Distribution[];
+  };
+  tutorials: {
+    hours: number;
+    distribution?: Distribution[];
+  };
+  labs: {
+    hours: number;
+    distribution?: Distribution[];
+  };
+  fieldworkPlacement: {
+    hours: number;
+    distribution?: Distribution[];
+  };
+  other: {
+    hours: number;
+    distribution?: Distribution[];
+  };
+}

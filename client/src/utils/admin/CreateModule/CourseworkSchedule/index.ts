@@ -40,8 +40,6 @@ export const updateCourseworkList = (
   moduleCredit: number,
   formFactor: number,
 ): Coursework[] => {
-  console.log('Initial coursework list:', courseworkList);
-
   const sortedCourseworkList = courseworkList.sort((a, b) => {
     const getNumericDeadlineWeek = (deadlineWeek: number | string) =>
       typeof deadlineWeek === 'string'
@@ -52,8 +50,6 @@ export const updateCourseworkList = (
       getNumericDeadlineWeek(b.deadlineWeek)
     );
   });
-
-  console.log('Sorted coursework list:', sortedCourseworkList);
 
   const updatedCourseworkList = sortedCourseworkList.map(
     (coursework, index) => {
@@ -134,11 +130,6 @@ export const updateCourseworkList = (
         ),
       };
 
-      console.log(
-        `Coursework: ${coursework.title}, Contact Time Fields:`,
-        contactTimeFields,
-      );
-
       const {
         feedbackTime,
         formativeAssessmentTime,
@@ -159,8 +150,6 @@ export const updateCourseworkList = (
       };
     },
   );
-
-  console.log('Updated coursework list:', updatedCourseworkList);
   return updatedCourseworkList;
 };
 
@@ -269,10 +258,6 @@ export const getPreparationTimeAndPrivateStudyTime = (
     moduleCredit,
   );
 
-  console.log(
-    `Coursework: ${coursework.title}, Initial Total Time: ${initialTotalTime}, Expected Total Time: ${expectedTotalTimeForCoursework}`,
-  );
-
   const preparationTime =
     coursework.type === 'exam'
       ? 0
@@ -282,10 +267,6 @@ export const getPreparationTimeAndPrivateStudyTime = (
     coursework.type !== 'exam'
       ? 0
       : Math.max(expectedTotalTimeForCoursework - initialTotalTime, 0);
-
-  console.log(
-    `Calculated Preparation Time: ${preparationTime}, Private Study Time: ${privateStudyTime}`,
-  );
 
   return { preparationTime, privateStudyTime };
 };

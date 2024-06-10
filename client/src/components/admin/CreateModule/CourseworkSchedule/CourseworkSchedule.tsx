@@ -21,7 +21,6 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
 
   React.useEffect(() => {
     if (!isPrePopulated) {
-      console.log('Running useEffect to populate coursework list');
       const updatedCourseworkList = updateCourseworkList(
         courseworkList,
         templateData,
@@ -29,25 +28,12 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         formFactor,
       );
 
-      console.log(
-        'Updated coursework list from updateCourseworkList:',
-        updatedCourseworkList,
-      );
-
       const updatedCourseworkListWithPreparationTime =
         updatedCourseworkList.map((coursework) => {
           const { preparationTime, privateStudyTime } =
             getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
-          console.log(
-            `Coursework: ${coursework.title}, Preparation Time: ${preparationTime}, Private Study Time: ${privateStudyTime}`,
-          );
           return { ...coursework, preparationTime, privateStudyTime };
         });
-
-      console.log(
-        'Updated coursework list with preparation and private study time:',
-        updatedCourseworkListWithPreparationTime,
-      );
 
       handleCourseworkListChange(updatedCourseworkListWithPreparationTime);
       setIsPrePopulated(true);
@@ -227,7 +213,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   if (isPrePopulated) {
                     handleScheduleChange(
                       index,
-                      'formativeAssessment',
+                      'formativeAssessmentTime',
                       Number(e.target.value),
                     );
                   }

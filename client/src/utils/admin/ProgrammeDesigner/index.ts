@@ -4,6 +4,7 @@ import { Coursework, Module, Programme } from '../../../shared/types';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 import {
   createModule,
@@ -189,23 +190,16 @@ export const useModuleActions = (
   programmeState: Programme[],
   setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>,
 ) => {
+  const navigate = useNavigate();
+
   const handleEditModule = useCallback(
-    (
-      moduleInstance: ModuleInstance,
-      setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
-      setSelectedModule: React.Dispatch<
-        React.SetStateAction<Module | undefined>
-      >,
-      setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => {
-      openEditModuleModal(
-        moduleInstance.module,
-        setModalMode,
-        setSelectedModule,
-        setIsModuleModalOpen,
-      );
+    (moduleInstance: ModuleInstance) => {
+      // Navigate to the create-module page with the module data
+      navigate('/admin/create-module', {
+        state: { module: moduleInstance.module },
+      });
     },
-    [],
+    [navigate],
   );
 
   const handleRemoveFromProgramme = useCallback(

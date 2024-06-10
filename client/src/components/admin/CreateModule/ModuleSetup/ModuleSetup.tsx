@@ -15,7 +15,6 @@ import {
   Checkbox,
   CheckboxGroup,
 } from '@chakra-ui/react';
-
 import { moduleSetupStyles } from './ModuleSetupStyles';
 import { ModuleSetupProps } from '../../../../types/admin/CreateModule/ModuleSetup';
 import { handleInputChange } from '../../../../utils/admin/CreateModule/ModuleSetup';

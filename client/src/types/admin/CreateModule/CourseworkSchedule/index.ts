@@ -14,4 +14,5 @@ export interface CourseworkScheduleProps {
   templateData: number[][][];
   handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
   formFactor: number;
+  isEditing: boolean;
 }

@@ -181,9 +181,9 @@ const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
               onChange={(e) => handleInputChange(e, formData, setFormData)}
             >
               <option value="">Select</option>
-              <option value="First">First</option>
-              <option value="Second">Second</option>
-              <option value="Whole Session">Whole Session</option>
+              <option value="first">First</option>
+              <option value="second">Second</option>
+              <option value="whole session">Whole Session</option>
             </Select>
           </FormControl>
         </GridItem>
@@ -197,8 +197,8 @@ const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
               onChange={(e) => handleInputChange(e, formData, setFormData)}
             >
               <option value="">Select</option>
-              <option value="Core">Core</option>
-              <option value="Optional">Optional</option>
+              <option value="core">Core</option>
+              <option value="optional">Optional</option>
             </Select>
           </FormControl>
         </GridItem>

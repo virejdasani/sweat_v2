@@ -5,7 +5,7 @@ import {
   Draggable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { Module, Programme } from '../../../shared/types';
+import { Programme } from '../../../shared/types';
 import {
   handleFilterChange,
   handleModuleTypeFilterChange,
@@ -13,40 +13,35 @@ import {
   handleSaveAllProgrammes,
   handleSearch,
   handleSearchChange,
-  openAddModuleModal,
-  closeModuleModal,
   fetchData,
 } from '../../../utils/admin/ProgrammeDesigner';
 import ModuleList from './ModuleCard/ModuleCard';
 import './ProgrammeDesigner.css';
 import SearchBar from './ModuleFilters/SearchBar/SearchBar';
-import ModuleForm from './ModuleForm/ModuleForm';
 import { useModuleActions } from '../../../utils/admin/ProgrammeDesigner';
 import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
 import { Button } from '@chakra-ui/react';
 import ModuleYearFilter from './ModuleFilters/YearFilter/YearFilter';
 import ModuleTypeFilter from './ModuleFilters/TypeFilter/TypeFilter';
+import { ModuleDocument } from '../../../types/admin/CreateModule';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
-  const [searchResults, setSearchResults] = useState<Module[]>([]);
+  const [searchResults, setSearchResults] = useState<ModuleDocument[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModuleType, setSelectedModuleType] = useState<string | null>(
     null,
   );
-  const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [selectedModule, setSelectedModule] = useState<Module | undefined>(
-    undefined,
-  );
+  // const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
+  // const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
 
   useEffect(() => {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
   }, []);
 
-  const { handleEditModule, handleSubmit } = useModuleActions(
+  const { handleEditModule } = useModuleActions(
     moduleInstances,
     setModuleInstances,
     programmeState,
@@ -85,7 +80,7 @@ function ProgrammeDesigner() {
           }
           selectedModuleType={selectedModuleType}
         />
-        <Button
+        {/* <Button
           colorScheme="blue"
           onClick={() =>
             openAddModuleModal(
@@ -96,7 +91,7 @@ function ProgrammeDesigner() {
           }
         >
           Add Module
-        </Button>
+        </Button> */}
       </div>
       <DragDropContext
         onDragEnd={(result: DropResult) =>
@@ -126,14 +121,16 @@ function ProgrammeDesigner() {
                       .filter(
                         (mi) =>
                           mi.programmeId === programme.id &&
-                          (!selectedYear || mi.module.year === selectedYear) &&
+                          (!selectedYear ||
+                            mi.module.moduleSetup.studyYear === selectedYear) &&
                           (!selectedModuleType ||
-                            mi.module.type === selectedModuleType) &&
+                            mi.module.moduleSetup.type ===
+                              selectedModuleType) &&
                           (searchQuery === '' ||
-                            mi.module.name
+                            mi.module.moduleSetup.moduleTitle
                               .toLowerCase()
                               .includes(searchQuery.toLowerCase()) ||
-                            mi.module.id
+                            mi.module.moduleSetup.moduleCode
                               .toLowerCase()
                               .includes(searchQuery.toLowerCase())),
                       )
@@ -157,14 +154,7 @@ function ProgrammeDesigner() {
                                 setModuleInstances={setModuleInstances}
                                 programmeState={programmeState}
                                 setProgrammeState={setProgrammeState}
-                                onEdit={() =>
-                                  handleEditModule(
-                                    mi,
-                                    setModalMode,
-                                    setSelectedModule,
-                                    setIsModuleModalOpen,
-                                  )
-                                }
+                                onEdit={() => handleEditModule(mi)}
                               />
                             </div>
                           )}
@@ -187,7 +177,7 @@ function ProgrammeDesigner() {
           Save All Programmes
         </Button>
       </div>
-      {isModuleModalOpen && (
+      {/* {isModuleModalOpen && (
         <ModuleForm
           mode={modalMode}
           module={selectedModule}
@@ -198,7 +188,7 @@ function ProgrammeDesigner() {
           programmeState={programmeState}
           setProgrammeState={setProgrammeState}
         />
-      )}
+      )} */}
     </div>
   );
 }

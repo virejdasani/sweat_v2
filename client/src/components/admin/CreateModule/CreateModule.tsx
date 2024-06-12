@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -14,8 +15,8 @@ import {
   StepSeparator,
   useSteps,
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
-import { steps } from '../../../types/admin/CreateModule';
+import { toast } from 'react-toastify';
+import { ModuleDocument, steps } from '../../../types/admin/CreateModule';
 import {
   handlePrev,
   handleNext,
@@ -30,7 +31,11 @@ import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import ModuleReview from './ModuleReview/ModuleReview';
-import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
+import {
+  fetchTemplateData,
+  transformTemplateDataToSaveData,
+} from '../../../utils/admin/CreateModule/TeachingSchedule';
+import { createModule } from '../../../services/admin/ProgrammeDesigner';
 
 const MAX_STEPS = 5;
 
@@ -38,7 +43,7 @@ const CreateModule: React.FC = () => {
   const location = useLocation();
   const { module, templateData: initialTemplateData } = location.state || {};
 
-  const [formData, setFormData] = React.useState<ModuleSetupFormData>({
+  const [formData, setFormData] = useState<ModuleSetupFormData>({
     moduleCode: '',
     moduleTitle: '',
     moduleCredit: 0,
@@ -50,25 +55,17 @@ const CreateModule: React.FC = () => {
     type: '',
   });
 
-  const [courseworkList, setCourseworkList] = React.useState<Coursework[]>([]);
-  const [templateData, setTemplateData] = React.useState<number[][][]>(
+  const [courseworkList, setCourseworkList] = useState<Coursework[]>([]);
+  const [templateData, setTemplateData] = useState<number[][][]>(
     initialTemplateData || [],
   );
-  const [formFactor, setFormFactor] = React.useState(0);
+  const [formFactor, setFormFactor] = useState(0);
 
   useEffect(() => {
     if (module) {
-      setFormData({
-        moduleCode: module.id,
-        moduleTitle: module.name,
-        moduleCredit: module.credits,
-        courseworkPercentage: module.courseworkPercentage,
-        examPercentage: module.examPercentage,
-        studyYear: module.year,
-        programme: module.programme,
-        semester: module.semester,
-        type: module.type,
-      });
+      setFormData(module.moduleSetup);
+      setCourseworkList(module.courseworkList || []);
+      setTemplateData(module.teachingSchedule || []);
     }
   }, [module]);
 
@@ -123,6 +120,7 @@ const CreateModule: React.FC = () => {
             semester={formData.semester}
             templateData={templateData}
             setTemplateData={setTemplateData}
+            editingScheduleData={module?.teachingSchedule}
           />
         );
       case 2:
@@ -145,6 +143,7 @@ const CreateModule: React.FC = () => {
             templateData={templateData}
             handleCourseworkListChange={handleCourseworkListChange}
             formFactor={formFactor}
+            isEditing={!!module}
           />
         );
       case 4:
@@ -161,19 +160,20 @@ const CreateModule: React.FC = () => {
   };
 
   const handleSave = async () => {
-    return;
-    // const moduleDocument: ModuleDocument = {
-    //   moduleSetup: formData,
-    //   teachingSchedule: transformTemplateDataToSaveData(templateData),
-    //   courseworkList,
-    // };
+    const moduleDocument: ModuleDocument = {
+      moduleSetup: formData,
+      teachingSchedule: transformTemplateDataToSaveData(templateData),
+      courseworkList,
+    };
 
-    // try {
-    //   await saveModuleDocument(moduleDocument);
-    //   console.log('Module document saved successfully');
-    // } catch (error) {
-    //   console.error('Error saving module document:', error);
-    // }
+    try {
+      await createModule(moduleDocument);
+      console.log('Module document saved successfully');
+      toast.success('Module document saved successfully');
+    } catch (error) {
+      console.error('Error saving module document:', error);
+      toast.error('Error saving module document');
+    }
   };
 
   const handleNextStep = () => {

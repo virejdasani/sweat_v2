@@ -39,7 +39,9 @@ exports.getModuleById = async (req, res) => {
 exports.createModule = async (req, res) => {
   try {
     const moduleData = req.body;
-    const existingModule = await Module.findOne({ id: moduleData.id });
+    const existingModule = await Module.findOne({
+      'moduleSetup.moduleCode': moduleData.moduleSetup.moduleCode,
+    });
 
     await createOrUpdateModule(moduleData, existingModule, res);
   } catch (error) {
@@ -88,17 +90,16 @@ exports.deleteModuleById = async (req, res) => {
     handleError(res, error);
   }
 };
-
 exports.updateProgrammeArrayInModules = async (req, res) => {
   try {
     const programmes = await Programme.find();
 
     const moduleToProgrammeMap = programmes.reduce((map, programme) => {
-      programme.moduleIds.forEach((moduleId) => {
-        if (!map[moduleId]) {
-          map[moduleId] = [];
+      programme.moduleIds.forEach((moduleCode) => {
+        if (!map[moduleCode]) {
+          map[moduleCode] = [];
         }
-        map[moduleId].push(programme.id);
+        map[moduleCode].push(programme.id);
       });
       return map;
     }, {});
@@ -111,15 +112,21 @@ exports.updateProgrammeArrayInModules = async (req, res) => {
       },
     }));
 
-    // Execute bulk write operations for updating moduleIds in programmes
     const programmeResults = await Programme.bulkWrite(updateProgrammeBulkOps);
 
     // Update the programme array in modules individually
     const moduleUpdatePromises = Object.entries(moduleToProgrammeMap).map(
-      async ([moduleId, programmeIds]) => {
+      async ([moduleCode, programmeIds]) => {
+        const module = await Module.findOne({
+          'moduleSetup.moduleCode': moduleCode,
+        });
+        if (!module) {
+          return;
+        }
+
         await Module.updateMany(
-          { id: moduleId },
-          { $set: { programme: programmeIds } },
+          { 'moduleSetup.moduleCode': moduleCode },
+          { $set: { 'moduleSetup.programme': programmeIds } },
         );
       },
     );

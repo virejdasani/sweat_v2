@@ -22,7 +22,7 @@ import {
   ModuleListProps,
 } from '../../../../types/admin/ProgrammeDesigner';
 import ModuleCardStyles from './ModuleCardStyles';
-import { Module } from '../../../../shared/types';
+import { ModuleDocument } from '../../../../types/admin/CreateModule';
 
 const ModuleCard: React.FC<ModuleCardProps> = ({
   module,
@@ -49,10 +49,9 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
         alignItems="center"
         sx={ModuleCardStyles.cardHeader}
       >
-        {' '}
         <GridItem>
           <Heading sx={ModuleCardStyles.moduleId}>
-            {module.id} - {module.name}
+            {module.moduleSetup.moduleCode} - {module.moduleSetup.moduleTitle}
           </Heading>
         </GridItem>
         <GridItem>
@@ -87,12 +86,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
             <AccordionIcon />
           </AccordionButton>
           <AccordionPanel sx={ModuleCardStyles.accordionPanel}>
-            <Text>Year: {module.year}</Text>
-            <Text>Type: {module.type}</Text>
-            <Text>Programme: {module.programme.join(', ')}</Text>
-            <Text>Semester: {module.semester}</Text>
-            <Text>Credits: {module.credits}</Text>
-            <Text>Timetabled Hours: {module.timetabledHours}</Text>
+            <Text>Year: {module.moduleSetup.studyYear}</Text>
+            <Text>Type: {module.moduleSetup.type}</Text>
+            <Text>Programme: {module.moduleSetup.programme.join(', ')}</Text>
+            <Text>Semester: {module.moduleSetup.semester}</Text>
+            <Text>Credits: {module.moduleSetup.moduleCredit}</Text>
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
@@ -100,9 +98,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
         open={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onRemoveFromProgramme={() =>
-          handleRemoveFromProgramme(module.id, programmeId)
+          handleRemoveFromProgramme(module.moduleSetup.moduleCode, programmeId)
         }
-        onRemoveFromDatabase={() => handleRemoveFromDatabase(module.id)}
+        onRemoveFromDatabase={() =>
+          handleRemoveFromDatabase(module.moduleSetup.moduleCode)
+        }
       />
     </Card>
   );
@@ -119,9 +119,9 @@ const ModuleList: React.FC<ModuleListProps> = ({
 }) => {
   return (
     <div className="module-list">
-      {modules.map((module: Module) => (
+      {modules.map((module: ModuleDocument) => (
         <ModuleCard
-          key={module.id}
+          key={module.moduleSetup.moduleCode}
           module={module}
           programmeId={programmeId}
           moduleInstances={moduleInstances}

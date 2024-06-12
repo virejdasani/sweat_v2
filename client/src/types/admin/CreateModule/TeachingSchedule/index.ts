@@ -3,6 +3,7 @@ export interface TeachingScheduleProps {
   semester: string;
   templateData: number[][][];
   setTemplateData: React.Dispatch<React.SetStateAction<number[][][]>>;
+  editingScheduleData?: TeachingScheduleSaveData;
 }
 
 export interface Distribution {

@@ -1,32 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Coursework, Module, Programme } from '../../../shared/types';
+import { Coursework, Programme } from '../../../shared/types';
+import { ModuleDocument } from '../CreateModule';
 
 export interface ModuleListProps {
-  modules: Module[];
+  modules: ModuleDocument[];
   programmeId: string;
   moduleInstances: ModuleInstance[];
   setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>;
   programmeState: Programme[];
   setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>;
-  onEdit: (module: Module) => void;
+  onEdit: (module: ModuleDocument) => void;
 }
 
 export interface ModuleCardProps {
-  module: Module;
+  module: ModuleDocument;
   programmeId: string;
   moduleInstances: ModuleInstance[];
   setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>;
   programmeState: Programme[];
   setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>;
-  onEdit: (module: Module) => void;
+  onEdit: (module: ModuleDocument) => void;
 }
 
 export interface ModuleModalProps {
   mode: 'add' | 'edit';
-  module?: Module;
+  module?: ModuleDocument;
   onClose: () => void;
   onSubmit: (
-    moduleData: Partial<Module>,
+    moduleData: Partial<ModuleDocument>,
     toast: any,
     onClose: any,
   ) => Promise<void>;
@@ -37,7 +38,7 @@ export interface ModuleModalProps {
 }
 
 export interface ModuleInstance {
-  module: Module;
+  module: ModuleDocument;
   programmeId: string;
   uniqueId: string;
 }
@@ -55,7 +56,7 @@ export interface ModuleTypeFilterProps {
 export interface SearchBarProps {
   searchQuery: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSearch: (results: Module[]) => void;
+  onSearch: (results: ModuleDocument[]) => void;
 }
 
 export interface DeleteModalProps {
@@ -75,7 +76,7 @@ export interface TeachingSchedule {
 }
 
 export interface ModuleFormStep1Props {
-  moduleData: Partial<Module>;
+  moduleData: Partial<ModuleDocument>;
   handleChange: (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement

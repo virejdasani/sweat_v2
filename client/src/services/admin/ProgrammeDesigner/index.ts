@@ -1,10 +1,13 @@
 import { AxiosResponse } from 'axios';
 import httpClient from '../../../shared/api/httpClient';
-import { Module, Programme } from '../../../shared/types';
+import { Programme } from '../../../shared/types';
+import { ModuleDocument } from '../../../types/admin/CreateModule';
 
-export const createModule = async (moduleData: Module): Promise<Module> => {
+export const createModule = async (
+  moduleData: ModuleDocument,
+): Promise<ModuleDocument> => {
   try {
-    const response: AxiosResponse<Module> = await httpClient.post(
+    const response: AxiosResponse<ModuleDocument> = await httpClient.post(
       '/modules/create-module',
       moduleData,
     );
@@ -17,10 +20,10 @@ export const createModule = async (moduleData: Module): Promise<Module> => {
 
 export const updateModuleById = async (
   moduleId: string,
-  updatedData: Partial<Module>,
-): Promise<Module> => {
+  updatedData: Partial<ModuleDocument>,
+): Promise<ModuleDocument> => {
   try {
-    const response: AxiosResponse<Module> = await httpClient.put(
+    const response: AxiosResponse<ModuleDocument> = await httpClient.put(
       `/modules/${moduleId}`,
       updatedData,
     );

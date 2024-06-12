@@ -16,11 +16,10 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   templateData,
   handleCourseworkListChange,
   formFactor,
+  isEditing,
 }) => {
-  const [isPrePopulated, setIsPrePopulated] = React.useState(false);
-
   React.useEffect(() => {
-    if (!isPrePopulated) {
+    if (!isEditing) {
       const updatedCourseworkList = updateCourseworkList(
         courseworkList,
         templateData,
@@ -36,15 +35,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         });
 
       handleCourseworkListChange(updatedCourseworkListWithPreparationTime);
-      setIsPrePopulated(true);
     }
   }, [
     templateData,
     courseworkList,
     moduleCredit,
     handleCourseworkListChange,
-    isPrePopulated,
     formFactor,
+    isEditing,
   ]);
 
   return (
@@ -66,18 +64,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={
-                  isPrePopulated ? coursework.contactTimeLectures || '' : ''
+                value={coursework.contactTimeLectures || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'contactTimeLectures',
+                    Number(e.target.value),
+                  )
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'contactTimeLectures',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -89,18 +83,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={
-                  isPrePopulated ? coursework.contactTimeTutorials || '' : ''
+                value={coursework.contactTimeTutorials || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'contactTimeTutorials',
+                    Number(e.target.value),
+                  )
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'contactTimeTutorials',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -112,16 +102,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={isPrePopulated ? coursework.contactTimeLabs || '' : ''}
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'contactTimeLabs',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
+                value={coursework.contactTimeLabs || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'contactTimeLabs',
+                    Number(e.target.value),
+                  )
+                }
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -133,18 +121,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={
-                  isPrePopulated ? coursework.contactTimeSeminars || '' : ''
+                value={coursework.contactTimeSeminars || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'contactTimeSeminars',
+                    Number(e.target.value),
+                  )
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'contactTimeSeminars',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -158,20 +142,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={
-                  isPrePopulated
-                    ? coursework.contactTimeFieldworkPlacement || ''
-                    : ''
+                value={coursework.contactTimeFieldworkPlacement || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'contactTimeFieldworkPlacement',
+                    Number(e.target.value),
+                  )
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'contactTimeFieldworkPlacement',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -183,16 +161,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={isPrePopulated ? coursework.contactTimeOthers || '' : ''}
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'contactTimeOthers',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
+                value={coursework.contactTimeOthers || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'contactTimeOthers',
+                    Number(e.target.value),
+                  )
+                }
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -206,18 +182,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={
-                  isPrePopulated ? coursework.formativeAssessmentTime || '' : ''
+                value={coursework.formativeAssessmentTime || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'formativeAssessmentTime',
+                    Number(e.target.value),
+                  )
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'formativeAssessmentTime',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -230,21 +202,17 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
               <Input
                 type="number"
                 value={
-                  isPrePopulated
-                    ? typeof coursework.privateStudyTime === 'number'
-                      ? coursework.privateStudyTime
-                      : ''
+                  typeof coursework.privateStudyTime === 'number'
+                    ? coursework.privateStudyTime
                     : ''
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'privateStudyTime',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'privateStudyTime',
+                    Number(e.target.value),
+                  )
+                }
                 style={courseworkScheduleStyles.input}
                 disabled={coursework.type !== 'exam'}
               />
@@ -258,21 +226,17 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
               <Input
                 type="number"
                 value={
-                  isPrePopulated
-                    ? typeof coursework.preparationTime === 'number'
-                      ? coursework.preparationTime
-                      : ''
+                  typeof coursework.preparationTime === 'number'
+                    ? coursework.preparationTime
                     : ''
                 }
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'preparationTime',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'preparationTime',
+                    Number(e.target.value),
+                  )
+                }
                 style={courseworkScheduleStyles.input}
                 disabled={coursework.type === 'exam'}
               />
@@ -287,16 +251,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={isPrePopulated ? coursework.keyboardTime || '' : ''}
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'keyboardTime',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
+                value={coursework.keyboardTime || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'keyboardTime',
+                    Number(e.target.value),
+                  )
+                }
                 style={courseworkScheduleStyles.input}
               />
             </Td>
@@ -308,16 +270,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={isPrePopulated ? coursework.feedbackTime || '' : ''}
-                onChange={(e) => {
-                  if (isPrePopulated) {
-                    handleScheduleChange(
-                      index,
-                      'feedbackTime',
-                      Number(e.target.value),
-                    );
-                  }
-                }}
+                value={coursework.feedbackTime || ''}
+                onChange={(e) =>
+                  handleScheduleChange(
+                    index,
+                    'feedbackTime',
+                    Number(e.target.value),
+                  )
+                }
                 style={courseworkScheduleStyles.input}
                 disabled={coursework.type === 'exam'}
               />

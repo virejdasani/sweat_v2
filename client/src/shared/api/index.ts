@@ -1,6 +1,7 @@
 import httpClient from './httpClient';
-import { Programme, Module } from '../types';
+import { Programme } from '../types';
 import { AxiosResponse } from 'axios';
+import { ModuleDocument } from '../../types/admin/CreateModule';
 
 export const getAllProgrammes = async (): Promise<Programme[]> => {
   try {
@@ -38,9 +39,10 @@ export const getProgrammeById = async (
   }
 };
 
-export const getAllModules = async (): Promise<Module[]> => {
+export const getAllModules = async (): Promise<ModuleDocument[]> => {
   try {
-    const response: AxiosResponse<Module[]> = await httpClient.get('/modules');
+    const response: AxiosResponse<ModuleDocument[]> =
+      await httpClient.get('/modules');
     return response.data;
   } catch (error) {
     console.error('Error fetching modules:', error);
@@ -59,9 +61,11 @@ export const getAllModuleIds = async (): Promise<string[]> => {
   }
 };
 
-export const getModuleById = async (moduleId: string): Promise<Module> => {
+export const getModuleById = async (
+  moduleId: string,
+): Promise<ModuleDocument> => {
   try {
-    const response: AxiosResponse<Module> = await httpClient.get(
+    const response: AxiosResponse<ModuleDocument> = await httpClient.get(
       `/modules/${moduleId}`,
     );
     return response.data;

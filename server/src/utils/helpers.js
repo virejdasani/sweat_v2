@@ -8,54 +8,54 @@ const {
 
 exports.createOrUpdateModule = async (moduleData, existingModule, res) => {
   try {
-    const processedModuleData = studyWorkloadSimulatorAlgorithm(moduleData);
+    const processedModuleData = moduleData;
 
     if (existingModule) {
-      // If the module exists, update it
       const updatedModule = await Module.findOneAndUpdate(
-        { id: existingModule.id },
+        { 'moduleSetup.moduleCode': existingModule.moduleSetup.moduleCode },
         processedModuleData,
         { new: true },
       );
 
-      // Remove the module from the moduleIds array of programmes that are no longer associated
-      const removePromises = existingModule.programme
-        .filter((programmeId) => !updatedModule.programme.includes(programmeId))
-        .map((programmeId) =>
-          Programme.findOneAndUpdate(
-            { id: programmeId },
-            { $pull: { moduleIds: existingModule.id } },
-            { new: true },
-          ),
-        );
-
-      // Add the module to the moduleIds array of new associated programmes
-      const addPromises = updatedModule.programme
+      const removePromises = existingModule.moduleSetup.programme
         .filter(
-          (programmeId) => !existingModule.programme.includes(programmeId),
+          (programmeId) =>
+            !updatedModule.moduleSetup.programme.includes(programmeId),
         )
         .map((programmeId) =>
           Programme.findOneAndUpdate(
             { id: programmeId },
-            { $addToSet: { moduleIds: updatedModule.id } },
+            { $pull: { moduleIds: existingModule.moduleSetup.moduleCode } },
             { new: true },
           ),
         );
 
-      const updatePromises = [...removePromises, ...addPromises];
-      await Promise.all(updatePromises);
+      const addPromises = updatedModule.moduleSetup.programme
+        .filter(
+          (programmeId) =>
+            !existingModule.moduleSetup.programme.includes(programmeId),
+        )
+        .map((programmeId) =>
+          Programme.findOneAndUpdate(
+            { id: programmeId },
+            { $addToSet: { moduleIds: updatedModule.moduleSetup.moduleCode } },
+            { new: true },
+          ),
+        );
+
+      await Promise.all([...removePromises, ...addPromises]);
 
       res.json(updatedModule);
     } else {
-      // If the module doesn't exist, create a new one
-      const newModule = await Module.create(processedModuleData);
+      const newModule = await Module.create(moduleData);
 
-      const updatePromises = processedModuleData.programme.map((programmeId) =>
-        Programme.findOneAndUpdate(
-          { id: programmeId },
-          { $addToSet: { moduleIds: newModule.id } },
-          { new: true },
-        ),
+      const updatePromises = moduleData.moduleSetup.programme.map(
+        (programmeId) =>
+          Programme.findOneAndUpdate(
+            { id: programmeId },
+            { $addToSet: { moduleIds: newModule.moduleSetup.moduleCode } },
+            { new: true },
+          ),
       );
 
       await Promise.all(updatePromises);

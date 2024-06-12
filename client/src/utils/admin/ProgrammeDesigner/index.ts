@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DropResult } from 'react-beautiful-dnd';
-import { Coursework, Module, Programme } from '../../../shared/types';
+import { Programme } from '../../../shared/types';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,13 +16,18 @@ import {
 } from '../../../services/admin/ProgrammeDesigner';
 import { getAllProgrammes, getAllModules } from '../../../shared/api';
 import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleSetupFormData } from '../../../types/admin/CreateModule/ModuleSetup';
+import { ModuleDocument } from '../../../types/admin/CreateModule';
+import { TeachingScheduleSaveData } from '../../../types/admin/CreateModule/TeachingSchedule';
+import { transformTemplateDataToSaveData } from '../../../utils/admin/CreateModule/TeachingSchedule';
+import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 
 export function handleOnDragEnd(
   result: DropResult,
   moduleInstances: ModuleInstance[],
   setModuleInstances: (moduleInstances: ModuleInstance[]) => void,
-  searchResults: Module[],
-  setSearchResults: (searchResults: Module[]) => void,
+  searchResults: ModuleDocument[],
+  setSearchResults: (searchResults: ModuleDocument[]) => void,
   programmeState: Programme[],
   setProgrammeState: (programmeState: Programme[]) => void,
 ) {
@@ -73,7 +78,7 @@ export function handleOnDragEnd(
     ...programme,
     moduleIds: newModuleInstances
       .filter((mi) => mi.programmeId === programme.id)
-      .map((mi) => mi.module.id),
+      .map((mi) => mi.module.moduleSetup.moduleCode),
   }));
 
   setProgrammeState(updatedProgrammeState);
@@ -81,10 +86,11 @@ export function handleOnDragEnd(
   setSearchResults(
     searchResults.map((module) => {
       const foundInstance = newModuleInstances.find(
-        (mi) => mi.module.id === module.id,
+        (mi) =>
+          mi.module.moduleSetup.moduleCode === module.moduleSetup.moduleCode,
       );
       return foundInstance ? foundInstance.module : module;
-    }),
+    }) as ModuleDocument[], // Ensuring the type is ModuleDocument[]
   );
 }
 
@@ -136,8 +142,8 @@ export const handleFilterChange = (
 export const handleSearchChange = (
   event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>,
-  onSearch: (results: Module[]) => void,
-  modules: Module[],
+  onSearch: (results: ModuleDocument[]) => void,
+  modules: ModuleDocument[],
   selectedYear: number | null,
   selectedModuleType: string | null,
 ) => {
@@ -148,22 +154,22 @@ export const handleSearchChange = (
   let filteredModules = modules.filter((module) => {
     const lowercaseQuery = query.toLowerCase();
     return (
-      module.id.toLowerCase().includes(lowercaseQuery) ||
-      module.name.toLowerCase().includes(lowercaseQuery)
+      module.moduleSetup.moduleCode.toLowerCase().includes(lowercaseQuery) ||
+      module.moduleSetup.moduleTitle.toLowerCase().includes(lowercaseQuery)
     );
   });
 
   // Apply year filter if a specific year is selected
   if (selectedYear) {
     filteredModules = filteredModules.filter(
-      (module) => module.year === selectedYear,
+      (module) => module.moduleSetup.studyYear === selectedYear,
     );
   }
 
   // Apply module type filter if a specific type is selected
   if (selectedModuleType) {
     filteredModules = filteredModules.filter(
-      (module) => module.type === selectedModuleType,
+      (module) => module.moduleSetup.type === selectedModuleType,
     );
   }
 
@@ -178,8 +184,8 @@ export const handleModuleTypeFilterChange = (
 };
 
 export const handleSearch = (
-  results: Module[],
-  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+  results: ModuleDocument[],
+  setSearchResults: React.Dispatch<React.SetStateAction<ModuleDocument[]>>,
 ) => {
   setSearchResults(results);
 };
@@ -194,7 +200,6 @@ export const useModuleActions = (
 
   const handleEditModule = useCallback(
     (moduleInstance: ModuleInstance) => {
-      // Navigate to the create-module page with the module data
       navigate('/admin/create-module', {
         state: { module: moduleInstance.module },
       });
@@ -205,23 +210,23 @@ export const useModuleActions = (
   const handleRemoveFromProgramme = useCallback(
     async (moduleId: string, programmeId: string) => {
       try {
-        // Remove the module from the specific programme using the API request
         const updatedProgramme = await removeModuleFromProgramme(
           programmeId,
           moduleId,
         );
 
-        // Update the programmeState with the updated programme
         setProgrammeState(
           programmeState.map((programme) =>
             programme.id === programmeId ? updatedProgramme : programme,
           ),
         );
 
-        // Remove the ModuleInstance object from the moduleInstances array
         const updatedModuleInstances = moduleInstances.filter(
           (mi) =>
-            !(mi.module.id === moduleId && mi.programmeId === programmeId),
+            !(
+              mi.module.moduleSetup.moduleCode === moduleId &&
+              mi.programmeId === programmeId
+            ),
         );
         setModuleInstances(updatedModuleInstances);
 
@@ -240,12 +245,10 @@ export const useModuleActions = (
   const handleRemoveFromDatabase = useCallback(
     async (moduleId: string) => {
       try {
-        // Delete the module from the database using the API request
         await deleteModuleById(moduleId);
 
-        // Remove the ModuleInstance objects with the deleted module from the moduleInstances array
         const updatedModuleInstances = moduleInstances.filter(
-          (mi) => mi.module.id !== moduleId,
+          (mi) => mi.module.moduleSetup.moduleCode !== moduleId,
         );
         setModuleInstances(updatedModuleInstances);
 
@@ -261,55 +264,46 @@ export const useModuleActions = (
   );
 
   const handleSubmit = useCallback(
-    async (moduleData: Partial<Module>, onCloseCallback?: () => void) => {
-      if (!validateModuleData(moduleData, toast)) {
+    async (
+      moduleSetup: ModuleSetupFormData,
+      templateData: number[][][],
+      courseworkList: Coursework[],
+      onCloseCallback?: () => void,
+    ) => {
+      const teachingSchedule: TeachingScheduleSaveData =
+        transformTemplateDataToSaveData(templateData);
+
+      if (
+        !validateModuleData(
+          moduleSetup,
+          teachingSchedule,
+          courseworkList,
+          toast,
+        )
+      ) {
         return;
       }
-      const mappedModule = {
-        id: (moduleData.id || '').trim(),
-        name: (moduleData.name || '').trim(),
-        year: moduleData.year as 1 | 2 | 3 | 4,
-        type: moduleData.type || 'core',
-        programme: moduleData.programme || [],
-        semester: moduleData.semester || 'first',
-        credits: moduleData.credits || 7.5,
-        timetabledHours: moduleData.timetabledHours || 0,
-        lectures: {
-          hours: moduleData.lectures?.hours || 0,
-        },
-        seminars: {
-          hours: moduleData.seminars?.hours || 0,
-        },
-        tutorials: {
-          hours: moduleData.tutorials?.hours || 0,
-        },
-        labs: {
-          hours: moduleData.labs?.hours || 0,
-        },
-        fieldworkPlacement: {
-          hours: moduleData.fieldworkPlacement?.hours || 0,
-        },
-        other: {
-          hours: moduleData.other?.hours || 0,
-        },
-        courseworks: moduleData.courseworks || [],
-      };
-      try {
-        await createModule(mappedModule);
 
-        // Display the success message
+      const moduleDocument: ModuleDocument = {
+        moduleSetup,
+        teachingSchedule,
+        courseworkList,
+      };
+
+      try {
+        await createModule(moduleDocument);
+
         toast.success(
-          moduleData.id
+          moduleSetup.moduleCode
             ? 'Module updated successfully!'
             : 'Module created successfully!',
           {
-            autoClose: 3000, // Display the success message for 2 seconds
+            autoClose: 3000,
           },
         );
 
-        // Display the refresh message
         toast.info('The page will refresh to reflect the changes.', {
-          autoClose: 3000, // Display the refresh message for 3 seconds
+          autoClose: 3000,
           onClose: () => {
             window.location.reload();
             onCloseCallback?.();
@@ -332,21 +326,21 @@ export const useModuleActions = (
 };
 
 const validateModuleData = (
-  moduleData: Partial<Module>,
+  moduleSetup: ModuleSetupFormData,
+  teachingSchedule: TeachingScheduleSaveData,
+  courseworkList: Coursework[],
   toast: any,
 ): boolean => {
-  // Check if all required fields are present and not empty strings
+  // Validate ModuleSetupFormData
   if (
-    !moduleData.id ||
-    !moduleData.name ||
-    !moduleData.year ||
-    !moduleData.type ||
-    !moduleData.programme ||
-    !moduleData.semester ||
-    !moduleData.credits ||
-    moduleData.credits <= 0 ||
-    moduleData.timetabledHours === undefined ||
-    moduleData.timetabledHours < 0
+    !moduleSetup.moduleCode ||
+    !moduleSetup.moduleTitle ||
+    !moduleSetup.studyYear ||
+    !moduleSetup.type ||
+    !moduleSetup.programme.length ||
+    !moduleSetup.semester ||
+    !moduleSetup.moduleCredit ||
+    moduleSetup.moduleCredit <= 0
   ) {
     toast.error('Please fill in all required fields.');
     return false;
@@ -354,21 +348,29 @@ const validateModuleData = (
 
   // Calculate the sum of teaching hours
   const teachingHoursSum =
-    (moduleData.lectures?.hours || 0) +
-    (moduleData.seminars?.hours || 0) +
-    (moduleData.tutorials?.hours || 0) +
-    (moduleData.labs?.hours || 0) +
-    (moduleData.fieldworkPlacement?.hours || 0) +
-    (moduleData.other?.hours || 0);
+    teachingSchedule.lectures.hours +
+    teachingSchedule.seminars.hours +
+    teachingSchedule.tutorials.hours +
+    teachingSchedule.labs.hours +
+    teachingSchedule.fieldworkPlacement.hours +
+    teachingSchedule.other.hours;
 
   // Check if timetabled hours match the sum of teaching hours
-  if (moduleData.timetabledHours !== teachingHoursSum) {
+  const timetabledHours =
+    teachingSchedule.lectures.hours +
+    teachingSchedule.seminars.hours +
+    teachingSchedule.tutorials.hours +
+    teachingSchedule.labs.hours +
+    teachingSchedule.fieldworkPlacement.hours +
+    teachingSchedule.other.hours;
+
+  if (timetabledHours !== teachingHoursSum) {
     toast.error('Timetabled hours must match the sum of teaching hours.');
     return false;
   }
 
   // Check if timetabled hours are not greater than 10 times the module credit
-  if (moduleData.timetabledHours > moduleData.credits * 10) {
+  if (timetabledHours > moduleSetup.moduleCredit * 10) {
     toast.error(
       'Timetabled hours cannot be greater than 10 times the module credit.',
     );
@@ -376,14 +378,13 @@ const validateModuleData = (
   }
 
   // Check if the sum of coursework weights is equal to 100
-  const courseworkWeightSum =
-    moduleData.courseworks?.reduce((sum, coursework) => {
-      const weight =
-        typeof coursework.weight === 'string'
-          ? parseFloat(coursework.weight)
-          : coursework.weight || 0;
-      return sum + weight;
-    }, 0) || 0;
+  const courseworkWeightSum = courseworkList.reduce((sum, coursework) => {
+    const weight =
+      typeof coursework.weight === 'string'
+        ? parseFloat(coursework.weight)
+        : coursework.weight || 0;
+    return sum + weight;
+  }, 0);
 
   if (courseworkWeightSum !== 100) {
     toast.error('The sum of coursework weights must be equal to 100.');
@@ -392,15 +393,15 @@ const validateModuleData = (
 
   // Check if any number is negative
   if (
-    moduleData.credits < 0 ||
-    moduleData.timetabledHours < 0 ||
-    (moduleData.lectures?.hours || 0) < 0 ||
-    (moduleData.seminars?.hours || 0) < 0 ||
-    (moduleData.tutorials?.hours || 0) < 0 ||
-    (moduleData.labs?.hours || 0) < 0 ||
-    (moduleData.fieldworkPlacement?.hours || 0) < 0 ||
-    (moduleData.other?.hours || 0) < 0 ||
-    moduleData.courseworks?.some((coursework) => {
+    moduleSetup.moduleCredit < 0 ||
+    timetabledHours < 0 ||
+    teachingSchedule.lectures.hours < 0 ||
+    teachingSchedule.seminars.hours < 0 ||
+    teachingSchedule.tutorials.hours < 0 ||
+    teachingSchedule.labs.hours < 0 ||
+    teachingSchedule.fieldworkPlacement.hours < 0 ||
+    teachingSchedule.other.hours < 0 ||
+    courseworkList.some((coursework) => {
       const weight =
         typeof coursework.weight === 'string'
           ? parseFloat(coursework.weight)
@@ -423,7 +424,9 @@ export const handleAddModuleClick = (
 
 export const openAddModuleModal = (
   setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
-  setSelectedModule: React.Dispatch<React.SetStateAction<Module | undefined>>,
+  setSelectedModule: React.Dispatch<
+    React.SetStateAction<ModuleDocument | undefined>
+  >,
   setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   setModalMode('add');
@@ -432,9 +435,11 @@ export const openAddModuleModal = (
 };
 
 export const openEditModuleModal = (
-  module: Module,
+  module: ModuleDocument,
   setModalMode: React.Dispatch<React.SetStateAction<'add' | 'edit'>>,
-  setSelectedModule: React.Dispatch<React.SetStateAction<Module | undefined>>,
+  setSelectedModule: React.Dispatch<
+    React.SetStateAction<ModuleDocument | undefined>
+  >,
   setIsModuleModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   setModalMode('edit');
@@ -448,34 +453,41 @@ export const closeModuleModal = (
   setIsModuleModalOpen(false);
 };
 
-export const handleAddModule = async (
-  module: Module,
-  searchResults: Module[],
-  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
-) => {
-  try {
-    // Create a new module using the API
-    const newModule = await createModule(module);
+// export const handleAddModule = async (
+//   module: Module,
+//   searchResults: Module[],
+//   setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+// ) => {
+//   try {
+//     // Create a new module using the API
+//     const newModule = await createModule(module);
 
-    // Add the new module to the searchResults array
-    setSearchResults([...searchResults, newModule]);
-  } catch (error) {
-    console.error('Error adding module:', error);
-  }
-};
+//     // Add the new module to the searchResults array
+//     setSearchResults([...searchResults, newModule]);
+//   } catch (error) {
+//     console.error('Error adding module:', error);
+//   }
+// };
 
 export const handleUpdateModule = async (
-  module: Module,
-  searchResults: Module[],
-  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+  module: ModuleDocument,
+  searchResults: ModuleDocument[],
+  setSearchResults: React.Dispatch<React.SetStateAction<ModuleDocument[]>>,
 ) => {
   try {
     // Update the existing module using the API
-    const updatedModule = await updateModuleById(module.id, module);
+    const updatedModule = await updateModuleById(
+      module.moduleSetup.moduleCode,
+      module,
+    );
 
     // Update the existing module in the searchResults array
     setSearchResults(
-      searchResults.map((m) => (m.id === updatedModule.id ? updatedModule : m)),
+      searchResults.map((m) =>
+        m.moduleSetup.moduleCode === updatedModule.moduleSetup.moduleCode
+          ? updatedModule
+          : m,
+      ),
     );
   } catch (error) {
     console.error('Error updating module:', error);
@@ -484,7 +496,7 @@ export const handleUpdateModule = async (
 
 export const fetchData = async (
   setProgrammeState: React.Dispatch<React.SetStateAction<Programme[]>>,
-  setSearchResults: React.Dispatch<React.SetStateAction<Module[]>>,
+  setSearchResults: React.Dispatch<React.SetStateAction<ModuleDocument[]>>,
   setModuleInstances: React.Dispatch<React.SetStateAction<ModuleInstance[]>>,
 ) => {
   try {
@@ -498,7 +510,9 @@ export const fetchData = async (
     const moduleInstancesData: ModuleInstance[] = programmes
       .flatMap((programme) =>
         programme.moduleIds.map((moduleId) => {
-          const foundModule = modules.find((m) => m.id === moduleId);
+          const foundModule = modules.find(
+            (m) => m.moduleSetup.moduleCode === moduleId,
+          );
           return foundModule
             ? {
                 module: foundModule,
@@ -515,108 +529,106 @@ export const fetchData = async (
     console.error('Error fetching data:', error);
   }
 };
-
-export const isValidModuleKey = (key: string): key is keyof Module => {
-  const validKeys: Array<keyof Module> = [
-    'id',
-    'name',
-    'year',
-    'type',
-    'programme',
-    'semester',
-    'credits',
-    'totalStudyHours',
-    'timetabledHours',
-    'privateStudyHours',
-    'lectures',
-    'seminars',
-    'tutorials',
-    'labs',
-    'fieldworkPlacement',
-    'other',
-    'examPrep',
-    'courseworks',
-    'totalHours',
+export const isValidModuleKey = (key: string): key is keyof ModuleDocument => {
+  const validKeys: Array<keyof ModuleDocument> = [
+    'moduleSetup',
+    'teachingSchedule',
+    'courseworkList',
   ];
 
-  return validKeys.includes(key as keyof Module);
+  return validKeys.includes(key as keyof ModuleDocument);
 };
-export const updateTeachingScheduleProperty = (
-  prevData: Partial<Module>,
-  propertyName: keyof Module,
-  value: number,
-): Partial<Module> => {
-  if (
-    propertyName === 'lectures' ||
-    propertyName === 'seminars' ||
-    propertyName === 'tutorials' ||
-    propertyName === 'labs' ||
-    propertyName === 'fieldworkPlacement' ||
-    propertyName === 'other'
-  ) {
-    const updatedProperty = {
-      ...prevData[propertyName],
-      hours: value,
-    };
+// export const updateTeachingScheduleProperty = (
+//   prevData: Partial<ModuleDocument>,
+//   propertyName: keyof ModuleDocument['teachingSchedule'],
+//   value: number,
+// ): Partial<ModuleDocument> => {
+//   if (
+//     propertyName === 'lectures' ||
+//     propertyName === 'seminars' ||
+//     propertyName === 'tutorials' ||
+//     propertyName === 'labs' ||
+//     propertyName === 'fieldworkPlacement' ||
+//     propertyName === 'other'
+//   ) {
+//     const updatedProperty = {
+//       ...prevData.teachingSchedule?.[propertyName],
+//       hours: value,
+//     };
 
-    return {
-      ...prevData,
-      [propertyName]: updatedProperty,
-    };
-  }
+//     return {
+//       ...prevData,
+//       teachingSchedule: {
+//         ...prevData.teachingSchedule,
+//         [propertyName]: updatedProperty,
+//       },
+//     };
+//   }
 
-  return prevData;
-};
+//   return prevData;
+// };
 
-export const handleChangeStep1 = (
-  event: React.ChangeEvent<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  >,
-  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
-) => {
-  const { name, value } = event.target;
+// export const handleChangeStep1 = (
+//   event: React.ChangeEvent<
+//     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+//   >,
+//   setModuleData: React.Dispatch<React.SetStateAction<Partial<ModuleDocument>>>,
+// ) => {
+//   const { name, value } = event.target;
 
-  if (name === 'timetabledHours') {
-    setModuleData((prevData: Partial<Module>) => ({
-      ...prevData,
-      timetabledHours: value === '' ? 0 : parseInt(value, 10),
-    }));
-  } else {
-    setModuleData((prevData: Partial<Module>) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  }
-};
+//   if (name === 'timetabledHours') {
+//     setModuleData((prevData: Partial<ModuleDocument>) => ({
+//       ...prevData,
+//       moduleSetup: {
+//         ...prevData.moduleSetup,
+//         timetabledHours: value === '' ? 0 : parseInt(value, 10),
+//       },
+//     }));
+//   } else {
+//     setModuleData((prevData: Partial<ModuleDocument>) => ({
+//       ...prevData,
+//       moduleSetup: {
+//         ...prevData.moduleSetup,
+//         [name]: value,
+//       },
+//     }));
+//   }
+// };
 
-export const handleChangeStep2 = (
-  event: React.ChangeEvent<{ value: unknown; name?: string }>,
-  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
-) => {
-  const { name, value } = event.target;
-  if (typeof name === 'string') {
-    const hours = value === '' ? 0 : parseInt(value as string, 10);
-    setModuleData((prevData: Partial<Module>) => ({
-      ...prevData,
-      [name]: {
-        hours,
-      },
-    }));
-  }
-};
-export const handleChangeStep3 = (
-  index: number,
-  field: keyof Coursework,
-  value: string | number,
-  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
-) => {
-  setModuleData((prevData) => ({
-    ...prevData,
-    courseworks: prevData.courseworks?.map((coursework, i) =>
-      i === index ? { ...coursework, [field]: value } : coursework,
-    ),
-  }));
-};
+// import { ModuleDocument } from '../../../types/admin/CreateModule';
+
+// export const handleChangeStep2 = (
+//   event: React.ChangeEvent<{ value: unknown; name?: string }>,
+//   setModuleData: React.Dispatch<React.SetStateAction<Partial<ModuleDocument>>>,
+// ) => {
+//   const { name, value } = event.target;
+//   if (typeof name === 'string') {
+//     const hours = value === '' ? 0 : parseInt(value as string, 10);
+//     setModuleData((prevData: Partial<ModuleDocument>) => ({
+//       ...prevData,
+//       teachingSchedule: {
+//         ...prevData.teachingSchedule,
+//         [name]: {
+//           hours,
+//         },
+//       },
+//     }));
+//   }
+// };
+
+// export const handleChangeStep3 = (
+//   index: number,
+//   field: keyof Coursework,
+//   value: string | number,
+//   setModuleData: React.Dispatch<React.SetStateAction<Partial<ModuleDocument>>>,
+// ) => {
+//   setModuleData((prevData) => ({
+//     ...prevData,
+//     courseworkList: prevData.courseworkList?.map((coursework, i) =>
+//       i === index ? { ...coursework, [field]: value } : coursework,
+//     ),
+//   }));
+// };
 
 export const handleNext =
   (setActiveStep: React.Dispatch<React.SetStateAction<number>>) => () => {
@@ -628,31 +640,31 @@ export const handleBack =
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-export const addCoursework = (
-  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
-) => {
-  setModuleData((prevData) => ({
-    ...prevData,
-    courseworks: [
-      ...(prevData.courseworks ?? []),
-      {
-        cwTitle: '',
-        weight: '',
-        type: 'assignment',
-        deadlineWeek: '',
-        releasedWeekEarlier: '',
-      },
-    ],
-  }));
-};
+// export const addCoursework = (
+//   setModuleData: React.Dispatch<React.SetStateAction<Partial<ModuleDocument>>>,
+// ) => {
+//   setModuleData((prevData) => ({
+//     ...prevData,
+//     courseworkList: [
+//       ...(prevData.courseworkList ?? []),
+//       {
+//         cwTitle: '',
+//         weight: 0,
+//         type: 'assignment',
+//         deadlineWeek: 0,
+//         releasedWeekEarlier: 0,
+//       },
+//     ],
+//   }));
+// };
 
 export const removeCoursework = (
   index: number,
-  setModuleData: React.Dispatch<React.SetStateAction<Partial<Module>>>,
+  setModuleData: React.Dispatch<React.SetStateAction<Partial<ModuleDocument>>>,
 ) => {
   setModuleData((prevData) => ({
     ...prevData,
-    courseworks: prevData.courseworks?.filter((_, i) => i !== index),
+    courseworkList: prevData.courseworkList?.filter((_, i) => i !== index),
   }));
 };
 

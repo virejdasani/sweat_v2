@@ -8,11 +8,14 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
-import './DateSetter.css';
+import './CourseworkCalendar.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import EditTermDateModal from './EditTermDateModal';
-import { CalendarKeyDateEvent } from '../shared/types/';
+import EditTermDateModal from './EditCourseworkCalendarModal';
+import { CalendarKeyDateEvent } from '../shared/types';
+
+// IDEA: maybe theres a "v1, v2,...,vn" added for each event, the vs are the version of the calendar that the event should be shown on.
+// so if v1 in event.(title/description) then it should be shown on the calendar with version 1, this can be switched - so this way there is 1 centeralised db but we pick and choose what to show on the calendar
 
 const locales = {};
 
@@ -32,7 +35,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 
-function DateSetter() {
+function CourseworkCalendarSetter() {
   // course CS means no reading week, EE means reading week.
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
@@ -72,13 +75,6 @@ function DateSetter() {
     end: new Date(),
   });
 
-  const [readingWeekEvent, setReadingWeekEvent] = useState({
-    title: 'Reading Week',
-    allDay: true,
-    start: new Date(),
-    end: new Date(),
-  });
-
   const [newEvent, setNewEvent] = useState({
     title: '',
     allDay: true,
@@ -92,8 +88,15 @@ function DateSetter() {
 
   const [fetchedItems, setFetchedItems] = useState<CalendarKeyDateEvent[]>([]);
 
+  // State for managing calendar versions
+  const [currentVersion, setCurrentVersion] = useState(1);
+  const [versions, setVersions] = useState<number[]>([1]);
+
   // fetch events from the server and set the events state
   useEffect(() => {
+    // Clear existing events when changing the calendar version
+    setEvents([]);
+
     const fetchData = async () => {
       const res = await fetch(baseURL);
       const data = await res.json();
@@ -170,25 +173,46 @@ function DateSetter() {
       if (readingWeekEvent) {
         console.log('Reading week start date:', readingWeekEvent.start);
         console.log('Reading week end date:', readingWeekEvent.end);
-        setReadingWeekEvent({
-          ...readingWeekEvent,
-          start: new Date(readingWeekEvent.start),
-          end: new Date(readingWeekEvent.end),
-        });
       }
 
       setFetchedItems(data);
       console.log('Fetched items: ', data);
+
+      // Extract all version numbers from the fetched events
+      const versionNumbers = new Set<number>();
+      data.forEach((event: CalendarKeyDateEvent) => {
+        const match = event.title.match(/CV(\d+)/);
+        if (match) {
+          versionNumbers.add(Number(match[1]));
+        }
+      });
+
+      // Sort the version numbers in ascending order
+      const versionsArray = Array.from(versionNumbers).sort((a, b) => a - b);
+      setVersions(versionsArray.length > 0 ? versionsArray : [1]);
+
+      // Set default version to 1 if it exists, otherwise use the last version
+      setCurrentVersion(
+        versionsArray.includes(1) ? 1 : versionsArray[versionsArray.length - 1],
+      );
     };
     fetchData();
   }, []);
+
+  // Ensure currentVersion defaults to 1 if it's not set
+  // this is because if there are no events with CV* in the title, the currentVersion will be undefined, so we set it to 1 (CV1)
+  useEffect(() => {
+    if (!currentVersion) {
+      setCurrentVersion(1);
+    }
+  }, [currentVersion]);
 
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
   useEffect(() => {
     const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
       _id: item._id,
-      title: item.title,
+      title: `${item.title}`,
       start: new Date(item.start),
       end: new Date(item.end),
       allDay: item.allDay,
@@ -202,40 +226,33 @@ function DateSetter() {
           )
         : localNewEvents;
 
+    const versionFilteredEvents = filteredEvents.filter((event) => {
+      const titleSuffix = `CV${currentVersion}`;
+      // Filter out events that don't have the current version suffix
+      // here make it so that bank holidays are not filtered out
+      // doest work because bank holidays are not stored in MongoDB (low priority)
+      return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
+    });
+
+    // set the events state to the fetched items ONLY
+    setEvents(versionFilteredEvents);
+
     setEvents((prevEvents) => {
-      // Filter out events that already exist in the events array
-      const uniqueNewEvents = filteredEvents.filter((newEvent) =>
+      const uniqueNewEvents = versionFilteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
-      // Concatenate unique new events with existing events
       const updatedEvents = [...prevEvents, ...uniqueNewEvents];
 
-      // If switching from EE to CS, remove the Reading Week event locally
       if (course === 'CS') {
         return updatedEvents.filter(
           (event) => !event.title.includes('Reading Week'),
         );
       }
 
-      // Concatenate unique new events with existing events
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems, course]);
-
-  // this is if we have added all bank holidays to MongoDB
-  // this replaces the existing events with the fetched items so only events from the server are displayed
-  // Update events state with fetched items
-  // useEffect(() => {
-  //   const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
-  //     _id: item._id,
-  //     title: item.title,
-  //     start: new Date(item.start),
-  //     end: new Date(item.end),
-  //     allDay: item.allDay,
-  //   }));
-  //   setEvents(localNewEvents); // Update events directly with fetched items
-  // }, [fetchedItems]);
+  }, [fetchedItems, course, currentVersion]);
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
@@ -251,49 +268,6 @@ function DateSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
-
-  const handleAddChristmasBreak = () => {
-    if (!christmasBreakEvent.start || !christmasBreakEvent.end) {
-      toast('Please select both start and end dates for the Christmas break');
-      return;
-    }
-    if (christmasBreakEvent.start >= christmasBreakEvent.end) {
-      toast('Christmas break start date must be before end date');
-      return;
-    }
-    handleAddEvent(christmasBreakEvent);
-    setChristmasBreakEvent({
-      title: 'Christmas Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-  };
-
-  const handleAddEasterBreak = () => {
-    // Check that both start and end dates are selected
-    if (!easterBreakEvent.start || !easterBreakEvent.end) {
-      toast('Please select both start and end dates for the Easter break');
-      return;
-    }
-
-    // Make sure start date is before end date
-    if (easterBreakEvent.start >= easterBreakEvent.end) {
-      toast('Easter break start date must be before end date');
-      return;
-    }
-
-    // Add the Easter break event
-    handleAddEvent(easterBreakEvent);
-
-    // Reset the Easter break input fields
-    setEasterBreakEvent({
-      title: 'Easter Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-  };
 
   // Function to handle course selection
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -442,6 +416,12 @@ function DateSetter() {
       return;
     }
 
+    // Ensure currentVersion is defined - should always be defined this is for testing
+    if (!currentVersion) {
+      toast('Current version is not set');
+      return;
+    }
+
     event.start.setHours(0, 0, 0, 0);
 
     // Calculate week number based on difference between event start date and Semester 1 start date
@@ -460,6 +440,8 @@ function DateSetter() {
       // Add week number to the event title
       event.title += ` (Week ${weekNumber})`;
     }
+
+    event.title += ` CV${currentVersion}`;
 
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
@@ -619,6 +601,24 @@ function DateSetter() {
     return false; // No clash detected
   }
 
+  const archiveCurrentCalendar = () => {
+    // Determine the maximum version number from the existing versions array
+    const maxVersion = Math.max(...versions);
+
+    // Create a new version that is one higher than the maximum version number
+    const newVersion = maxVersion + 1;
+
+    // Update the current version and versions state
+    setCurrentVersion(newVersion);
+    setVersions((prevVersions) => [...prevVersions, newVersion]);
+
+    // Clear current events (if that's intended)
+    setEvents([]);
+
+    // Show a toast notification to inform the user
+    toast(`Archived current calendar. Now viewing version ${newVersion}`);
+  };
+
   // fetch bank holidays from api and add to calendar
   useEffect(() => {
     fetch('https://www.gov.uk/bank-holidays.json')
@@ -670,17 +670,7 @@ function DateSetter() {
       />
       <div className="calendar">
         <div className="calendarHeader">
-          <h1 className="mb-4">Academic Calendar</h1>
-
-          <a
-            href="https://www.liverpool.ac.uk/term-dates/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            University of Liverpool Term Dates
-          </a>
-
-          <hr className="lightRounded"></hr>
+          <h1 className="mb-4">Coursework Calendar</h1>
 
           {/* Dropdown for selecting course */}
           <span>Show reading week </span>
@@ -689,175 +679,32 @@ function DateSetter() {
             <option value="EE">Yes</option>
           </select>
 
-          {/* Input field for adding semester 1 start date */}
-          <div className="formInput">
-            <span>Semester 1 Start Date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Start Date"
-                selected={semester1Event.start}
-                onChange={(start: Date) =>
-                  // Set end date to start date because it's a one day event element
-                  setSemester1Event({ ...semester1Event, start, end: start })
-                }
-              />
-            </div>
-            <button
-              className="eventButton"
-              onClick={() => handleAddEvent(semester1Event)}
-            >
-              Set Semester 1 Start Date
-            </button>
-          </div>
-
-          {/* Input field for adding semester 2 start date */}
-          <div className="formInput">
-            <span>Semester 2 Start Date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Start Date"
-                selected={semester2Event.start}
-                onChange={(start: Date) =>
-                  // Set end date to start date because it's a one day event element
-                  setSemester2Event({ ...semester2Event, start, end: start })
-                }
-              />
-            </div>
-            <button
-              className="eventButton"
-              onClick={() => handleAddEvent(semester2Event)}
-            >
-              Set Semester 2 Start Date
-            </button>
-          </div>
-          <hr className="lightRounded"></hr>
-
-          {/* Christmas break section */}
-          <div className="datePickers">
-            <span>Christmas start date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Start Date"
-                selected={christmasBreakEvent.start}
-                onChange={(start: Date) =>
-                  setChristmasBreakEvent({ ...christmasBreakEvent, start })
-                }
-              />
-            </div>
-          </div>
-          <div className="datePickers">
-            <span>Christmas end date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="End Date"
-                selected={christmasBreakEvent.end}
-                onChange={(end: Date) =>
-                  setChristmasBreakEvent({ ...christmasBreakEvent, end })
-                }
-              />
-            </div>
-          </div>
-          <button
-            className="eventButton mb-2"
-            onClick={handleAddChristmasBreak}
-          >
-            Set Christmas Break
-          </button>
-
-          {/* Easter break section */}
-          <hr className="lightRounded"></hr>
           <div>
-            <div className="datePickers">
-              <span>Easter start date: </span>
-              <div className="d-inline">
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="Start Date"
-                  selected={easterBreakEvent.start}
-                  onChange={(start: Date) =>
-                    setEasterBreakEvent({ ...easterBreakEvent, start })
-                  }
-                />
-              </div>
-            </div>
-            <div className="datePickers">
-              <span>Easter end date: </span>
-              <div className="d-inline">
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="End Date"
-                  selected={easterBreakEvent.end}
-                  onChange={(end: Date) =>
-                    setEasterBreakEvent({ ...easterBreakEvent, end })
-                  }
-                />
-              </div>
-            </div>
-            <button className="eventButton mb-2" onClick={handleAddEasterBreak}>
-              Set Easter Break
+            <label>Calendar Version: </label>
+            {/* Dropdown for selecting calendar version */}
+            <select
+              value={currentVersion}
+              onChange={(e) => setCurrentVersion(Number(e.target.value))}
+            >
+              {versions.map((version) => (
+                <option key={version} value={version}>
+                  CV{version}
+                </option>
+              ))}
+            </select>
+            <button onClick={archiveCurrentCalendar}>
+              Archive Current Calendar
             </button>
           </div>
 
-          {/* Easter break section with conditional rendering */}
-          {course === 'EE' && (
-            <>
-              <hr className="lightRounded"></hr>
-              <div>
-                <div className="datePickers">
-                  <span>Reading Week Start Date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Start Date"
-                      selected={readingWeekEvent.start}
-                      onChange={(start: Date) =>
-                        setReadingWeekEvent({ ...readingWeekEvent, start })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="datePickers">
-                  <span>Reading Week End Date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="End Date"
-                      selected={readingWeekEvent.end}
-                      onChange={(end: Date) => {
-                        setReadingWeekEvent({ ...readingWeekEvent, end });
-                      }}
-                    />
-                  </div>
-                </div>
-                <button
-                  className="eventButton"
-                  onClick={() =>
-                    handleAddEvent({
-                      title: 'Reading Week',
-                      allDay: true,
-                      start: readingWeekEvent.start,
-                      end: readingWeekEvent.end,
-                    })
-                  }
-                >
-                  Set Reading Week
-                </button>
-              </div>
-            </>
-          )}
-
           <hr className="lightRounded"></hr>
 
-          {/* Input field for adding holidays */}
+          {/* Input field for adding courseworks */}
           <div>
-            <span>Add holiday: </span>
+            <span>Add coursework: </span>
             <input
               type="text"
-              placeholder="Holiday name"
+              placeholder="Coursework name"
               style={{ width: '20%', marginRight: '10px' }}
               value={holidayEvent.title}
               onChange={(e) =>
@@ -865,7 +712,7 @@ function DateSetter() {
               }
             />
             <div className="datePickers">
-              <span>Holiday start date: </span>
+              <span>Coursework start date: </span>
               <div className="d-inline">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -878,7 +725,7 @@ function DateSetter() {
               </div>
             </div>
             <div className="datePickers">
-              <span>Holiday end date: </span>
+              <span>Coursework end date: </span>
               <div className="d-inline">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -895,31 +742,10 @@ function DateSetter() {
               className="eventButton"
               onClick={() => handleAddEvent(holidayEvent)}
             >
-              Set new Holiday
+              Set coursework
             </button>
           </div>
         </div>
-
-        {/* delete all events from mongodb */}
-        <button
-          className="eventButton"
-          onClick={() => {
-            axios
-              .delete(baseURL + 'delete-all-events')
-              .then((res: { data: CalendarKeyDateEvent }) => {
-                console.log('All events deleted from MongoDB');
-                console.log(res);
-              })
-              .catch((err: { data: CalendarKeyDateEvent }) => {
-                console.error('Error deleting all events from MongoDB: ', err);
-              });
-
-            setEvents([]); // Update local state to reflect the event deletion
-            toast('All events deleted');
-          }}
-        >
-          Delete All Events
-        </button>
 
         {/* divider */}
         <hr className="rounded"></hr>
@@ -963,4 +789,4 @@ function DateSetter() {
   );
 }
 
-export default DateSetter;
+export default CourseworkCalendarSetter;

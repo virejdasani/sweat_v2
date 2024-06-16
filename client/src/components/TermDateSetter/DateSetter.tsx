@@ -468,12 +468,15 @@ function DateSetter() {
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
 
+    let posted = false;
+
     // Make POST request to add the event to MongoDB
     axios
       .post(baseURL + 'add-event', event)
       .then((res: { data: CalendarKeyDateEvent }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
+        posted = true;
 
         // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
         const newEvent = { ...event, _id: res.data._id };
@@ -493,19 +496,28 @@ function DateSetter() {
 
     toast(event.title + ' added');
 
-    // now reload the page to show the new event
-    window.location.reload();
+    if (posted) {
+      // reload the page to show the new event
+      window.location.reload();
+    } else {
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
   };
 
   // deletes from mongodb and updates the events state locally
   function deleteEvents() {
     if (selectEvent) {
+      let deleted = false;
+
       // Make DELETE request to backend API endpoint to delete the event from MongoDB
       axios
         .delete(baseURL + `delete-event/${selectEvent._id}`)
         .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event deleted from MongoDB: ', selectEvent);
           console.log(res);
+          deleted = true;
         })
         .catch((err: { data: CalendarKeyDateEvent }) => {
           console.error('Error deleting event from MongoDB: ', err);
@@ -518,8 +530,14 @@ function DateSetter() {
 
       toast(selectEvent.title + ' deleted');
 
-      // reload the page to show the updated events
-      window.location.reload();
+      if (deleted) {
+        // reload the page to show the event has been deleted
+        window.location.reload();
+      } else {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
     }
   }
 

@@ -699,7 +699,7 @@ function DateSetter() {
             <option value="EE">Yes</option>
           </select>
 
-          {/* only show semester 1 and 2 dates if there is no semester 1 and 2 dates set */}
+          {/* dont let user set new dates, if dates already exist */}
           {
             // check if there are atleast 2 events with titles that include "Semester" in the fetched items
             fetchedItems.filter((event) => event.title.includes('Semester'))
@@ -713,8 +713,7 @@ function DateSetter() {
                   Semester 2 Start Date: {semester2Event.start.toDateString()}
                 </div>
                 <div className="mt-2">
-                  To edit semester dates: navigate to the date, select & click
-                  edit
+                  To edit semester dates: navigate to the date and click it
                 </div>
               </div>
             ) : (
@@ -773,75 +772,123 @@ function DateSetter() {
               </>
             )
           }
+
           <hr className="lightRounded"></hr>
 
-          {/* Christmas break section */}
-          <div className="datePickers">
-            <span>Christmas start date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Start Date"
-                selected={christmasBreakEvent.start}
-                onChange={(start: Date) =>
-                  setChristmasBreakEvent({ ...christmasBreakEvent, start })
-                }
-              />
-            </div>
-          </div>
-          <div className="datePickers">
-            <span>Christmas end date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="End Date"
-                selected={christmasBreakEvent.end}
-                onChange={(end: Date) =>
-                  setChristmasBreakEvent({ ...christmasBreakEvent, end })
-                }
-              />
-            </div>
-          </div>
-          <button
-            className="eventButton mb-2"
-            onClick={handleAddChristmasBreak}
-          >
-            Set Christmas Break
-          </button>
+          {
+            // check if there is an event with title that includes "Christmas Break" in the fetched items
+            fetchedItems.filter((event) =>
+              event.title.includes('Christmas Break'),
+            ).length === 1 ? (
+              // show christmas break date
+              <div className="mb-4">
+                <div>
+                  Christmas Break: {christmasBreakEvent.start.toDateString()} -{' '}
+                  {christmasBreakEvent.end.toDateString()}
+                </div>
+                <div className="mt-2">
+                  To edit Christmas break dates: navigate to the date and click
+                  it
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Christmas break section */}
+                <div className="datePickers">
+                  <span>Christmas start date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="Start Date"
+                      selected={christmasBreakEvent.start}
+                      onChange={(start: Date) =>
+                        setChristmasBreakEvent({
+                          ...christmasBreakEvent,
+                          start,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="datePickers">
+                  <span>Christmas end date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="End Date"
+                      selected={christmasBreakEvent.end}
+                      onChange={(end: Date) =>
+                        setChristmasBreakEvent({ ...christmasBreakEvent, end })
+                      }
+                    />
+                  </div>
+                </div>
+                <button
+                  className="eventButton mb-2"
+                  onClick={handleAddChristmasBreak}
+                >
+                  Set Christmas Break
+                </button>
+              </>
+            )
+          }
 
           {/* Easter break section */}
           <hr className="lightRounded"></hr>
-          <div>
-            <div className="datePickers">
-              <span>Easter start date: </span>
-              <div className="d-inline">
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="Start Date"
-                  selected={easterBreakEvent.start}
-                  onChange={(start: Date) =>
-                    setEasterBreakEvent({ ...easterBreakEvent, start })
-                  }
-                />
+
+          {
+            // check if there is an event with title that includes "Easter Break" in the fetched items
+            fetchedItems.filter((event) => event.title.includes('Easter Break'))
+              .length === 1 ? (
+              // show easter break date
+              <div className="mb-4">
+                <div>
+                  Easter Break: {easterBreakEvent.start.toDateString()} -{' '}
+                  {easterBreakEvent.end.toDateString()}
+                </div>
+                <div className="mt-2">
+                  To edit Easter break dates: navigate to the date and click it
+                </div>
               </div>
-            </div>
-            <div className="datePickers">
-              <span>Easter end date: </span>
-              <div className="d-inline">
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="End Date"
-                  selected={easterBreakEvent.end}
-                  onChange={(end: Date) =>
-                    setEasterBreakEvent({ ...easterBreakEvent, end })
-                  }
-                />
-              </div>
-            </div>
-            <button className="eventButton mb-2" onClick={handleAddEasterBreak}>
-              Set Easter Break
-            </button>
-          </div>
+            ) : (
+              <>
+                <div>
+                  <div className="datePickers">
+                    <span>Easter start date: </span>
+                    <div className="d-inline">
+                      <DatePicker
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Start Date"
+                        selected={easterBreakEvent.start}
+                        onChange={(start: Date) =>
+                          setEasterBreakEvent({ ...easterBreakEvent, start })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="datePickers">
+                    <span>Easter end date: </span>
+                    <div className="d-inline">
+                      <DatePicker
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="End Date"
+                        selected={easterBreakEvent.end}
+                        onChange={(end: Date) =>
+                          setEasterBreakEvent({ ...easterBreakEvent, end })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <button
+                    className="eventButton mb-2"
+                    onClick={handleAddEasterBreak}
+                  >
+                    Set Easter Break
+                  </button>
+                </div>
+              </>
+            )
+          }
 
           {/* Easter break section with conditional rendering */}
           {course === 'EE' && (

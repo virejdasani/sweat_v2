@@ -496,14 +496,15 @@ function DateSetter() {
 
     toast(event.title + ' added');
 
-    if (posted) {
-      // reload the page to show the new event
-      window.location.reload();
-    } else {
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    }
+    // netlify breaks if we reload the page
+    // if (posted) {
+    //   // reload the page to show the new event
+    //   window.location.reload();
+    // } else {
+    //   setTimeout(() => {
+    //     window.location.reload();
+    //   }, 1000);
+    // }
   };
 
   // deletes from mongodb and updates the events state locally
@@ -530,14 +531,15 @@ function DateSetter() {
 
       toast(selectEvent.title + ' deleted');
 
-      if (deleted) {
-        // reload the page to show the event has been deleted
-        window.location.reload();
-      } else {
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
+      // netlify breaks if we reload the page
+      // if (deleted) {
+      //   // reload the page to show the event has been deleted
+      //   window.location.reload();
+      // } else {
+      //   setTimeout(() => {
+      //     window.location.reload();
+      //   }, 1000);
+      // }
     }
   }
 

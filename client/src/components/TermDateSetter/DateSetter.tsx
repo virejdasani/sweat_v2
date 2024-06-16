@@ -731,7 +731,8 @@ function DateSetter() {
                   Semester 2 Start Date: {semester2Event.start.toDateString()}
                 </div>
                 <div className="mt-2">
-                  To edit semester dates: navigate to the date and click it
+                  <div>Semester dates have been set</div>
+                  To edit these, navigate to the date and click it
                 </div>
               </div>
             ) : (
@@ -805,8 +806,8 @@ function DateSetter() {
                   {christmasBreakEvent.end.toDateString()}
                 </div>
                 <div className="mt-2">
-                  To edit Christmas break dates: navigate to the date and click
-                  it
+                  <div>Christmas dates have been set</div>
+                  To edit these, navigate to the date and click it
                 </div>
               </div>
             ) : (
@@ -865,7 +866,8 @@ function DateSetter() {
                   {easterBreakEvent.end.toDateString()}
                 </div>
                 <div className="mt-2">
-                  To edit Easter break dates: navigate to the date and click it
+                  <div>Easter dates have been set</div>
+                  To edit these, navigate to the date and click it To edit
                 </div>
               </div>
             ) : (

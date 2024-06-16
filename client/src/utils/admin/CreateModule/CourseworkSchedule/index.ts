@@ -271,17 +271,46 @@ export const getPreparationTimeAndPrivateStudyTime = (
   return { preparationTime, privateStudyTime };
 };
 
-export const handleInputChange = (
-  editableCourseworkList: Coursework[],
+export const handleInputChangeUtil = (
+  internalCourseworkList: Coursework[],
   index: number,
-  field: string,
-  value: number,
-  handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void,
+  field: keyof Omit<
+    Coursework,
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+  >,
+  value: number | undefined,
+  handleScheduleChange: (
+    index: number,
+    field: keyof Omit<
+      Coursework,
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    >,
+    value: number | undefined,
+  ) => void,
+  setInternalCourseworkList: (courseworkList: Coursework[]) => void,
 ) => {
-  const updatedCourseworkList = [...editableCourseworkList];
-  updatedCourseworkList[index] = {
-    ...updatedCourseworkList[index],
-    [field]: value,
-  };
-  handleCourseworkListChange(updatedCourseworkList);
+  const updatedCourseworkList = [...internalCourseworkList];
+  updatedCourseworkList[index][field] = value;
+  setInternalCourseworkList(updatedCourseworkList);
+  handleScheduleChange(index, field, value);
+};
+
+export const handleInputBlurUtil = (
+  internalCourseworkList: Coursework[],
+  index: number,
+  field: keyof Omit<
+    Coursework,
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+  >,
+  handleScheduleChange: (
+    index: number,
+    field: keyof Omit<
+      Coursework,
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    >,
+    value: number | undefined,
+  ) => void,
+) => {
+  const value = Number(internalCourseworkList[index][field]);
+  handleScheduleChange(index, field, value);
 };

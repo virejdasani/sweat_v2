@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Table,
   Thead,
@@ -30,7 +30,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './CourseworkSetup.css';
 
 const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
-  courseworkList,
+  courseworkList = [],
   onCourseworkListChange,
   semester,
   examPercentage,
@@ -45,7 +45,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     isFormValid,
   } = CourseworkSetupFunctions({ courseworkList, onCourseworkListChange });
 
-  React.useEffect(() => {
+  useEffect(() => {
     addExamCoursework(examPercentage, courseworkList, onCourseworkListChange);
   }, [examPercentage, courseworkList, onCourseworkListChange]);
 
@@ -207,13 +207,13 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       >
         Total Weight: {totalWeight}
         {totalWeight > 100 && (
-          <Text style={{ color: 'red' }}>
+          <Text as="span" style={{ color: 'red' }}>
             {' '}
             (Warning: Total weight exceeds 100%)
           </Text>
         )}
         {totalWeight < 100 && (
-          <Text style={{ color: 'red' }}>
+          <Text as="span" style={{ color: 'red' }}>
             {' '}
             (Warning: Total weight is less than 100%)
           </Text>

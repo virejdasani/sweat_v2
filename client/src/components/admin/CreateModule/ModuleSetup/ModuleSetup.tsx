@@ -93,6 +93,7 @@ const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
                 setFormData({
                   ...formData,
                   courseworkPercentage: parseInt(value),
+                  examPercentage: 100 - parseInt(value),
                 })
               }
               min={0}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Table, Thead, Tbody, Tr, Th, Td, Input, Text } from '@chakra-ui/react';
 import { courseworkScheduleStyles } from './CourseworkScheduleStyles';
 import { CourseworkScheduleProps } from '../../../../types/admin/CreateModule/CourseworkSchedule';
@@ -7,34 +7,48 @@ import {
   expectedTotalTime,
   getPreparationTimeAndPrivateStudyTime,
   updateCourseworkList,
+  handleInputChangeUtil,
+  handleInputBlurUtil,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
+import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
 
 const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
-  courseworkList,
-  moduleCredit,
+  courseworkList = [],
+  moduleCredit = 0,
   handleScheduleChange,
-  templateData,
+  templateData = [],
   handleCourseworkListChange,
-  formFactor,
-  isEditing,
+  formFactor = 0,
+  isEditing = false,
 }) => {
-  React.useEffect(() => {
-    if (!isEditing) {
-      const updatedCourseworkList = updateCourseworkList(
-        courseworkList,
-        templateData,
-        moduleCredit,
-        formFactor,
-      );
+  const [internalCourseworkList, setInternalCourseworkList] = useState<
+    Coursework[]
+  >([]);
+  const isInitialized = useRef(false);
 
-      const updatedCourseworkListWithPreparationTime =
-        updatedCourseworkList.map((coursework) => {
-          const { preparationTime, privateStudyTime } =
-            getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
-          return { ...coursework, preparationTime, privateStudyTime };
-        });
+  useEffect(() => {
+    if (!isInitialized.current) {
+      if (!isEditing) {
+        const updatedCourseworkList = updateCourseworkList(
+          courseworkList,
+          templateData,
+          moduleCredit,
+          formFactor,
+        );
 
-      handleCourseworkListChange(updatedCourseworkListWithPreparationTime);
+        const updatedCourseworkListWithPreparationTime =
+          updatedCourseworkList.map((coursework) => {
+            const { preparationTime, privateStudyTime } =
+              getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
+            return { ...coursework, preparationTime, privateStudyTime };
+          });
+
+        setInternalCourseworkList(updatedCourseworkListWithPreparationTime);
+        handleCourseworkListChange(updatedCourseworkListWithPreparationTime);
+      } else {
+        setInternalCourseworkList(courseworkList);
+      }
+      isInitialized.current = true;
     }
   }, [
     templateData,
@@ -50,7 +64,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
       <Thead>
         <Tr>
           <Th style={courseworkScheduleStyles.th}>Activity</Th>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Th key={index} style={courseworkScheduleStyles.th}>
               {coursework.title}
             </Th>
@@ -60,16 +74,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
       <Tbody>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Contact time: Lectures</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.contactTimeLectures || ''}
+                value={coursework.contactTimeLectures ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'contactTimeLectures',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'contactTimeLectures',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -79,16 +104,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Contact time: Tutorials</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.contactTimeTutorials || ''}
+                value={coursework.contactTimeTutorials ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'contactTimeTutorials',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'contactTimeTutorials',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -98,16 +134,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Contact time: Labs</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.contactTimeLabs || ''}
+                value={coursework.contactTimeLabs ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'contactTimeLabs',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'contactTimeLabs',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -117,16 +164,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Contact time: Seminars</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.contactTimeSeminars || ''}
+                value={coursework.contactTimeSeminars ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'contactTimeSeminars',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'contactTimeSeminars',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -138,16 +196,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
           <Td style={courseworkScheduleStyles.td}>
             Contact time: Fieldwork Placement
           </Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.contactTimeFieldworkPlacement || ''}
+                value={coursework.contactTimeFieldworkPlacement ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'contactTimeFieldworkPlacement',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'contactTimeFieldworkPlacement',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -157,16 +226,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Contact time: Others</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.contactTimeOthers || ''}
+                value={coursework.contactTimeOthers ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'contactTimeOthers',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'contactTimeOthers',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -178,16 +258,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
           <Td style={courseworkScheduleStyles.td}>
             Linked formative assessment (if applicable)
           </Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.formativeAssessmentTime || ''}
+                value={coursework.formativeAssessmentTime ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'formativeAssessmentTime',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'formativeAssessmentTime',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -197,7 +288,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Private study</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
@@ -207,10 +298,21 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                     : ''
                 }
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'privateStudyTime',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'privateStudyTime',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -221,7 +323,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Preparation time</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
@@ -231,10 +333,21 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                     : ''
                 }
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'preparationTime',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'preparationTime',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -247,16 +360,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
           <Td style={courseworkScheduleStyles.td}>
             Keyboard Time (Actual hours on task)
           </Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.keyboardTime || ''}
+                value={coursework.keyboardTime ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'keyboardTime',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'keyboardTime',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -266,16 +390,27 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Feedback time</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Input
                 type="number"
-                value={coursework.feedbackTime || ''}
+                value={coursework.feedbackTime ?? ''}
                 onChange={(e) =>
-                  handleScheduleChange(
+                  handleInputChangeUtil(
+                    internalCourseworkList,
                     index,
                     'feedbackTime',
-                    Number(e.target.value),
+                    e.target.value === '' ? undefined : Number(e.target.value),
+                    handleScheduleChange,
+                    setInternalCourseworkList,
+                  )
+                }
+                onBlur={() =>
+                  handleInputBlurUtil(
+                    internalCourseworkList,
+                    index,
+                    'feedbackTime',
+                    handleScheduleChange,
                   )
                 }
                 style={courseworkScheduleStyles.input}
@@ -286,7 +421,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         </Tr>
         <Tr>
           <Td style={courseworkScheduleStyles.td}>Total time</Td>
-          {courseworkList.map((coursework, index) => (
+          {internalCourseworkList.map((coursework, index) => (
             <Td key={index} style={courseworkScheduleStyles.td}>
               <Text
                 style={{
@@ -307,14 +442,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                 {expectedTotalTime(coursework.weight || 0, moduleCredit)}
                 {calculateTotalTime(coursework) >
                   expectedTotalTime(coursework.weight || 0, moduleCredit) && (
-                  <Text style={{ color: 'red' }}>
+                  <Text as="span" style={{ color: 'red' }}>
                     {' '}
                     (Warning: Exceeds expected time!)
                   </Text>
                 )}
                 {calculateTotalTime(coursework) <
                   expectedTotalTime(coursework.weight || 0, moduleCredit) && (
-                  <Text style={{ color: 'red' }}>
+                  <Text as="span" style={{ color: 'red' }}>
                     {' '}
                     (Warning: Below expected time!)
                   </Text>

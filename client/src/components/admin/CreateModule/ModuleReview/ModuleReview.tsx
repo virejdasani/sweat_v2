@@ -9,72 +9,25 @@ import {
   Td,
   Heading,
 } from '@chakra-ui/react';
-import { ModuleSetupFormData } from '../../../../types/admin/CreateModule/ModuleSetup';
-import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
-
-interface ModuleReviewProps {
-  formData: ModuleSetupFormData;
-  courseworkList: Coursework[];
-  templateData: number[][][];
-}
+import { ModuleReviewProps } from '../../../../types/admin/CreateModule/ModuleReview';
+import {
+  calculateContactTime,
+  calculateFormativeAssessmentTime,
+  calculatePrivateStudyTime,
+  calculatePreparationTime,
+  calculateKeyboardTime,
+  calculateFeedbackTime,
+  calculateTotalTime,
+  calculateOverallTime,
+} from '../../../../utils/admin/CreateModule/ModuleReview';
 
 const ModuleReview: React.FC<ModuleReviewProps> = ({
   formData,
-  courseworkList,
-  templateData,
+  courseworkList = [],
+  templateData = [],
 }) => {
-  const calculateContactTime = () => {
-    const contactTimeFromStep2 = templateData.reduce(
-      (total, table) =>
-        total +
-        table.reduce(
-          (tableTotal, row) =>
-            tableTotal + row.reduce((rowTotal, value) => rowTotal + value, 0),
-          0,
-        ),
-      0,
-    );
-    return contactTimeFromStep2;
-  };
-
-  const calculateFormativeAssessmentTime = () => {
-    return courseworkList.reduce(
-      (total, coursework) => total + (coursework.formativeAssessmentTime || 0),
-      0,
-    );
-  };
-
-  const calculatePrivateStudyTime = () => {
-    return courseworkList.reduce(
-      (total, coursework) => total + (coursework.privateStudyTime || 0),
-      0,
-    );
-  };
-
-  const calculatePreparationTime = () => {
-    return courseworkList.reduce(
-      (total, coursework) => total + (coursework.preparationTime || 0),
-      0,
-    );
-  };
-
-  const calculateKeyboardTime = () => {
-    return courseworkList.reduce(
-      (total, coursework) => total + (coursework.keyboardTime || 0),
-      0,
-    );
-  };
-
-  const calculateFeedbackTime = () => {
-    return courseworkList.reduce(
-      (total, coursework) => total + (coursework.feedbackTime || 0),
-      0,
-    );
-  };
-
-  const calculateTotalTime = () => {
-    return formData.moduleCredit * 10;
-  };
+  const overallTime = calculateOverallTime(templateData, courseworkList);
+  const totalTime = calculateTotalTime(formData);
 
   return (
     <Box>
@@ -91,51 +44,36 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
         <Tbody>
           <Tr>
             <Td>Contact Time</Td>
-            <Td>{calculateContactTime()}</Td>
+            <Td>{calculateContactTime(templateData)}</Td>
           </Tr>
           <Tr>
             <Td>Formative Assessment Time</Td>
-            <Td>{calculateFormativeAssessmentTime()}</Td>
+            <Td>{calculateFormativeAssessmentTime(courseworkList)}</Td>
           </Tr>
           <Tr>
             <Td>Private Study Time</Td>
-            <Td>{calculatePrivateStudyTime()}</Td>
+            <Td>{calculatePrivateStudyTime(courseworkList)}</Td>
           </Tr>
           <Tr>
             <Td>Preparation Time</Td>
-            <Td>{calculatePreparationTime()}</Td>
+            <Td>{calculatePreparationTime(courseworkList)}</Td>
           </Tr>
           <Tr>
             <Td>Keyboard Time</Td>
-            <Td>{calculateKeyboardTime()}</Td>
+            <Td>{calculateKeyboardTime(courseworkList)}</Td>
           </Tr>
           <Tr>
             <Td>Feedback Time</Td>
-            <Td>{calculateFeedbackTime()}</Td>
+            <Td>{calculateFeedbackTime(courseworkList)}</Td>
           </Tr>
           <Tr>
             <Td>Total Time</Td>
             <Td
               style={{
-                color:
-                  calculateContactTime() +
-                    calculateFormativeAssessmentTime() +
-                    calculatePrivateStudyTime() +
-                    calculatePreparationTime() +
-                    calculateKeyboardTime() +
-                    calculateFeedbackTime() ===
-                  calculateTotalTime()
-                    ? 'green'
-                    : 'red',
+                color: overallTime === totalTime ? 'green' : 'red',
               }}
             >
-              {calculateContactTime() +
-                calculateFormativeAssessmentTime() +
-                calculatePrivateStudyTime() +
-                calculatePreparationTime() +
-                calculateKeyboardTime() +
-                calculateFeedbackTime()}{' '}
-              / {calculateTotalTime()}
+              {overallTime} / {totalTime}
             </Td>
           </Tr>
         </Tbody>

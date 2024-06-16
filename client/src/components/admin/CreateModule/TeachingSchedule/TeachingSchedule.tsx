@@ -8,7 +8,6 @@ import {
   Th,
   Td,
   Input,
-  Button,
   Heading,
   Flex,
 } from '@chakra-ui/react';
@@ -17,18 +16,14 @@ import {
   headerStyle,
   rowStyle,
   inputStyle,
-  buttonStyle,
 } from './TeachingScheduleStyles';
 import { TeachingScheduleProps } from '../../../../types/admin/CreateModule/TeachingSchedule';
 import {
   fetchTemplateData,
   getSemesterHeading,
-  transformTemplateDataToSaveData,
+  transformEditingDataToTemplateData,
+  handleInputChange,
 } from '../../../../utils/admin/CreateModule/TeachingSchedule';
-import {
-  TeachingScheduleSaveData,
-  Distribution,
-} from '../../../../types/admin/CreateModule/TeachingSchedule';
 
 const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
   moduleCredit,
@@ -57,45 +52,6 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
       setTemplateData(transformEditingDataToTemplateData(editingScheduleData));
     }
   }, [editingScheduleData, setTemplateData]);
-
-  const transformEditingDataToTemplateData = (
-    scheduleData: TeachingScheduleSaveData,
-  ) => {
-    const transformedData = [
-      scheduleData.lectures,
-      scheduleData.tutorials,
-      scheduleData.labs,
-      scheduleData.seminars,
-      scheduleData.fieldworkPlacement,
-      scheduleData.other,
-    ].map((activity) => {
-      const weeks = Array(15).fill(0);
-      if (activity.distribution) {
-        activity.distribution.forEach((dist: Distribution) => {
-          weeks[dist.week - 1] = dist.hours; // Assuming week is 1-based index
-        });
-      }
-      return weeks;
-    });
-    return [transformedData];
-  };
-
-  const handleInputChange = (
-    tableIndex: number,
-    rowIndex: number,
-    colIndex: number,
-    value: string,
-  ) => {
-    const updatedData = [...templateData];
-    updatedData[tableIndex][rowIndex][colIndex] = parseInt(value);
-    setTemplateData(updatedData);
-  };
-
-  const handleSave = () => {
-    const saveData = transformTemplateDataToSaveData(templateData);
-    console.log('Saved Data:', JSON.stringify(saveData, null, 2));
-    // Implement the actual save logic here (e.g., API call to save the data)
-  };
 
   const renderTableHeader = () => (
     <Thead>
@@ -134,6 +90,8 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
                       rowIndex,
                       colIndex,
                       e.target.value,
+                      templateData,
+                      setTemplateData,
                     )
                   }
                   {...inputStyle}
@@ -181,9 +139,6 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
           </Flex>
         </>
       )}
-      <Button onClick={handleSave} {...buttonStyle}>
-        Save
-      </Button>
     </Box>
   );
 };

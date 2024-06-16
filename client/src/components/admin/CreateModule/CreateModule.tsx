@@ -15,13 +15,15 @@ import {
   StepSeparator,
   useSteps,
 } from '@chakra-ui/react';
-import { toast } from 'react-toastify';
-import { ModuleDocument, steps } from '../../../types/admin/CreateModule';
+import { steps } from '../../../types/admin/CreateModule';
 import {
   handlePrev,
   handleNext,
-  prevStep,
   nextStep,
+  prevStep,
+  handleSave,
+  handleCourseworkListChange,
+  handleScheduleChange,
 } from '../../../utils/admin/CreateModule';
 import ModuleSetup from './ModuleSetup/ModuleSetup';
 import { createModuleStyles } from './CreateModuleStyles';
@@ -31,11 +33,7 @@ import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import ModuleReview from './ModuleReview/ModuleReview';
-import {
-  fetchTemplateData,
-  transformTemplateDataToSaveData,
-} from '../../../utils/admin/CreateModule/TeachingSchedule';
-import { createModule } from '../../../services/admin/ProgrammeDesigner';
+import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
 
 const MAX_STEPS = 5;
 
@@ -82,28 +80,6 @@ const CreateModule: React.FC = () => {
     }
   }, [formData.moduleCredit, formData.semester, initialTemplateData]);
 
-  const handleCourseworkListChange = (updatedCourseworkList: Coursework[]) => {
-    setCourseworkList(updatedCourseworkList);
-  };
-
-  const handleScheduleChange = (
-    index: number,
-    field: keyof Omit<
-      Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
-    >,
-    value: number | undefined,
-  ) => {
-    if (value === undefined) return;
-
-    const updatedCourseworkList = [...courseworkList];
-    updatedCourseworkList[index] = {
-      ...updatedCourseworkList[index],
-      [field]: value,
-    };
-    handleCourseworkListChange(updatedCourseworkList);
-  };
-
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
@@ -127,7 +103,12 @@ const CreateModule: React.FC = () => {
         return (
           <CourseworkSetup
             courseworkList={courseworkList}
-            onCourseworkListChange={handleCourseworkListChange}
+            onCourseworkListChange={(updatedCourseworkList) =>
+              handleCourseworkListChange(
+                updatedCourseworkList,
+                setCourseworkList,
+              )
+            }
             semester={formData.semester}
             examPercentage={100 - formData.courseworkPercentage}
             formFactor={formFactor}
@@ -139,9 +120,22 @@ const CreateModule: React.FC = () => {
           <CourseworkSchedule
             courseworkList={courseworkList}
             moduleCredit={formData.moduleCredit}
-            handleScheduleChange={handleScheduleChange}
+            handleScheduleChange={(index, field, value) =>
+              handleScheduleChange(
+                index,
+                field,
+                value,
+                courseworkList,
+                setCourseworkList,
+              )
+            }
             templateData={templateData}
-            handleCourseworkListChange={handleCourseworkListChange}
+            handleCourseworkListChange={(updatedCourseworkList) =>
+              handleCourseworkListChange(
+                updatedCourseworkList,
+                setCourseworkList,
+              )
+            }
             formFactor={formFactor}
             isEditing={!!module}
           />
@@ -156,23 +150,6 @@ const CreateModule: React.FC = () => {
         );
       default:
         return null;
-    }
-  };
-
-  const handleSave = async () => {
-    const moduleDocument: ModuleDocument = {
-      moduleSetup: formData,
-      teachingSchedule: transformTemplateDataToSaveData(templateData),
-      courseworkList,
-    };
-
-    try {
-      await createModule(moduleDocument);
-      console.log('Module document saved successfully');
-      toast.success('Module document saved successfully');
-    } catch (error) {
-      console.error('Error saving module document:', error);
-      toast.error('Error saving module document');
     }
   };
 
@@ -214,7 +191,11 @@ const CreateModule: React.FC = () => {
           Previous
         </Button>
         <Button
-          onClick={activeStep === MAX_STEPS - 1 ? handleSave : handleNextStep}
+          onClick={
+            activeStep === MAX_STEPS - 1
+              ? () => handleSave(formData, templateData, courseworkList)
+              : handleNextStep
+          }
           disabled={activeStep === MAX_STEPS}
         >
           {activeStep === MAX_STEPS - 1 ? 'Submit' : 'Next'}

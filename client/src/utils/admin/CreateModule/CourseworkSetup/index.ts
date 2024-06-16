@@ -4,7 +4,7 @@ import {
 } from '../../../../types/admin/CreateModule/CourseworkSetup';
 
 export const CourseworkSetupFunctions = ({
-  courseworkList,
+  courseworkList = [],
   onCourseworkListChange,
 }: CourseworkSetupFunctionsProps) => {
   const handleAddCoursework = () => {
@@ -31,14 +31,16 @@ export const CourseworkSetupFunctions = ({
     value: string | number | Date | null,
   ) => {
     const updatedList = [...courseworkList];
+    const updatedValue = value === null ? undefined : value; // Handle null values
+
     updatedList[index] = {
       ...updatedList[index],
       [field]:
         field === 'weight'
           ? parseInt(value as string, 10)
           : field === 'deadlineDate'
-            ? value
-            : value,
+            ? updatedValue
+            : updatedValue,
     };
     onCourseworkListChange(updatedList);
   };

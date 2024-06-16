@@ -1,5 +1,8 @@
 import { fetchModuleTemplate } from '../../../../services/admin/CreateModule/TeachingSchedule';
-import { TeachingScheduleSaveData } from '../../../../types/admin/CreateModule/TeachingSchedule';
+import {
+  TeachingScheduleSaveData,
+  Distribution,
+} from '../../../../types/admin/CreateModule/TeachingSchedule';
 
 export const fetchTemplateData = async (
   moduleCredit: number,
@@ -71,4 +74,50 @@ export const transformTemplateDataToSaveData = (
   });
 
   return teachingScheduleSaveData;
+};
+
+export const transformEditingDataToTemplateData = (
+  scheduleData: TeachingScheduleSaveData,
+): number[][][] => {
+  const transformedData = [
+    scheduleData.lectures,
+    scheduleData.tutorials,
+    scheduleData.labs,
+    scheduleData.seminars,
+    scheduleData.fieldworkPlacement,
+    scheduleData.other,
+  ].map((activity) => {
+    const weeks = Array(15).fill(0);
+    if (activity.distribution) {
+      activity.distribution.forEach((dist: Distribution) => {
+        weeks[dist.week - 1] = dist.hours; // Assuming week is 1-based index
+      });
+    }
+    return weeks;
+  });
+  return [transformedData];
+};
+
+export const handleInputChange = (
+  tableIndex: number,
+  rowIndex: number,
+  colIndex: number,
+  value: string,
+  templateData: number[][][],
+  setTemplateData: (data: number[][][]) => void,
+) => {
+  const updatedData = [...templateData];
+  updatedData[tableIndex][rowIndex][colIndex] = parseInt(value);
+  setTemplateData(updatedData);
+};
+
+export const handleSave = (
+  templateData: number[][][],
+  transformTemplateDataToSaveData: (
+    data: number[][][],
+  ) => TeachingScheduleSaveData,
+) => {
+  const saveData = transformTemplateDataToSaveData(templateData);
+  console.log('Saved Data:', JSON.stringify(saveData, null, 2));
+  // Implement the actual save logic here (e.g., API call to save the data)
 };

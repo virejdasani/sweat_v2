@@ -468,7 +468,7 @@ function DateSetter() {
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
 
-    let posted = false;
+    // let posted = false;
 
     // Make POST request to add the event to MongoDB
     axios
@@ -476,7 +476,7 @@ function DateSetter() {
       .then((res: { data: CalendarKeyDateEvent }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
-        posted = true;
+        // posted = true;
 
         // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
         const newEvent = { ...event, _id: res.data._id };
@@ -510,7 +510,7 @@ function DateSetter() {
   // deletes from mongodb and updates the events state locally
   function deleteEvents() {
     if (selectEvent) {
-      let deleted = false;
+      // let deleted = false;
 
       // Make DELETE request to backend API endpoint to delete the event from MongoDB
       axios
@@ -518,7 +518,7 @@ function DateSetter() {
         .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event deleted from MongoDB: ', selectEvent);
           console.log(res);
-          deleted = true;
+          // deleted = true;
         })
         .catch((err: { data: CalendarKeyDateEvent }) => {
           console.error('Error deleting event from MongoDB: ', err);

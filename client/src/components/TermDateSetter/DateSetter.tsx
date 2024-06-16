@@ -123,6 +123,8 @@ function DateSetter() {
           ...semester1Event,
           start: semester1Start,
         });
+      } else {
+        console.log('Semester 1 start date not found');
       }
       if (semester2Start) {
         console.log('Semester 2 start date:', semester2Start);
@@ -130,6 +132,8 @@ function DateSetter() {
           ...semester2Event,
           start: semester2Start,
         });
+      } else {
+        console.log('Semester 2 start date not found');
       }
 
       // extract easter start and end dates
@@ -488,6 +492,9 @@ function DateSetter() {
     }
 
     toast(event.title + ' added');
+
+    // now reload the page to show the new event
+    window.location.reload();
   };
 
   // deletes from mongodb and updates the events state locally
@@ -510,6 +517,9 @@ function DateSetter() {
       setShowModal(false);
 
       toast(selectEvent.title + ' deleted');
+
+      // reload the page to show the updated events
+      window.location.reload();
     }
   }
 
@@ -689,49 +699,80 @@ function DateSetter() {
             <option value="EE">Yes</option>
           </select>
 
-          {/* Input field for adding semester 1 start date */}
-          <div className="formInput">
-            <span>Semester 1 Start Date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Start Date"
-                selected={semester1Event.start}
-                onChange={(start: Date) =>
-                  // Set end date to start date because it's a one day event element
-                  setSemester1Event({ ...semester1Event, start, end: start })
-                }
-              />
-            </div>
-            <button
-              className="eventButton"
-              onClick={() => handleAddEvent(semester1Event)}
-            >
-              Set Semester 1 Start Date
-            </button>
-          </div>
+          {/* only show semester 1 and 2 dates if there is no semester 1 and 2 dates set */}
+          {
+            // check if there are atleast 2 events with titles that include "Semester" in the fetched items
+            fetchedItems.filter((event) => event.title.includes('Semester'))
+              .length === 2 ? (
+              // show semester 1 and 2 dates
+              <div className="mb-4">
+                <div>
+                  Semester 1 Start Date: {semester1Event.start.toDateString()}
+                </div>
+                <div className="ml-4">
+                  Semester 2 Start Date: {semester2Event.start.toDateString()}
+                </div>
+                <div className="mt-2">
+                  To edit semester dates: navigate to the date, select & click
+                  edit
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Input field for adding semester 1 start date */}
+                <div className="formInput">
+                  <span>Semester 1 Start Date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="Start Date"
+                      selected={semester1Event.start}
+                      onChange={(start: Date) =>
+                        // Set end date to start date because it's a one day event element
+                        setSemester1Event({
+                          ...semester1Event,
+                          start,
+                          end: start,
+                        })
+                      }
+                    />
+                  </div>
+                  <button
+                    className="eventButton"
+                    onClick={() => handleAddEvent(semester1Event)}
+                  >
+                    Set Semester 1 Start Date
+                  </button>
+                </div>
 
-          {/* Input field for adding semester 2 start date */}
-          <div className="formInput">
-            <span>Semester 2 Start Date: </span>
-            <div className="d-inline">
-              <DatePicker
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Start Date"
-                selected={semester2Event.start}
-                onChange={(start: Date) =>
-                  // Set end date to start date because it's a one day event element
-                  setSemester2Event({ ...semester2Event, start, end: start })
-                }
-              />
-            </div>
-            <button
-              className="eventButton"
-              onClick={() => handleAddEvent(semester2Event)}
-            >
-              Set Semester 2 Start Date
-            </button>
-          </div>
+                {/* Input field for adding semester 2 start date */}
+                <div className="formInput">
+                  <span>Semester 2 Start Date: </span>
+                  <div className="d-inline">
+                    <DatePicker
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="Start Date"
+                      selected={semester2Event.start}
+                      onChange={(start: Date) =>
+                        // Set end date to start date because it's a one day event element
+                        setSemester2Event({
+                          ...semester2Event,
+                          start,
+                          end: start,
+                        })
+                      }
+                    />
+                  </div>
+                  <button
+                    className="eventButton"
+                    onClick={() => handleAddEvent(semester2Event)}
+                  >
+                    Set Semester 2 Start Date
+                  </button>
+                </div>
+              </>
+            )
+          }
           <hr className="lightRounded"></hr>
 
           {/* Christmas break section */}

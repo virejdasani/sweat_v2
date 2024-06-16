@@ -14,7 +14,7 @@ exports.getAllModules = async (req, res) => {
 
 exports.getAllModuleIds = async (req, res) => {
   try {
-    const moduleIds = await Module.find().distinct('id');
+    const moduleIds = await Module.find().distinct('moduleSetup.moduleCode');
     res.json(moduleIds);
   } catch (error) {
     handleError(res, error);
@@ -24,7 +24,7 @@ exports.getAllModuleIds = async (req, res) => {
 exports.getModuleById = async (req, res) => {
   try {
     const moduleId = req.params.id;
-    const module = await Module.findOne({ id: moduleId });
+    const module = await Module.findOne({ 'moduleSetup.moduleCode': moduleId });
 
     if (!module) {
       return res.status(404).json({ error: 'Module not found' });
@@ -54,7 +54,9 @@ exports.updateModuleById = async (req, res) => {
     const moduleId = req.params.id;
     const updatedData = req.body;
 
-    const existingModule = await Module.findOne({ id: moduleId });
+    const existingModule = await Module.findOne({
+      'moduleSetup.moduleCode': moduleId,
+    });
     if (!existingModule) {
       return res.status(404).json({ error: 'Module not found' });
     }
@@ -67,29 +69,40 @@ exports.updateModuleById = async (req, res) => {
 
 exports.deleteModuleById = async (req, res) => {
   try {
-    const moduleId = req.params.id;
-    const deletedModule = await Module.findOneAndDelete({ id: moduleId });
+    const moduleCode = req.params.moduleCode;
+
+    if (!moduleCode) {
+      return res.status(400).json({ error: 'Module code is required' });
+    }
+
+    const deletedModule = await Module.findOneAndDelete({
+      'moduleSetup.moduleCode': moduleCode,
+    });
 
     if (!deletedModule) {
+      console.log(`Module with code ${moduleCode} not found`);
       return res.status(404).json({ error: 'Module not found' });
     }
 
     // Remove the module's id from the moduleIds array of associated programmes
-    const updatePromises = deletedModule.programme.map((programmeId) =>
-      Programme.findOneAndUpdate(
-        { id: programmeId },
-        { $pull: { moduleIds: moduleId } },
-        { new: true },
-      ),
+    const updatePromises = deletedModule.moduleSetup.programme.map(
+      (programmeId) =>
+        Programme.findOneAndUpdate(
+          { id: programmeId },
+          { $pull: { moduleIds: moduleCode } },
+          { new: true },
+        ),
     );
 
     await Promise.all(updatePromises);
 
     res.json({ message: 'Module deleted successfully' });
   } catch (error) {
+    console.error(`Error deleting module with code ${moduleCode}:`, error);
     handleError(res, error);
   }
 };
+
 exports.updateProgrammeArrayInModules = async (req, res) => {
   try {
     const programmes = await Programme.find();

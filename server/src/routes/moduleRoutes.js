@@ -24,6 +24,6 @@ router.post('/create-module', moduleController.createModule);
 
 router.put('/:id', moduleController.updateModuleById);
 
-router.delete('/:id', moduleController.deleteModuleById);
+router.delete('/:moduleCode', moduleController.deleteModuleById);
 
 module.exports = router;

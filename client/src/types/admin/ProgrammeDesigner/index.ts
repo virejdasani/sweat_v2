@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Coursework, Programme } from '../../../shared/types';
+import { Programme } from '../../../shared/types';
 import { ModuleDocument } from '../CreateModule';
+import { Coursework } from '../CreateModule/CourseworkSetup';
 
 export interface ModuleListProps {
   modules: ModuleDocument[];

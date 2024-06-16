@@ -49,7 +49,9 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
 
   useEffect(() => {
     if (editingScheduleData) {
-      setTemplateData(transformEditingDataToTemplateData(editingScheduleData));
+      const transformedData =
+        transformEditingDataToTemplateData(editingScheduleData);
+      setTemplateData(transformedData);
     }
   }, [editingScheduleData, setTemplateData]);
 

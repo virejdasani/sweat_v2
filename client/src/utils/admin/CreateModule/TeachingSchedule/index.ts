@@ -35,8 +35,8 @@ export const transformTemplateDataToSaveData = (
     other: { hours: 0, distribution: [] },
   };
 
-  templateData.forEach((table) => {
-    table.forEach((row, rowIndex) => {
+  templateData.forEach((semesterData) => {
+    semesterData.forEach((row, rowIndex) => {
       let activityKey: keyof TeachingScheduleSaveData;
 
       switch (rowIndex) {
@@ -66,10 +66,12 @@ export const transformTemplateDataToSaveData = (
         .map((hours, week) => ({ week: week + 1, hours }))
         .filter((item) => item.hours > 0);
 
-      teachingScheduleSaveData[activityKey] = {
-        hours: distribution.reduce((total, dist) => total + dist.hours, 0),
-        distribution,
-      };
+      teachingScheduleSaveData[activityKey].hours += distribution.reduce(
+        (total, dist) => total + dist.hours,
+        0,
+      );
+
+      teachingScheduleSaveData[activityKey].distribution!.push(...distribution);
     });
   });
 
@@ -80,22 +82,23 @@ export const transformEditingDataToTemplateData = (
   scheduleData: TeachingScheduleSaveData,
 ): number[][][] => {
   const transformedData = [
-    scheduleData.lectures,
-    scheduleData.tutorials,
-    scheduleData.labs,
-    scheduleData.seminars,
-    scheduleData.fieldworkPlacement,
-    scheduleData.other,
-  ].map((activity) => {
-    const weeks = Array(15).fill(0);
-    if (activity.distribution) {
-      activity.distribution.forEach((dist: Distribution) => {
-        weeks[dist.week - 1] = dist.hours; // Assuming week is 1-based index
-      });
-    }
-    return weeks;
+    createWeekArray(scheduleData.lectures?.distribution),
+    createWeekArray(scheduleData.tutorials?.distribution),
+    createWeekArray(scheduleData.labs?.distribution),
+    createWeekArray(scheduleData.seminars?.distribution),
+    createWeekArray(scheduleData.fieldworkPlacement?.distribution),
+    createWeekArray(scheduleData.other?.distribution),
+  ];
+
+  return [transformedData, transformedData];
+};
+
+const createWeekArray = (distribution: Distribution[] = []): number[] => {
+  const weeks = Array(15).fill(0);
+  distribution.forEach((dist) => {
+    weeks[dist.week - 1] = dist.hours; // Assuming week is 1-based index
   });
-  return [transformedData];
+  return weeks;
 };
 
 export const handleInputChange = (
@@ -109,15 +112,4 @@ export const handleInputChange = (
   const updatedData = [...templateData];
   updatedData[tableIndex][rowIndex][colIndex] = parseInt(value);
   setTemplateData(updatedData);
-};
-
-export const handleSave = (
-  templateData: number[][][],
-  transformTemplateDataToSaveData: (
-    data: number[][][],
-  ) => TeachingScheduleSaveData,
-) => {
-  const saveData = transformTemplateDataToSaveData(templateData);
-  console.log('Saved Data:', JSON.stringify(saveData, null, 2));
-  // Implement the actual save logic here (e.g., API call to save the data)
 };

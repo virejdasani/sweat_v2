@@ -125,7 +125,12 @@ export const handleSaveAllProgrammes = async (
       throw error;
     }
 
-    toast.success('All programmes saved successfully');
+    toast.success(
+      'All programmes saved successfully. The page will refresh to show the changes.',
+    );
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000); // Wait for 3 seconds before refreshing
   } catch (error) {
     console.error('Error updating module IDs for programmes:', error);
     toast.error('Error saving programmes. Please try again');
@@ -243,12 +248,12 @@ export const useModuleActions = (
   );
 
   const handleRemoveFromDatabase = useCallback(
-    async (moduleId: string) => {
+    async (moduleCode: string) => {
       try {
-        await deleteModuleById(moduleId);
+        await deleteModuleById(moduleCode);
 
         const updatedModuleInstances = moduleInstances.filter(
-          (mi) => mi.module.moduleSetup.moduleCode !== moduleId,
+          (mi) => mi.module.moduleSetup.moduleCode !== moduleCode,
         );
         setModuleInstances(updatedModuleInstances);
 

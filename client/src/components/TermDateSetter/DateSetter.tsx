@@ -1006,18 +1006,21 @@ function DateSetter() {
                         </option>
                       ),
                     )}
+                    <option value={0}>None</option>
                   </select>
                 </div>
                 <button
                   className="eventButton"
-                  onClick={() =>
-                    handleAddEvent({
-                      title: 'Reading Week',
-                      allDay: true,
-                      start: readingWeekEvent.start,
-                      end: readingWeekEvent.end,
-                    })
-                  }
+                  onClick={() => {
+                    if (selectedWeek !== 0) {
+                      handleAddEvent({
+                        title: 'Reading Week',
+                        allDay: true,
+                        start: readingWeekEvent.start,
+                        end: readingWeekEvent.end,
+                      });
+                    }
+                  }}
                 >
                   Set Reading Week
                 </button>

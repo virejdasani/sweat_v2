@@ -250,7 +250,7 @@ function DateSetter() {
       start: calculateStartDate(selectedWeek),
       end: calculateEndDate(selectedWeek),
     });
-  });
+  }, [selectedWeek, semester1Event.start]);
 
   // this is if we have added all bank holidays to MongoDB
   // this replaces the existing events with the fetched items so only events from the server are displayed

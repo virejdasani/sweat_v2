@@ -25,9 +25,16 @@ import {
   CourseworkSetupProps,
 } from '../../../../types/admin/CreateModule/CourseworkSetup';
 import { courseworkSetupStyles } from './CourseworkSetupStyles';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import './CourseworkSetup.css';
+
+const daysOfWeek = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
 
 const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   courseworkList = [],
@@ -36,6 +43,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   examPercentage,
   formFactor,
   onFormFactorChange,
+  formData,
 }) => {
   const {
     handleAddCoursework,
@@ -49,6 +57,12 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     addExamCoursework(examPercentage, courseworkList, onCourseworkListChange);
   }, [examPercentage, courseworkList, onCourseworkListChange]);
 
+  const numWeeks =
+    formData.semester === 'whole session' ||
+    formData.semester === 'Whole Session'
+      ? 30
+      : 15;
+
   return (
     <div>
       <Table style={courseworkSetupStyles.table}>
@@ -60,7 +74,8 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
             <Th style={courseworkSetupStyles.th}>Deadline Week</Th>
             <Th style={courseworkSetupStyles.th}>Released Week Earlier</Th>
             <Th style={courseworkSetupStyles.th}>Actions</Th>
-            <Th style={courseworkSetupStyles.th}>Date</Th>
+            <Th style={courseworkSetupStyles.th}>Day of Week</Th>
+            <Th style={courseworkSetupStyles.th}>Time</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -112,13 +127,12 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                     handleInputChange(index, 'deadlineWeek', e.target.value)
                   }
                   style={courseworkSetupStyles.select}
-                  disabled={coursework.type === 'exam'}
+                  disabled={
+                    coursework.type === 'exam' && semester !== 'whole session'
+                  }
                 >
-                  {Array.from({ length: 15 }, (_, i) => {
-                    if (
-                      (semester === 'second' || semester === 'Second') &&
-                      i + 1 === 8
-                    ) {
+                  {Array.from({ length: numWeeks }, (_, i) => {
+                    if (semester === 'second' && i + 1 === 8) {
                       return (
                         <React.Fragment key={i}>
                           <option key={i + 1} value={i + 1}>
@@ -132,6 +146,26 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                           </option>
                           <option key="easterBreak3" value="easterBreak3">
                             Easter Break Week 3
+                          </option>
+                        </React.Fragment>
+                      );
+                    } else if (semester === 'whole session' && i + 1 === 23) {
+                      return (
+                        <React.Fragment key={i}>
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                          <option key="easterBreak1" value="easterBreak1">
+                            Easter Break Week 1
+                          </option>
+                          <option key="easterBreak2" value="easterBreak2">
+                            Easter Break Week 2
+                          </option>
+                          <option key="easterBreak3" value="easterBreak3">
+                            Easter Break Week 3
+                          </option>
+                          <option key={i + 2} value={i + 2}>
+                            {i + 2}
                           </option>
                         </React.Fragment>
                       );
@@ -175,20 +209,33 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 </Button>
               </Td>
               {coursework.type !== 'exam' && (
-                <Td style={courseworkSetupStyles.td}>
-                  <DatePicker
-                    selected={
-                      coursework.deadlineDate
-                        ? new Date(coursework.deadlineDate)
-                        : null
-                    }
-                    onChange={(date: Date | null) =>
-                      handleInputChange(index, 'deadlineDate', date)
-                    }
-                    dateFormat="dd/MM/yyyy"
-                    className="datePicker"
-                  />
-                </Td>
+                <>
+                  <Td style={courseworkSetupStyles.td}>
+                    <Select
+                      value={coursework.deadlineDay}
+                      onChange={(e) =>
+                        handleInputChange(index, 'deadlineDay', e.target.value)
+                      }
+                      style={courseworkSetupStyles.select}
+                    >
+                      {daysOfWeek.map((day, i) => (
+                        <option key={i} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </Select>
+                  </Td>
+                  <Td style={courseworkSetupStyles.td}>
+                    <Input
+                      type="time"
+                      value={coursework.deadlineTime}
+                      onChange={(e) =>
+                        handleInputChange(index, 'deadlineTime', e.target.value)
+                      }
+                      style={courseworkSetupStyles.input}
+                    />
+                  </Td>
+                </>
               )}
             </Tr>
           ))}

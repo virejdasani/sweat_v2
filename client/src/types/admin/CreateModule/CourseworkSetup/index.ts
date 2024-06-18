@@ -1,3 +1,5 @@
+import { ModuleSetupFormData } from '../ModuleSetup';
+
 export interface Coursework {
   title: string;
   weight: number;
@@ -5,6 +7,8 @@ export interface Coursework {
   deadlineWeek: number;
   deadlineDate?: Date;
   releasedWeekEarlier: number;
+  deadlineDay?: string;
+  deadlineTime?: string;
   contactTimeLectures?: number;
   contactTimeTutorials?: number;
   contactTimeLabs?: number;
@@ -26,6 +30,7 @@ export interface CourseworkSetupProps {
   examPercentage: number;
   formFactor: number;
   onFormFactorChange: (formFactor: number) => void;
+  formData: ModuleSetupFormData;
 }
 
 export interface CourseworkSetupFunctionsProps {

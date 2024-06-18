@@ -24,7 +24,34 @@ const courseworkSchema = new mongoose.Schema({
   },
   deadlineWeek: { type: Number, required: true },
   deadlineDate: { type: Date },
-  releasedWeekEarlier: { type: Number, required: true },
+  releasedWeekEarlier: {
+    type: Number,
+    required: function () {
+      return this.type !== 'exam';
+    },
+  },
+  deadlineDay: {
+    type: String,
+    enum: [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ],
+    required: function () {
+      return this.type !== 'exam';
+    },
+  },
+  deadlineTime: {
+    type: String,
+    match: /^([01]\d|2[0-3]):([0-5]\d)$/,
+    required: function () {
+      return this.type !== 'exam';
+    },
+  },
   contactTimeLectures: { type: Number, default: 0 },
   contactTimeTutorials: { type: Number, default: 0 },
   contactTimeLabs: { type: Number, default: 0 },

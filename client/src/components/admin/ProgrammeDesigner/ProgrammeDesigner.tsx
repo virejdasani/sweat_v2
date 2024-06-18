@@ -24,6 +24,7 @@ import { Button } from '@chakra-ui/react';
 import ModuleYearFilter from './ModuleFilters/YearFilter/YearFilter';
 import ModuleTypeFilter from './ModuleFilters/TypeFilter/TypeFilter';
 import { ModuleDocument } from '../../../types/admin/CreateModule';
+import { useNavigate } from 'react-router-dom';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
@@ -33,9 +34,9 @@ function ProgrammeDesigner() {
   const [selectedModuleType, setSelectedModuleType] = useState<string | null>(
     null,
   );
-  // const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
-  // const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
@@ -80,18 +81,14 @@ function ProgrammeDesigner() {
           }
           selectedModuleType={selectedModuleType}
         />
-        {/* <Button
+      </div>
+      <div className="add-module-button-container">
+        <Button
           colorScheme="blue"
-          onClick={() =>
-            openAddModuleModal(
-              setModalMode,
-              setSelectedModule,
-              setIsModuleModalOpen,
-            )
-          }
+          onClick={() => navigate('/admin/create-module')}
         >
           Add Module
-        </Button> */}
+        </Button>
       </div>
       <DragDropContext
         onDragEnd={(result: DropResult) =>
@@ -177,18 +174,6 @@ function ProgrammeDesigner() {
           Save All Programmes
         </Button>
       </div>
-      {/* {isModuleModalOpen && (
-        <ModuleForm
-          mode={modalMode}
-          module={selectedModule}
-          onClose={() => closeModuleModal(setIsModuleModalOpen)}
-          onSubmit={handleSubmit}
-          moduleInstances={moduleInstances}
-          setModuleInstances={setModuleInstances}
-          programmeState={programmeState}
-          setProgrammeState={setProgrammeState}
-        />
-      )} */}
     </div>
   );
 }

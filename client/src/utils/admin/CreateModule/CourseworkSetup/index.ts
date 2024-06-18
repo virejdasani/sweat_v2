@@ -15,6 +15,8 @@ export const CourseworkSetupFunctions = ({
       deadlineWeek: 1,
       releasedWeekEarlier: 1,
       feedbackTime: 1,
+      deadlineDay: '',
+      deadlineTime: '',
     };
     onCourseworkListChange([...courseworkList, newCoursework]);
   };
@@ -31,7 +33,15 @@ export const CourseworkSetupFunctions = ({
     value: string | number | Date | null,
   ) => {
     const updatedList = [...courseworkList];
-    const updatedValue = value === null ? undefined : value; // Handle null values
+    const updatedValue = value === null ? undefined : value;
+
+    if (field === 'deadlineTime' && typeof value === 'string') {
+      const isValidTime = /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
+      if (!isValidTime) {
+        alert('Please enter a valid time in HH:mm format');
+        return;
+      }
+    }
 
     updatedList[index] = {
       ...updatedList[index],
@@ -84,6 +94,8 @@ export const addExamCoursework = (
       deadlineWeek: 15,
       releasedWeekEarlier: 1,
       feedbackTime: 1,
+      deadlineDay: '',
+      deadlineTime: '',
     };
     onCourseworkListChange([...courseworkList, examCoursework]);
   }

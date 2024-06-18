@@ -73,62 +73,65 @@ export const updateCourseworkList = (
           .slice(startWeek, numericDeadlineWeek)
           .reduce((acc, val) => acc + val, 0);
 
-      const contactTimeFields = {
-        contactTimeLectures: Math.round(
-          (templateData.reduce(
-            (total, semesterData) =>
-              total + calculateContactTime(semesterData[0]),
-            0,
-          ) *
-            formFactor) /
-            100,
-        ),
-        contactTimeTutorials: Math.round(
-          (templateData.reduce(
-            (total, semesterData) =>
-              total + calculateContactTime(semesterData[1]),
-            0,
-          ) *
-            formFactor) /
-            100,
-        ),
-        contactTimeLabs: Math.round(
-          (templateData.reduce(
-            (total, semesterData) =>
-              total + calculateContactTime(semesterData[2]),
-            0,
-          ) *
-            formFactor) /
-            100,
-        ),
-        contactTimeSeminars: Math.round(
-          (templateData.reduce(
-            (total, semesterData) =>
-              total + calculateContactTime(semesterData[3]),
-            0,
-          ) *
-            formFactor) /
-            100,
-        ),
-        contactTimeFieldworkPlacement: Math.round(
-          (templateData.reduce(
-            (total, semesterData) =>
-              total + calculateContactTime(semesterData[4]),
-            0,
-          ) *
-            formFactor) /
-            100,
-        ),
-        contactTimeOthers: Math.round(
-          (templateData.reduce(
-            (total, semesterData) =>
-              total + calculateContactTime(semesterData[5]),
-            0,
-          ) *
-            formFactor) /
-            100,
-        ),
-      };
+      const contactTimeFields =
+        coursework.type === 'exam'
+          ? {}
+          : {
+              contactTimeLectures: Math.round(
+                (templateData.reduce(
+                  (total, semesterData) =>
+                    total + calculateContactTime(semesterData[0]),
+                  0,
+                ) *
+                  formFactor) /
+                  100,
+              ),
+              contactTimeTutorials: Math.round(
+                (templateData.reduce(
+                  (total, semesterData) =>
+                    total + calculateContactTime(semesterData[1]),
+                  0,
+                ) *
+                  formFactor) /
+                  100,
+              ),
+              contactTimeLabs: Math.round(
+                (templateData.reduce(
+                  (total, semesterData) =>
+                    total + calculateContactTime(semesterData[2]),
+                  0,
+                ) *
+                  formFactor) /
+                  100,
+              ),
+              contactTimeSeminars: Math.round(
+                (templateData.reduce(
+                  (total, semesterData) =>
+                    total + calculateContactTime(semesterData[3]),
+                  0,
+                ) *
+                  formFactor) /
+                  100,
+              ),
+              contactTimeFieldworkPlacement: Math.round(
+                (templateData.reduce(
+                  (total, semesterData) =>
+                    total + calculateContactTime(semesterData[4]),
+                  0,
+                ) *
+                  formFactor) /
+                  100,
+              ),
+              contactTimeOthers: Math.round(
+                (templateData.reduce(
+                  (total, semesterData) =>
+                    total + calculateContactTime(semesterData[5]),
+                  0,
+                ) *
+                  formFactor) /
+                  100,
+              ),
+            };
 
       const {
         feedbackTime,
@@ -150,7 +153,63 @@ export const updateCourseworkList = (
       };
     },
   );
+
   return updatedCourseworkList;
+};
+export const updateExamContactTime = (
+  courseworkList: Coursework[],
+  templateData: number[][][],
+  moduleCredit: number,
+  formFactor: number,
+): Coursework[] => {
+  const totalContactTime = templateData.reduce(
+    (totals, semesterData) => {
+      return totals.map(
+        (total, index) =>
+          total + semesterData[index].reduce((sum, value) => sum + value, 0),
+      );
+    },
+    [0, 0, 0, 0, 0, 0], // Initial totals for each contact time field
+  );
+
+  const nonExamCourseworkList = updateCourseworkList(
+    courseworkList.filter((coursework) => coursework.type !== 'exam'),
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  const nonExamCourseworkContactTime = nonExamCourseworkList.reduce(
+    (totals, coursework) => {
+      return [
+        totals[0] + (coursework.contactTimeLectures || 0),
+        totals[1] + (coursework.contactTimeTutorials || 0),
+        totals[2] + (coursework.contactTimeLabs || 0),
+        totals[3] + (coursework.contactTimeSeminars || 0),
+        totals[4] + (coursework.contactTimeFieldworkPlacement || 0),
+        totals[5] + (coursework.contactTimeOthers || 0),
+      ];
+    },
+    [0, 0, 0, 0, 0, 0], // Initial totals for each contact time field
+  );
+
+  const examContactTime = totalContactTime.map(
+    (total, index) => total - nonExamCourseworkContactTime[index],
+  );
+
+  return courseworkList.map((coursework) =>
+    coursework.type === 'exam'
+      ? {
+          ...coursework,
+          contactTimeLectures: examContactTime[0],
+          contactTimeTutorials: examContactTime[1],
+          contactTimeLabs: examContactTime[2],
+          contactTimeSeminars: examContactTime[3],
+          contactTimeFieldworkPlacement: examContactTime[4],
+          contactTimeOthers: examContactTime[5],
+        }
+      : coursework,
+  );
 };
 
 export const getKeyboardTime = (
@@ -266,7 +325,19 @@ export const getPreparationTimeAndPrivateStudyTime = (
   const privateStudyTime =
     coursework.type !== 'exam'
       ? 0
-      : Math.max(expectedTotalTimeForCoursework - initialTotalTime, 0);
+      : Math.max(
+          expectedTotalTimeForCoursework -
+            (contactTimeLectures || 0) -
+            (contactTimeTutorials || 0) -
+            (contactTimeLabs || 0) -
+            (contactTimeSeminars || 0) -
+            (contactTimeFieldworkPlacement || 0) -
+            (contactTimeOthers || 0) -
+            (formativeAssessmentTime || 0) -
+            (keyboardTime || 0) -
+            (feedbackTime || 0),
+          0,
+        );
 
   return { preparationTime, privateStudyTime };
 };

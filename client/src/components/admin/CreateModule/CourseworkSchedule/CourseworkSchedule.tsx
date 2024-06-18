@@ -9,6 +9,7 @@ import {
   updateCourseworkList,
   handleInputChangeUtil,
   handleInputBlurUtil,
+  updateExamContactTime,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
 import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
 
@@ -36,8 +37,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
           formFactor,
         );
 
+        const updatedCourseworkListWithExamContactTime = updateExamContactTime(
+          updatedCourseworkList,
+          templateData,
+          moduleCredit,
+          formFactor,
+        );
+
         const updatedCourseworkListWithPreparationTime =
-          updatedCourseworkList.map((coursework) => {
+          updatedCourseworkListWithExamContactTime.map((coursework) => {
             const { preparationTime, privateStudyTime } =
               getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
             return { ...coursework, preparationTime, privateStudyTime };

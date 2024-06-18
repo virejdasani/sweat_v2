@@ -1,5 +1,5 @@
 import React from 'react';
-import ProgrammeDesigner from '../../../components/admin/ProgrammeDesigner';
+import ProgrammeDesigner from '../../../components/admin/ProgrammeDesigner/ProgrammeDesigner';
 const ProgrammeDesignPage: React.FC = () => {
   return (
     <div>

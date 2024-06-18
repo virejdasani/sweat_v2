@@ -113,6 +113,7 @@ const CreateModule: React.FC = () => {
             examPercentage={100 - formData.courseworkPercentage}
             formFactor={formFactor}
             onFormFactorChange={setFormFactor}
+            formData={formData}
           />
         );
       case 3:

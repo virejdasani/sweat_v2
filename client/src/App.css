@@ -1,4 +1,4 @@
-#root {
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
@@ -11,15 +11,16 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 body {
-  /* background: radial-gradient(circle at 50% 100%, #0c1c3d, #000000 90%); */
   background: darkgrey;
 }
 
@@ -27,6 +28,7 @@ body {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -44,4 +46,4 @@ body {
 
 .read-the-docs {
   color: #888;
-}
+} */

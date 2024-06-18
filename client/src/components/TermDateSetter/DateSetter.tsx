@@ -13,6 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import EditTermDateModal from './EditTermDateModal';
 import { CalendarKeyDateEvent } from '../shared/types/';
+// bootstrap css
 
 const locales = {};
 

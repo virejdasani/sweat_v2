@@ -7,6 +7,7 @@ import ProgrammeDesignPage from './pages/admin/ProgrammeDesign/ProgrammeDesignPa
 import CreateModulePage from './pages/admin/CreateModule/CreateModulePage';
 import CourseworkCalendar from './components/CourseworkCalendar/CourseworkCalendar';
 import Home from './components/Home/Home';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (

@@ -227,6 +227,31 @@ function DateSetter() {
     });
   }, [fetchedItems, course]);
 
+  // Add a state for the selected week number
+  const [selectedWeek, setSelectedWeek] = useState<number>(1);
+
+  // Calculate and set the Reading Week start and end dates based on the selected week
+  useEffect(() => {
+    const calculateStartDate = (weekNumber: number) => {
+      const startDate = new Date(semester1Event.start);
+      startDate.setDate(startDate.getDate() + 7 * (weekNumber - 1));
+      return startDate;
+    };
+
+    const calculateEndDate = (weekNumber: number) => {
+      const endDate = new Date(semester1Event.start);
+      endDate.setDate(endDate.getDate() + 7 * weekNumber);
+      return endDate;
+    };
+
+    // Set the Reading Week start and end dates based on the selected week number
+    setReadingWeekEvent({
+      ...readingWeekEvent,
+      start: calculateStartDate(selectedWeek),
+      end: calculateEndDate(selectedWeek),
+    });
+  });
+
   // this is if we have added all bank holidays to MongoDB
   // this replaces the existing events with the fetched items so only events from the server are displayed
   // Update events state with fetched items
@@ -912,8 +937,8 @@ function DateSetter() {
             )
           }
 
-          {/* Easter break section with conditional rendering */}
-          {course === 'EE' && (
+          {/* reading week section with conditional rendering */}
+          {/* {course === 'EE' && (
             <>
               <hr className="lightRounded"></hr>
               <div>
@@ -953,6 +978,49 @@ function DateSetter() {
                       end: readingWeekEvent.end,
                     })
                   }
+                >
+                  Set Reading Week
+                </button>
+              </div>
+            </>
+          )} */}
+
+          {course === 'EE' && (
+            <>
+              <hr className="lightRounded"></hr>
+              <div>
+                <div className="datePickers">
+                  <span>Reading Week: </span>
+                  <select
+                    value={selectedWeek}
+                    onChange={(e) => setSelectedWeek(Number(e.target.value))}
+                  >
+                    {Array.from(
+                      { length: 12 },
+                      (
+                        _,
+                        i, // this is because semester is 15 weeks long but reading week is only in first 12 weeks
+                      ) => (
+                        <option key={i + 1} value={i + 1}>
+                          Week {i + 1}
+                        </option>
+                      ),
+                    )}
+                    <option value={0}>None</option>
+                  </select>
+                </div>
+                <button
+                  className="eventButton"
+                  onClick={() => {
+                    if (selectedWeek !== 0) {
+                      handleAddEvent({
+                        title: 'Reading Week',
+                        allDay: true,
+                        start: readingWeekEvent.start,
+                        end: readingWeekEvent.end,
+                      });
+                    }
+                  }}
                 >
                   Set Reading Week
                 </button>

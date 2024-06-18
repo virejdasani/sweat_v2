@@ -135,7 +135,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
             {semesterHeading}
           </Heading>
           <Flex direction="column" gap={8}>
-            {templateData.map((table, tableIndex) => (
+            {templateData.map((_, tableIndex) => (
               <Box key={tableIndex}>{renderTable(tableIndex)}</Box>
             ))}
           </Flex>

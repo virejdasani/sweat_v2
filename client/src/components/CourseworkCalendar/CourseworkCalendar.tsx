@@ -536,7 +536,7 @@ function CourseworkCalendarSetter() {
 
     // check if there is a clash only if saving a new event not editing an existing event
     if (!selectEvent && checkClash(updatedEvent, events)) {
-      toast('Clash with another event');
+      toast('Date clash with another event');
     }
 
     // If it's an existing event (selectEvent is defined), update the event

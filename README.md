@@ -1,3 +1,9 @@
+## Deployed frontend: https://sweatdeployed.netlify.app/
+
+## Deployed backend: https://sweat-backend.onrender.com/
+
+---
+
 # Project Name
 
 ## Description

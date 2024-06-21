@@ -1,7 +1,7 @@
 const Programme = require('../models/programme');
 const { handleError } = require('../utils/errorHandler');
 
-exports.getAllProgrammes = async (req, res) => {
+const getAllProgrammes = async (req, res) => {
   try {
     const programmes = await Programme.find();
     res.json(programmes);
@@ -10,7 +10,7 @@ exports.getAllProgrammes = async (req, res) => {
   }
 };
 
-exports.getAllProgrammeIds = async (req, res) => {
+const getAllProgrammeIds = async (req, res) => {
   try {
     const programmeIds = await Programme.find().distinct('id');
     res.json(programmeIds);
@@ -19,7 +19,7 @@ exports.getAllProgrammeIds = async (req, res) => {
   }
 };
 
-exports.getProgrammeById = async (req, res) => {
+const getProgrammeById = async (req, res) => {
   try {
     const programmeId = req.params.id;
     const programme = await Programme.findOne({ id: programmeId });
@@ -34,11 +34,9 @@ exports.getProgrammeById = async (req, res) => {
   }
 };
 
-exports.createProgramme = async (req, res) => {
+const createProgramme = async (req, res) => {
   try {
     const programmeData = req.body;
-
-    // TODO: Apply any necessary validation or processing to the programme data
 
     const newProgramme = await Programme.create(programmeData);
     res.status(201).json(newProgramme);
@@ -47,12 +45,10 @@ exports.createProgramme = async (req, res) => {
   }
 };
 
-exports.updateProgrammeById = async (req, res) => {
+const updateProgrammeById = async (req, res) => {
   try {
     const programmeId = req.params.id;
     const updatedData = req.body;
-
-    // TODO: Apply any necessary validation or processing to the updated data
 
     const updatedProgramme = await Programme.findOneAndUpdate(
       { id: programmeId },
@@ -70,12 +66,10 @@ exports.updateProgrammeById = async (req, res) => {
   }
 };
 
-exports.updateModuleIdsForAllProgrammes = async (req, res) => {
+const updateModuleIdsForAllProgrammes = async (req, res) => {
   try {
     const programmeId = req.params.id;
     const { moduleIds } = req.body;
-
-    // Validate and sanitize the input data if needed
 
     const updatedDoc = await Programme.findOneAndUpdate(
       { id: programmeId },
@@ -95,7 +89,7 @@ exports.updateModuleIdsForAllProgrammes = async (req, res) => {
   }
 };
 
-exports.deleteProgrammeById = async (req, res) => {
+const deleteProgrammeById = async (req, res) => {
   try {
     const programmeId = req.params.id;
     const deletedProgramme = await Programme.findOneAndDelete({
@@ -112,18 +106,16 @@ exports.deleteProgrammeById = async (req, res) => {
   }
 };
 
-exports.removeModuleFromProgramme = async (req, res) => {
+const removeModuleFromProgramme = async (req, res) => {
   try {
     const programmeId = req.params.id;
     const { moduleId } = req.body;
 
-    // Find the programme by ID
     const programme = await Programme.findOne({ id: programmeId });
     if (!programme) {
       return res.status(404).json({ error: 'Programme not found' });
     }
 
-    // Find the index of the module in the programme's modules array
     const moduleIndex = programme.moduleIds.indexOf(moduleId);
     if (moduleIndex === -1) {
       return res
@@ -131,14 +123,23 @@ exports.removeModuleFromProgramme = async (req, res) => {
         .json({ error: 'Module not found in the programme' });
     }
 
-    // Remove the module from the programme's modules array
     programme.moduleIds.splice(moduleIndex, 1);
 
-    // Save the updated programme
     const updatedProgramme = await programme.save();
 
     res.json(updatedProgramme);
   } catch (error) {
     handleError(res, error);
   }
+};
+
+module.exports = {
+  getAllProgrammes,
+  getAllProgrammeIds,
+  getProgrammeById,
+  createProgramme,
+  updateProgrammeById,
+  updateModuleIdsForAllProgrammes,
+  deleteProgrammeById,
+  removeModuleFromProgramme,
 };

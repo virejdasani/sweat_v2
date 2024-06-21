@@ -15,68 +15,63 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-const calendarModel = require('./src/models/calendar.js');
+// Import controllers
+const moduleController = require('./src/controllers/moduleController');
+const programmeController = require('./src/controllers/programmeController');
+const calendarController = require('./src/controllers/calendarController');
 
-app.get('/', async (req, res) => {
-  try {
-    const calendar = await calendarModel.find();
-    res.json(calendar);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// Module routes
+app.get('/modules/module-template', moduleController.getModuleTemplate);
+app.get('/modules', moduleController.getAllModules);
+app.get('/modules/ids', moduleController.getAllModuleIds);
+app.get('/modules/:id', moduleController.getModuleById);
+app.put(
+  '/modules/update-programme-array',
+  moduleController.updateProgrammeArrayInModules,
+);
+app.post(
+  '/modules/create-module',
+  moduleController.createOrUpdateModuleController,
+);
+app.put('/modules/:id', moduleController.createOrUpdateModuleController);
+app.delete('/modules/:moduleCode', moduleController.deleteModuleById);
 
-app.post('/add-event', async (req, res) => {
-  calendarModel.create(req.body).then((calendar) => {
-    res.json(calendar);
-  });
-});
+// Programme routes
+app.get('/programmes', programmeController.getAllProgrammes);
+app.get('/programmes/ids', programmeController.getAllProgrammeIds);
+app.get('/programmes/:id', programmeController.getProgrammeById);
+app.post('/programmes/create-programme', programmeController.createProgramme);
+app.put('/programmes/:id', programmeController.updateProgrammeById);
+app.put(
+  '/programmes/:id/update-module-ids',
+  programmeController.updateModuleIdsForAllProgrammes,
+);
+app.put(
+  '/programmes/:id/remove-module',
+  programmeController.removeModuleFromProgramme,
+);
+app.delete('/programmes/:id', programmeController.deleteProgrammeById);
 
-app.delete('/delete-event/:eventId', async (req, res) => {
-  const eventId = req.params.eventId;
-  calendarModel.findByIdAndDelete({ _id: eventId }).then((calendar) => {
-    res.json(calendar);
-  });
-});
-
-app.put('/update-event/:eventId', async (req, res) => {
-  const eventId = req.params.eventId;
-  calendarModel
-    .findByIdAndUpdate({ _id: eventId }, req.body)
-    .then((calendar) => {
-      res.json(calendar);
-    });
-});
-
-// delete all events
-app.delete('/delete-all-events', async (req, res) => {
-  calendarModel.deleteMany().then((calendar) => {
-    res.json(calendar);
-  });
-});
+// Calendar routes
+app.get('/calendar', calendarController.getEvents);
+app.post('/calendar/save-events', calendarController.saveEvents);
+app.post('/add-event', calendarController.addEvent);
+app.delete('/delete-event/:eventId', calendarController.deleteEvent);
+app.put('/update-event/:eventId', calendarController.updateEvent);
+app.delete('/delete-all-events', calendarController.deleteAllEvents);
 
 // MongoDB connection
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('MongoDB connected');
-
-    // Import routes
-    const routes = require('./src/routes');
-
-    // Use routes
-    app.use('/api', routes);
-
-    // Start server
     const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => console.log(err));
 
-// // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({
-//     message: 'Internal Server Error',
-//   });
-// });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal Server Error' });
+});

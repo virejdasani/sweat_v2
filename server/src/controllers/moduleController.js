@@ -2,8 +2,12 @@ const Module = require('../models/module');
 const Programme = require('../models/programme');
 const { handleError } = require('../utils/errorHandler');
 const { createOrUpdateModule } = require('../utils/helpers');
+const path = require('path');
+const fs = require('fs');
 
-exports.getAllModules = async (req, res) => {
+const templatesDir = path.join(__dirname, '../templates'); // Ensure this path is correct
+
+const getAllModules = async (req, res) => {
   try {
     const modules = await Module.find();
     res.json(modules);
@@ -12,7 +16,7 @@ exports.getAllModules = async (req, res) => {
   }
 };
 
-exports.getAllModuleIds = async (req, res) => {
+const getAllModuleIds = async (req, res) => {
   try {
     const moduleIds = await Module.find().distinct('moduleSetup.moduleCode');
     res.json(moduleIds);
@@ -21,7 +25,7 @@ exports.getAllModuleIds = async (req, res) => {
   }
 };
 
-exports.getModuleById = async (req, res) => {
+const getModuleById = async (req, res) => {
   try {
     const moduleId = req.params.id;
     const module = await Module.findOne({ 'moduleSetup.moduleCode': moduleId });
@@ -36,7 +40,7 @@ exports.getModuleById = async (req, res) => {
   }
 };
 
-exports.createModule = async (req, res) => {
+const createOrUpdateModuleController = async (req, res) => {
   try {
     const moduleData = req.body;
     const existingModule = await Module.findOne({
@@ -49,25 +53,7 @@ exports.createModule = async (req, res) => {
   }
 };
 
-exports.updateModuleById = async (req, res) => {
-  try {
-    const moduleId = req.params.id;
-    const updatedData = req.body;
-
-    const existingModule = await Module.findOne({
-      'moduleSetup.moduleCode': moduleId,
-    });
-    if (!existingModule) {
-      return res.status(404).json({ error: 'Module not found' });
-    }
-
-    await createOrUpdateModule(updatedData, existingModule, res);
-  } catch (error) {
-    handleError(res, error);
-  }
-};
-
-exports.deleteModuleById = async (req, res) => {
+const deleteModuleById = async (req, res) => {
   try {
     const moduleCode = req.params.moduleCode;
 
@@ -80,11 +66,9 @@ exports.deleteModuleById = async (req, res) => {
     });
 
     if (!deletedModule) {
-      console.log(`Module with code ${moduleCode} not found`);
       return res.status(404).json({ error: 'Module not found' });
     }
 
-    // Remove the module's id from the moduleIds array of associated programmes
     const updatePromises = deletedModule.moduleSetup.programme.map(
       (programmeId) =>
         Programme.findOneAndUpdate(
@@ -98,12 +82,11 @@ exports.deleteModuleById = async (req, res) => {
 
     res.json({ message: 'Module deleted successfully' });
   } catch (error) {
-    console.error(`Error deleting module with code ${moduleCode}:`, error);
     handleError(res, error);
   }
 };
 
-exports.updateProgrammeArrayInModules = async (req, res) => {
+const updateProgrammeArrayInModules = async (req, res) => {
   try {
     const programmes = await Programme.find();
 
@@ -117,7 +100,6 @@ exports.updateProgrammeArrayInModules = async (req, res) => {
       return map;
     }, {});
 
-    // Prepare bulk operations for updating moduleIds in programmes
     const updateProgrammeBulkOps = programmes.map((programme) => ({
       updateOne: {
         filter: { _id: programme._id },
@@ -127,7 +109,6 @@ exports.updateProgrammeArrayInModules = async (req, res) => {
 
     const programmeResults = await Programme.bulkWrite(updateProgrammeBulkOps);
 
-    // Update the programme array in modules individually
     const moduleUpdatePromises = Object.entries(moduleToProgrammeMap).map(
       async ([moduleCode, programmeIds]) => {
         const module = await Module.findOne({
@@ -151,7 +132,33 @@ exports.updateProgrammeArrayInModules = async (req, res) => {
       programmeResults,
     });
   } catch (error) {
-    console.error('Error updating programme array in modules:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+};
+
+const getModuleTemplate = (req, res) => {
+  const { moduleCredit, semester } = req.query;
+
+  const templateFileName = `module-template-${moduleCredit}-${semester}.json`;
+  const templateFilePath = path.join(templatesDir, templateFileName);
+
+  console.log(`Looking for template file at: ${templateFilePath}`); // Log the path for debugging
+
+  if (fs.existsSync(templateFilePath)) {
+    const templateData = fs.readFileSync(templateFilePath, 'utf-8');
+    res.json(JSON.parse(templateData));
+  } else {
+    console.error(`Template file not found: ${templateFilePath}`); // Log the error for debugging
+    res.status(404).json({ message: 'Module template not found' });
+  }
+};
+
+module.exports = {
+  getAllModules,
+  getAllModuleIds,
+  getModuleById,
+  createOrUpdateModuleController,
+  deleteModuleById,
+  updateProgrammeArrayInModules,
+  getModuleTemplate,
 };

@@ -27,7 +27,7 @@ const courseworkSchema = new mongoose.Schema({
   releasedWeekEarlier: {
     type: Number,
     required: function () {
-      return this.type !== 'exam';
+      return this.type !== 'Exam';
     },
   },
   deadlineDay: {
@@ -42,14 +42,14 @@ const courseworkSchema = new mongoose.Schema({
       'Sunday',
     ],
     required: function () {
-      return this.type !== 'exam';
+      return this.type !== 'Exam';
     },
   },
   deadlineTime: {
     type: String,
     match: /^([01]\d|2[0-3]):([0-5]\d)$/,
     required: function () {
-      return this.type !== 'exam';
+      return this.type !== 'Exam';
     },
   },
   contactTimeLectures: { type: Number, default: 0 },

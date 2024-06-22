@@ -26,7 +26,7 @@ const localizer = dateFnsLocalizer({
 
 const eventsOnCalendar: CalendarKeyDateEvent[] = [];
 
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+const baseURL = import.meta.env.VITE_API_BASE_URL + 'calendar/';
 
 // Add all to calendar does not work because it will open a new tab with the calendar event for each event
 // TODO: move the bank holidays fetching func to a separate file

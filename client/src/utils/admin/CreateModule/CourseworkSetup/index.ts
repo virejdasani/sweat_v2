@@ -15,8 +15,8 @@ export const CourseworkSetupFunctions = ({
       deadlineWeek: 1,
       releasedWeekEarlier: 1,
       feedbackTime: 1,
-      deadlineDay: '',
-      deadlineTime: '',
+      deadlineDay: 'Monday', // Set default value
+      deadlineTime: '09:00', // Set default value
     };
     onCourseworkListChange([...courseworkList, newCoursework]);
   };
@@ -33,7 +33,7 @@ export const CourseworkSetupFunctions = ({
     value: string | number | Date | null,
   ) => {
     const updatedList = [...courseworkList];
-    const updatedValue = value === null ? undefined : value;
+    let updatedValue = value === null ? undefined : value;
 
     if (field === 'deadlineTime' && typeof value === 'string') {
       const isValidTime = /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
@@ -43,15 +43,15 @@ export const CourseworkSetupFunctions = ({
       }
     }
 
+    if (field === 'weight' && typeof value === 'string') {
+      updatedValue = parseInt(value, 10);
+    }
+
     updatedList[index] = {
       ...updatedList[index],
-      [field]:
-        field === 'weight'
-          ? parseInt(value as string, 10)
-          : field === 'deadlineDate'
-            ? updatedValue
-            : updatedValue,
+      [field]: updatedValue,
     };
+
     onCourseworkListChange(updatedList);
   };
 

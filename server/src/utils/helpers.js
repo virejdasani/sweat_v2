@@ -1,4 +1,3 @@
-// moduleUtils.js
 const Module = require('../models/module');
 const Programme = require('../models/programme');
 const { handleError } = require('./errorHandler');
@@ -14,7 +13,7 @@ exports.createOrUpdateModule = async (moduleData, existingModule, res) => {
       const updatedModule = await Module.findOneAndUpdate(
         { 'moduleSetup.moduleCode': existingModule.moduleSetup.moduleCode },
         processedModuleData,
-        { new: true },
+        { new: true, runValidators: true },
       );
 
       const removePromises = existingModule.moduleSetup.programme

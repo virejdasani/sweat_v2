@@ -55,10 +55,10 @@ app.delete('/programmes/:id', programmeController.deleteProgrammeById);
 // Calendar routes
 app.get('/calendar', calendarController.getEvents);
 app.post('/calendar/save-events', calendarController.saveEvents);
-app.post('/add-event', calendarController.addEvent);
-app.delete('/delete-event/:eventId', calendarController.deleteEvent);
-app.put('/update-event/:eventId', calendarController.updateEvent);
-app.delete('/delete-all-events', calendarController.deleteAllEvents);
+app.post('/calendar/add-event', calendarController.addEvent);
+app.delete('/calendar/delete-event/:eventId', calendarController.deleteEvent);
+app.put('/calendar/update-event/:eventId', calendarController.updateEvent);
+app.delete('/calendar/delete-all-events', calendarController.deleteAllEvents);
 
 // MongoDB connection
 mongoose

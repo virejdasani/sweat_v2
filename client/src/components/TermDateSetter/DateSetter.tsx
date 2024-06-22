@@ -13,7 +13,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import EditTermDateModal from './EditTermDateModal';
 import { CalendarKeyDateEvent } from '../shared/types/';
-// bootstrap css
 
 const locales = {};
 
@@ -34,6 +33,9 @@ const baseURL = import.meta.env.VITE_API_BASE_URL + 'calendar/';
 // TODO: move code to respective components
 
 function DateSetter() {
+  // state to store the current academic year being viewed
+  const [academicYear, setAcademicYear] = useState<string>('2023/24');
+
   // course CS means no reading week, EE means reading week.
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
@@ -100,11 +102,15 @@ function DateSetter() {
       const data = await res.json();
 
       // Search for events with titles "Semester 1 Start Date" and "Semester 2 Start Date"
-      const semester1StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
-        event.title.includes('Semester 1 Start Date'),
+      const semester1StartDateEvent = data.find(
+        (event: CalendarKeyDateEvent) =>
+          event.title.includes('Semester 1 Start Date') &&
+          event.title.includes(academicYear),
       );
-      const semester2StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
-        event.title.includes('Semester 2 Start Date'),
+      const semester2StartDateEvent = data.find(
+        (event: CalendarKeyDateEvent) =>
+          event.title.includes('Semester 2 Start Date') &&
+          event.title.includes(academicYear),
       );
 
       // Extract semester start dates
@@ -138,8 +144,10 @@ function DateSetter() {
       }
 
       // extract easter start and end dates
-      const easterBreakEvent = data.find((event: CalendarKeyDateEvent) =>
-        event.title.includes('Easter Break'),
+      const easterBreakEvent = data.find(
+        (event: CalendarKeyDateEvent) =>
+          event.title.includes('Easter Break') &&
+          event.title.includes(academicYear),
       );
 
       if (easterBreakEvent) {
@@ -153,8 +161,10 @@ function DateSetter() {
       }
 
       // extract christmas start and end dates
-      const christmasBreakEvent = data.find((event: CalendarKeyDateEvent) =>
-        event.title.includes('Christmas Break'),
+      const christmasBreakEvent = data.find(
+        (event: CalendarKeyDateEvent) =>
+          event.title.includes('Christmas Break') &&
+          event.title.includes(academicYear),
       );
 
       if (christmasBreakEvent) {
@@ -165,11 +175,15 @@ function DateSetter() {
           start: new Date(christmasBreakEvent.start),
           end: new Date(christmasBreakEvent.end),
         });
+      } else {
+        console.log('Christmas break not found');
       }
 
       // extract reading week start and end dates
-      const readingWeekEvent = data.find((event: CalendarKeyDateEvent) =>
-        event.title.includes('Reading Week'),
+      const readingWeekEvent = data.find(
+        (event: CalendarKeyDateEvent) =>
+          event.title.includes('Reading Week') &&
+          event.title.includes(academicYear),
       );
 
       if (readingWeekEvent) {
@@ -186,7 +200,7 @@ function DateSetter() {
       console.log('Fetched items: ', data);
     };
     fetchData();
-  }, []);
+  }, [academicYear]);
 
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
@@ -207,26 +221,43 @@ function DateSetter() {
           )
         : localNewEvents;
 
+    const academicYearFilteredEvents = filteredEvents.filter((event) => {
+      return event.title.includes(academicYear);
+    });
+
+    // set the events state to the fetched items ONLY
+    setEvents(academicYearFilteredEvents);
+
     setEvents((prevEvents) => {
-      // Filter out events that already exist in the events array
-      const uniqueNewEvents = filteredEvents.filter((newEvent) =>
+      const uniqueNewEvents = academicYearFilteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
-      // Concatenate unique new events with existing events
       const updatedEvents = [...prevEvents, ...uniqueNewEvents];
 
-      // If switching from EE to CS, remove the Reading Week event locally
       if (course === 'CS') {
         return updatedEvents.filter(
           (event) => !event.title.includes('Reading Week'),
         );
       }
 
-      // Concatenate unique new events with existing events
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems, course]);
+  }, [fetchedItems, course, academicYear]);
+
+  // function to handle academic year change
+  const handleAcademicYearChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const selectedYear = e.target.value;
+    setAcademicYear(selectedYear);
+  };
+
+  // Function to handle course selection
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCourse = e.target.value;
+    setCourse(selectedCourse);
+  };
 
   // Add a state for the selected week number
   const [selectedWeek, setSelectedWeek] = useState<number>(1);
@@ -292,6 +323,8 @@ function DateSetter() {
       return;
     }
     handleAddEvent(christmasBreakEvent);
+
+    // Reset the Christmas break input fields
     setChristmasBreakEvent({
       title: 'Christmas Break',
       allDay: true,
@@ -323,12 +356,6 @@ function DateSetter() {
       start: new Date(),
       end: new Date(),
     });
-  };
-
-  // Function to handle course selection
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCourse = e.target.value;
-    setCourse(selectedCourse);
   };
 
   const getSemesterWeekNumber = (
@@ -491,6 +518,9 @@ function DateSetter() {
       event.title += ` (Week ${weekNumber})`;
     }
 
+    // add current year to the title
+    event.title += ` (${academicYear})`;
+
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
 
@@ -513,7 +543,7 @@ function DateSetter() {
         console.error('Error adding event to MongoDB: ', err);
       });
 
-    // Add the new event to the calendar even if there is a clash
+    // Add the new event to the calendar
     setEvents([...events, event]);
 
     if (clashDetected) {
@@ -738,6 +768,20 @@ function DateSetter() {
 
           <hr className="lightRounded"></hr>
 
+          <div>
+            {/* dropdown for selecting current academic year */}
+            <span>Academic Year: </span>
+            <select
+              className="mb-4"
+              value={academicYear}
+              onChange={handleAcademicYearChange}
+            >
+              <option value="2023/24">2023/24</option>
+              <option value="2024/25">2024/25</option>
+              <option value="2025/26">2025/26</option>
+            </select>
+          </div>
+
           {/* Dropdown for selecting course */}
           <span>Show reading week </span>
           <select className="mb-4" value={course} onChange={handleCourseChange}>
@@ -747,9 +791,18 @@ function DateSetter() {
 
           {/* dont let user set new dates, if dates already exist */}
           {
-            // check if there are atleast 2 events with titles that include "Semester" in the fetched items
-            fetchedItems.filter((event) => event.title.includes('Semester'))
-              .length === 2 ? (
+            // check that there is an event with title that includes "Semester 1 Start Date" in the fetched items in this academic year
+            fetchedItems.filter(
+              (event) =>
+                event.title.includes('Semester 1') &&
+                event.title.includes(academicYear),
+            ).length === 1 &&
+            // check that there is an event with title that includes "Semester 2 Start Date" in the fetched items in this academic year
+            fetchedItems.filter(
+              (event) =>
+                event.title.includes('Semester 2') &&
+                event.title.includes(academicYear),
+            ).length === 1 ? (
               // show semester 1 and 2 dates
               <div className="mb-4">
                 <div>
@@ -824,8 +877,10 @@ function DateSetter() {
 
           {
             // check if there is an event with title that includes "Christmas Break" in the fetched items
-            fetchedItems.filter((event) =>
-              event.title.includes('Christmas Break'),
+            fetchedItems.filter(
+              (event) =>
+                event.title.includes('Christmas Break') &&
+                event.title.includes(academicYear),
             ).length === 1 ? (
               // show christmas break date
               <div className="mb-4">
@@ -895,7 +950,7 @@ function DateSetter() {
                 </div>
                 <div className="mt-2">
                   <div>Easter dates have been set</div>
-                  To edit these, navigate to the date and click it To edit
+                  To edit these, navigate to the date and click it
                 </div>
               </div>
             ) : (

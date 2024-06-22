@@ -33,6 +33,9 @@ const baseURL = import.meta.env.VITE_API_BASE_URL + 'calendar/';
 // TODO: move code to respective components
 
 function CourseworkCalendarSetter() {
+  // state to store the current academic year being viewed
+  const [academicYear, setAcademicYear] = useState<string>('2023/24');
+
   // course CS means no reading week, EE means reading week.
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
@@ -226,16 +229,17 @@ function CourseworkCalendarSetter() {
     const versionFilteredEvents = filteredEvents.filter((event) => {
       const titleSuffix = `CV${currentVersion}`;
       // Filter out events that don't have the current version suffix
-      // here make it so that bank holidays are not filtered out
-      // doest work because bank holidays are not stored in MongoDB (low priority)
       return event.title.endsWith(titleSuffix) || !event.title.includes('CV');
     });
 
-    // set the events state to the fetched items ONLY
-    setEvents(versionFilteredEvents);
+    const academicYearFilteredEvents = versionFilteredEvents.filter((event) =>
+      event.title.includes(academicYear),
+    );
+
+    setEvents(academicYearFilteredEvents);
 
     setEvents((prevEvents) => {
-      const uniqueNewEvents = versionFilteredEvents.filter((newEvent) =>
+      const uniqueNewEvents = academicYearFilteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
@@ -249,7 +253,21 @@ function CourseworkCalendarSetter() {
 
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems, course, currentVersion]);
+  }, [fetchedItems, course, currentVersion, academicYear]);
+
+  // function to handle academic year change
+  const handleAcademicYearChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const selectedYear = e.target.value;
+    setAcademicYear(selectedYear);
+  };
+
+  // Function to handle course selection
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCourse = e.target.value;
+    setCourse(selectedCourse);
+  };
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
@@ -265,12 +283,6 @@ function CourseworkCalendarSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
-
-  // Function to handle course selection
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCourse = e.target.value;
-    setCourse(selectedCourse);
-  };
 
   const getSemesterWeekNumber = (
     date: Date,
@@ -439,6 +451,9 @@ function CourseworkCalendarSetter() {
     }
 
     event.title += ` CV${currentVersion}`;
+
+    // add academic year to the event title
+    event.title += ` (${academicYear})`;
 
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
@@ -668,6 +683,20 @@ function CourseworkCalendarSetter() {
       <div className="calendar">
         <div className="calendarHeader">
           <h1 className="mb-4">Coursework Calendar</h1>
+
+          <div>
+            {/* dropdown for selecting current academic year */}
+            <span>Academic Year: </span>
+            <select
+              className="mb-4"
+              value={academicYear}
+              onChange={handleAcademicYearChange}
+            >
+              <option value="2023/24">2023/24</option>
+              <option value="2024/25">2024/25</option>
+              <option value="2025/26">2025/26</option>
+            </select>
+          </div>
 
           {/* Dropdown for selecting course */}
           <span>Show reading week </span>

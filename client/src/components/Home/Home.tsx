@@ -9,7 +9,10 @@ const Home = () => {
         <Link to="/admin/set-key-dates">Set Key Dates (Admin access only)</Link>
       </div>
       <div className="linkContainer">
-        <Link to="/coursework-calendar">Coursework Calendar</Link>
+        <Link to="/academic-event-calendar">Academic Event Calendar</Link>
+      </div>
+      <div className="linkContainer">
+        <Link to="/coursework-calendar">Coursework Calendar (for testing)</Link>
       </div>
       <div className="linkContainer">
         <Link to="/admin/create-module">Create Module</Link>

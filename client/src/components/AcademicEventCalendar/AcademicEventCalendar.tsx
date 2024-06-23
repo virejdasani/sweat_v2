@@ -8,10 +8,10 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
-import './CourseworkCalendar.css';
+import './AcademicEventCalendar.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import EditTermDateModal from './EditCourseworkCalendarModal';
+import EditAcademicEventCalendarModal from './EditAcademicEventCalendarModal';
 import { CalendarKeyDateEvent } from '../shared/types';
 
 const locales = {};
@@ -32,7 +32,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL + 'calendar/';
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 
-function CourseworkCalendarSetter() {
+function AcademicEventCalendar() {
   const [academicYear, setAcademicYear] = useState<string>('2023/24');
 
   // course CS means no reading week, EE means reading week.
@@ -418,6 +418,9 @@ function CourseworkCalendarSetter() {
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
   const handleAddEvent = (event: CalendarKeyDateEvent) => {
+    // calendar version
+    console.log('Current version:', currentVersion);
+
     // check that event title is not empty (so bank holidays can't be added without a title)
     if (!event.title) {
       toast('Please enter a name for the date');
@@ -681,7 +684,7 @@ function CourseworkCalendarSetter() {
       />
       <div className="calendar">
         <div className="calendarHeader">
-          <h1 className="mb-4">Coursework Calendar</h1>
+          <h1 className="mb-4">Academic Event Calendar</h1>
 
           <div>
             {/* dropdown for selecting current academic year */}
@@ -724,12 +727,12 @@ function CourseworkCalendarSetter() {
 
           <hr className="lightRounded"></hr>
 
-          {/* Input field for adding courseworks */}
+          {/* Input field for adding event/deadline */}
           <div>
-            <span>Add coursework: </span>
+            <span>Add Event / Deadline: </span>
             <input
               type="text"
-              placeholder="Coursework name"
+              placeholder="Event name"
               style={{ width: '20%', marginRight: '10px' }}
               value={holidayEvent.title}
               onChange={(e) =>
@@ -737,27 +740,16 @@ function CourseworkCalendarSetter() {
               }
             />
             <div className="datePickers">
-              <span>Coursework start date: </span>
+              <span>Event start date: </span>
               <div className="d-inline">
                 <DatePicker
-                  dateFormat="dd/MM/yyyy"
+                  // showIcon
+                  dateFormat="dd/MM/yyyy - HH:mm"
                   placeholderText="Add Holiday"
+                  showTimeSelect
                   selected={holidayEvent.start}
                   onChange={(start: Date) =>
-                    setHolidayEvent({ ...holidayEvent, start })
-                  }
-                />
-              </div>
-            </div>
-            <div className="datePickers">
-              <span>Coursework end date: </span>
-              <div className="d-inline">
-                <DatePicker
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="End Date"
-                  selected={holidayEvent.end}
-                  onChange={(end: Date) =>
-                    setHolidayEvent({ ...holidayEvent, end })
+                    setHolidayEvent({ ...holidayEvent, start, end: start })
                   }
                 />
               </div>
@@ -767,7 +759,7 @@ function CourseworkCalendarSetter() {
               className="eventButton"
               onClick={() => handleAddEvent(holidayEvent)}
             >
-              Set coursework
+              Add Event / Deadline
             </button>
           </div>
         </div>
@@ -795,7 +787,7 @@ function CourseworkCalendarSetter() {
           }}
         />
 
-        <EditTermDateModal
+        <EditAcademicEventCalendarModal
           eventTitle={eventTitle}
           showModal={showModal}
           selectEvent={selectEvent}
@@ -814,4 +806,4 @@ function CourseworkCalendarSetter() {
   );
 }
 
-export default CourseworkCalendarSetter;
+export default AcademicEventCalendar;

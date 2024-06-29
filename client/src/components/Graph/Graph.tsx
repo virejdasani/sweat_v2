@@ -12,8 +12,8 @@ import {
 function Graph() {
   const data = [
     {
-      name: '1',
-      ELEC330: 1,
+      week: '1',
+      ELEC330: 3,
       ELEC340: 9,
       ELEC317: 3,
       ELEC382: 6,
@@ -23,9 +23,10 @@ function Graph() {
       AERO350: 3,
       COMP323: 3,
       COMP390: 3,
+      total: 54,
     },
     {
-      name: '2',
+      week: '2',
       ELEC330: 4,
       ELEC340: 13,
       ELEC317: 3,
@@ -36,10 +37,11 @@ function Graph() {
       AERO350: 4,
       COMP323: 4,
       COMP390: 4,
+      total: 87,
     },
 
     {
-      name: '3',
+      week: '3',
       ELEC330: 4,
       ELEC340: 7,
       ELEC317: 3,
@@ -50,10 +52,11 @@ function Graph() {
       AERO350: 4,
       COMP323: 4,
       COMP390: 4,
+      total: 46,
     },
 
     {
-      name: '4',
+      week: '4',
       ELEC330: 2,
       ELEC340: 7,
       ELEC317: 3,
@@ -64,10 +67,11 @@ function Graph() {
       AERO350: 2,
       COMP323: 2,
       COMP390: 2,
+      total: 34,
     },
 
     {
-      name: '5',
+      week: '5',
       ELEC330: 4,
       ELEC340: 7,
       ELEC317: 3,
@@ -78,10 +82,11 @@ function Graph() {
       AERO350: 4,
       COMP323: 4,
       COMP390: 4,
+      total: 56,
     },
 
     {
-      name: '6',
+      week: '6',
       ELEC330: 4,
       ELEC340: 7,
       ELEC317: 3,
@@ -92,9 +97,10 @@ function Graph() {
       AERO350: 4,
       COMP323: 4,
       COMP390: 4,
+      total: 44,
     },
     {
-      name: '7',
+      week: '7',
       ELEC330: 2,
       ELEC340: 10,
       ELEC317: 1,
@@ -105,9 +111,10 @@ function Graph() {
       AERO350: 2,
       COMP323: 2,
       COMP390: 2,
+      total: 25,
     },
     {
-      name: '8',
+      week: '8',
       ELEC330: 4,
       ELEC340: 13,
       ELEC317: 3,
@@ -118,9 +125,10 @@ function Graph() {
       AERO350: 4,
       COMP323: 6,
       COMP390: 4,
+      total: 68,
     },
     {
-      name: '9',
+      week: '9',
       ELEC330: 8,
       ELEC340: 70,
       ELEC317: 3,
@@ -131,9 +139,10 @@ function Graph() {
       AERO350: 8,
       COMP323: 8,
       COMP390: 64,
+      total: 182,
     },
     {
-      name: '10',
+      week: '10',
       ELEC330: 76,
       ELEC340: 10,
       ELEC317: 3,
@@ -144,9 +153,10 @@ function Graph() {
       AERO350: 10,
       COMP323: 10,
       COMP390: 10,
+      total: 137,
     },
     {
-      name: '11',
+      week: '11',
       ELEC330: 2,
       ELEC340: 13,
       ELEC317: 3,
@@ -157,9 +167,10 @@ function Graph() {
       AERO350: 4,
       COMP323: 2,
       COMP390: 2,
+      total: 56,
     },
     {
-      name: '12',
+      week: '12',
       ELEC330: 3,
       ELEC340: 7,
       ELEC317: 0,
@@ -170,9 +181,10 @@ function Graph() {
       AERO350: 3,
       COMP323: 5,
       COMP390: 157,
+      total: 196,
     },
     {
-      name: '13',
+      week: '13',
       ELEC330: 0,
       ELEC340: 0,
       ELEC317: 0,
@@ -183,9 +195,10 @@ function Graph() {
       AERO350: 0,
       COMP323: 0,
       COMP390: 0,
+      total: 31,
     },
     {
-      name: '14',
+      week: '14',
       ELEC330: 0,
       ELEC340: 0,
       ELEC317: 0,
@@ -196,9 +209,10 @@ function Graph() {
       AERO350: 0,
       COMP323: 1,
       COMP390: 0,
+      total: 8,
     },
     {
-      name: '15',
+      week: '15',
       ELEC330: 0,
       ELEC340: 0,
       ELEC317: 0,
@@ -209,8 +223,22 @@ function Graph() {
       AERO350: 0,
       COMP323: 5,
       COMP390: 0,
+      total: 27,
     },
   ];
+
+  // get the totals of each week dont get the week
+  // const totals = data.map((week) => {
+  //   let total = 0;
+  //   for (const key in week) {
+  //     if (key !== 'week') {
+  //       total += week[key];
+  //     }
+  //   }
+  //   return total;
+  // });
+
+  // console.log(totals);
 
   return (
     <div>
@@ -223,10 +251,10 @@ function Graph() {
           width={900}
           height={500}
           data={data}
-          margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+          margin={{ top: 5, right: 20, bottom: 5, left: 20 }}
         >
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey="week" />
           <YAxis />
           <Legend />
           <Line type="monotone" dataKey="ELEC330" stroke="#8884d8" />
@@ -238,7 +266,8 @@ function Graph() {
           <Line type="monotone" dataKey="ELEC373" stroke="#FF00FF" />
           <Line type="monotone" dataKey="AERO350" stroke="#00FFFF" />
           <Line type="monotone" dataKey="COMP323" stroke="#FF0000" />
-          <Line type="monotone" dataKey="COMP390" stroke="#000000" />
+          <Line type="monotone" dataKey="COMP390" stroke="#0000FF" />
+          <Line name="Total" type="monotone" dataKey="total" stroke="#000000" />
 
           <Tooltip />
         </LineChart>

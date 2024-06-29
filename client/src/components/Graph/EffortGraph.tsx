@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-function Graph() {
+function EffortGraph() {
   const data = [
     {
       week: '1',
@@ -276,4 +276,4 @@ function Graph() {
   );
 }
 
-export default Graph;
+export default EffortGraph;

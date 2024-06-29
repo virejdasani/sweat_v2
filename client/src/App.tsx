@@ -8,7 +8,7 @@ import CreateModulePage from './pages/admin/CreateModule/CreateModulePage';
 import CourseworkCalendar from './components/CourseworkCalendar/CourseworkCalendar';
 import AcademicEventCalendar from './components/AcademicEventCalendar/AcademicEventCalendar';
 import Home from './components/Home/Home';
-import Graph from './components/Graph/Graph';
+import EffortGraph from './components/Graph/EffortGraph';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
           path="/admin/programme-design"
           element={<ProgrammeDesignPage />}
         />
-        <Route path="/Graph" element={<Graph />} />
+        <Route path="/Graph" element={<EffortGraph />} />
       </Routes>
       <ToastContainer />
     </Router>

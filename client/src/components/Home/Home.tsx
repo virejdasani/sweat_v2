@@ -20,6 +20,9 @@ const Home = () => {
       <div className="linkContainer">
         <Link to="/admin/programme-design">Programme Design</Link>
       </div>
+      <div className="linkContainer">
+        <Link to="/Graph">Graph</Link>
+      </div>
     </div>
   );
 };

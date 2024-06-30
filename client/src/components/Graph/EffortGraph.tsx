@@ -20,6 +20,8 @@ import { ModuleDocument } from '../../types/admin/CreateModule';
 import { InputData, TeachingSchedule, inputTestData } from './GraphTypes';
 
 function EffortGraph() {
+  // TODO: weeks are only 12 in abu's data, but 15 in the excel file
+
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
   const [searchResults, setSearchResults] = useState<ModuleDocument[]>([]);
 
@@ -79,8 +81,26 @@ function EffortGraph() {
     return Object.values(result);
   }
 
-  const data = aggregateData(inputTestData);
-  console.log(data);
+  // this is the data that will be passed to the graph (inputTestData for testing, moduleInstances for real data)
+  const dataToGraph = inputTestData;
+
+  const graphReadableData = aggregateData(dataToGraph);
+  console.log(graphReadableData);
+
+  const colors = [
+    '#8884d8',
+    '#82ca9d',
+    '#800000',
+    '#FFA500',
+    '#008000',
+    '#000080',
+    '#FF00FF',
+    '#00FFFF',
+    '#FF0000',
+    '#0000FF',
+  ];
+
+  const moduleNames = dataToGraph.map((item) => item.uniqueId);
 
   return (
     <div>
@@ -92,14 +112,23 @@ function EffortGraph() {
         <LineChart
           width={900}
           height={500}
-          data={data}
+          data={graphReadableData}
           margin={{ top: 5, right: 20, bottom: 5, left: 20 }}
         >
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis dataKey="week" />
           <YAxis />
           <Legend />
-          <Line type="monotone" dataKey="ELEC399" stroke="#8884d8" />
+          {moduleNames.map((moduleName, index) => (
+            <Line
+              key={moduleName}
+              type="monotone"
+              dataKey={moduleName}
+              stroke={colors[index % colors.length]}
+            />
+          ))}
+
+          {/* <Line type="monotone" dataKey="ELEC399" stroke="#8884d8" />
           <Line type="monotone" dataKey="ELEC300" stroke="#82ca9d" />
           <Line type="monotone" dataKey="ELEC362-AVS" stroke="#800000" />
           <Line type="monotone" dataKey="ELEC382" stroke="#FFA500" />
@@ -108,7 +137,8 @@ function EffortGraph() {
           <Line type="monotone" dataKey="ELEC373" stroke="#FF00FF" />
           <Line type="monotone" dataKey="AERO350" stroke="#00FFFF" />
           <Line type="monotone" dataKey="COMP323" stroke="#FF0000" />
-          <Line type="monotone" dataKey="COMP390" stroke="#0000FF" />
+          <Line type="monotone" dataKey="COMP390" stroke="#0000FF" /> */}
+
           <Line name="Total" type="monotone" dataKey="total" stroke="#000000" />
 
           <Tooltip />

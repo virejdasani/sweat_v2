@@ -2,56 +2,19 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
 const distributionSchema = new mongoose.Schema({
-  week: { type: Number, required: true },
-  hours: { type: Number, required: true },
+  week: { type: Number },
+  hours: { type: Number },
 });
 
 const courseworkSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  weight: { type: Number, required: true },
-  type: {
-    type: String,
-    enum: [
-      'exam',
-      'assignment',
-      'class test',
-      'lab report',
-      'presentation',
-      'other',
-    ],
-    lowercase: true, // This makes the enum case insensitive
-    required: true,
-  },
-  deadlineWeek: { type: Number, required: true },
+  title: { type: String },
+  weight: { type: Number },
+  type: { type: String },
+  deadlineWeek: { type: Number },
   deadlineDate: { type: Date },
-  releasedWeekEarlier: {
-    type: Number,
-    required: function () {
-      return this.type !== 'Exam';
-    },
-  },
-  deadlineDay: {
-    type: String,
-    enum: [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ],
-    required: function () {
-      return this.type !== 'Exam';
-    },
-  },
-  deadlineTime: {
-    type: String,
-    match: /^([01]\d|2[0-3]):([0-5]\d)$/,
-    required: function () {
-      return this.type !== 'Exam';
-    },
-  },
+  releasedWeekEarlier: { type: Number, default: null },
+  deadlineDay: { type: String, default: null },
+  deadlineTime: { type: String, default: null },
   contactTimeLectures: { type: Number, default: 0 },
   contactTimeTutorials: { type: Number, default: 0 },
   contactTimeLabs: { type: Number, default: 0 },
@@ -66,44 +29,34 @@ const courseworkSchema = new mongoose.Schema({
 });
 
 const scheduleSchema = new mongoose.Schema({
-  hours: { type: Number, required: true },
+  hours: { type: Number },
   distribution: [distributionSchema],
 });
 
 const moduleSetupSchema = new mongoose.Schema({
-  moduleCode: { type: String, required: true, unique: true },
-  moduleTitle: { type: String, required: true },
-  moduleCredit: { type: Number, required: true },
-  courseworkPercentage: { type: Number, required: true },
-  examPercentage: { type: Number, required: true },
-  studyYear: { type: Number, enum: [1, 2, 3, 4], required: true },
-  programme: { type: [String], required: true },
-  semester: {
-    type: String,
-    enum: ['first', 'second', 'whole session'],
-    lowercase: true, // This makes the enum case insensitive
-    required: true,
-  },
-  type: {
-    type: String,
-    enum: ['core', 'optional'],
-    lowercase: true, // This makes the enum case insensitive
-    required: true,
-  },
+  moduleCode: { type: String },
+  moduleTitle: { type: String },
+  moduleCredit: { type: Number },
+  courseworkPercentage: { type: Number },
+  examPercentage: { type: Number },
+  studyYear: { type: Number },
+  programme: { type: [String] },
+  semester: { type: String },
+  type: { type: String },
 });
 
 const moduleSchema = new mongoose.Schema({
-  id: { type: String, default: uuidv4, unique: true }, // Adding custom id field
-  moduleSetup: { type: moduleSetupSchema, required: true },
+  id: { type: String, default: uuidv4, unique: true },
+  moduleSetup: { type: moduleSetupSchema },
   teachingSchedule: {
-    lectures: { type: scheduleSchema, required: true },
-    seminars: { type: scheduleSchema, required: true },
-    tutorials: { type: scheduleSchema, required: true },
-    labs: { type: scheduleSchema, required: true },
-    fieldworkPlacement: { type: scheduleSchema, required: true },
-    other: { type: scheduleSchema, required: true },
+    lectures: { type: scheduleSchema },
+    seminars: { type: scheduleSchema },
+    tutorials: { type: scheduleSchema },
+    labs: { type: scheduleSchema },
+    fieldworkPlacement: { type: scheduleSchema },
+    other: { type: scheduleSchema },
   },
-  courseworkList: { type: [courseworkSchema], required: true },
+  courseworkList: { type: [courseworkSchema] },
 });
 
 const Module = mongoose.model('Module', moduleSchema);

@@ -212,12 +212,16 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 <>
                   <Td style={courseworkSetupStyles.td}>
                     <Select
-                      value={coursework.deadlineDay}
-                      onChange={(e) =>
-                        handleInputChange(index, 'deadlineDay', e.target.value)
-                      }
+                      value={coursework.deadlineDay || 'Select a day'}
+                      onChange={(e) => {
+                        handleInputChange(index, 'deadlineDay', e.target.value);
+                      }}
                       style={courseworkSetupStyles.select}
                     >
+                      <option value="" disabled>
+                        Select a day
+                      </option>{' '}
+                      {/* Default option */}
                       {daysOfWeek.map((day, i) => (
                         <option key={i} value={day}>
                           {day}

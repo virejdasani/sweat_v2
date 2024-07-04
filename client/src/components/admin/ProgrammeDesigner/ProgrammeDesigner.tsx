@@ -42,8 +42,6 @@ function ProgrammeDesigner() {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
   }, []);
 
-  console.log(moduleInstances);
-
   const { handleEditModule } = useModuleActions(
     moduleInstances,
     setModuleInstances,

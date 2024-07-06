@@ -1,0 +1,36 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.home h1 {
+  font-size: 3rem;
+  color: #333;
+}
+
+.home a {
+  margin: 1rem;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: #fff;
+  background-color: #333;
+  border-radius: 5px;
+}
+
+.home a:hover {
+  background-color: #555;
+}
+
+.home a:active {
+  background-color: #777;
+}
+
+.linkContainer {
+  display: flex;
+  flex-direction: row;
+}

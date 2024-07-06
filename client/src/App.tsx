@@ -7,6 +7,9 @@ import ProgrammeDesignPage from './pages/admin/ProgrammeDesign/ProgrammeDesignPa
 import CreateModulePage from './pages/admin/CreateModule/CreateModulePage';
 import CourseworkCalendar from './components/CourseworkCalendar/CourseworkCalendar';
 import AcademicEventCalendar from './components/AcademicEventCalendar/AcademicEventCalendar';
+import AdminHome from './components/admin/AdminHome/AdminHome';
+import StaffHome from './components/staff/StaffHome/StaffHome';
+import StudentHome from './components/student/StudentHome/StudentHome';
 import Home from './components/Home/Home';
 import EffortGraph from './components/Graph/EffortGraph';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,6 +19,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<AdminHome />} />
+        <Route path="/staff" element={<StaffHome />} />
+        <Route path="/student" element={<StudentHome />} />
 
         <Route path="/admin/set-key-dates" element={<DateSetter />} />
         <Route path="/coursework-calendar" element={<CourseworkCalendar />} />

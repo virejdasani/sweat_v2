@@ -17,11 +17,13 @@ import { fetchData } from '../../utils/admin/ProgrammeDesigner';
 import { ModuleInstance } from '../../types/admin/ProgrammeDesigner';
 import { ModuleDocument } from '../../types/admin/CreateModule';
 
-import { InputData, TeachingSchedule, inputTestData } from './GraphTypes';
+import { TeachingSchedule, inputTestData } from './GraphTypes';
 
 function EffortGraph() {
+  // TODO: fixed some typescript errors by doing type: any and console logging states (not sure how to fix some of them without doing this)
   // TODO: weeks are only 12 in abu's data, but 15 in the excel file
 
+  // TODO: cleanup. some of this code is yanked from abu's side of the code
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
   const [searchResults, setSearchResults] = useState<ModuleDocument[]>([]);
 
@@ -32,16 +34,19 @@ function EffortGraph() {
   }, []);
 
   console.log(moduleInstances);
+  console.log(inputTestData);
+  console.log(programmeState);
+  console.log(searchResults);
 
   // Function to aggregate hours by week for each module
-  function aggregateData(input: InputData[]): any[] {
+  function aggregateData(input: any[]): any[] {
     const result: { [key: string]: any } = {};
 
     input.forEach((item) => {
       const moduleCode = item.uniqueId;
       const { teachingSchedule } = item.module;
 
-      teachingSchedule.lectures.distribution.forEach((dist) => {
+      teachingSchedule.lectures.distribution.forEach((dist: any) => {
         if (!result[dist.week])
           result[dist.week] = { week: dist.week.toString(), total: 0 };
         if (!result[dist.week][moduleCode]) result[dist.week][moduleCode] = 0;
@@ -49,7 +54,7 @@ function EffortGraph() {
         result[dist.week].total += dist.hours;
       });
 
-      teachingSchedule.tutorials.distribution.forEach((dist) => {
+      teachingSchedule.tutorials.distribution.forEach((dist: any) => {
         if (!result[dist.week])
           result[dist.week] = { week: dist.week.toString(), total: 0 };
         if (!result[dist.week][moduleCode]) result[dist.week][moduleCode] = 0;
@@ -68,7 +73,7 @@ function EffortGraph() {
       otherActivities.forEach((activity) => {
         teachingSchedule[
           activity as keyof TeachingSchedule
-        ].distribution.forEach((dist) => {
+        ].distribution.forEach((dist: any) => {
           if (!result[dist.week])
             result[dist.week] = { week: dist.week.toString(), total: 0 };
           if (!result[dist.week][moduleCode]) result[dist.week][moduleCode] = 0;
@@ -82,9 +87,10 @@ function EffortGraph() {
   }
 
   // this is the data that will be passed to the graph (inputTestData for testing, moduleInstances for real data)
-  const dataToGraph = inputTestData;
+  const dataToGraph = moduleInstances;
 
   const graphReadableData = aggregateData(dataToGraph);
+
   console.log(graphReadableData);
 
   const colors = [

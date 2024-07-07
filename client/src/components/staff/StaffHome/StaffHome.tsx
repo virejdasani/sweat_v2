@@ -33,7 +33,14 @@ const StaffHome = () => {
   return (
     <div className="home">
       <h1 className="">SWEAT Staff Home</h1>
-
+      <button
+        className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        onClick={() => {
+          window.history.back();
+        }}
+      >
+        Home
+      </button>
       {!isLoggedIn ? (
         <div className="linkContainer">
           <form action="submit">
@@ -54,6 +61,17 @@ const StaffHome = () => {
         </div>
       ) : (
         <>
+          <div className="linkContainer">
+            <Link to="/coursework-calendar">
+              Coursework Calendar (for testing)
+            </Link>
+          </div>
+          <div className="linkContainer">
+            <Link to="/admin/create-module">Create Module</Link>
+          </div>
+          <div className="linkContainer">
+            <Link to="/admin/programme-design">Programme Design</Link>
+          </div>
           <div className="linkContainer">
             <Link to="/academic-event-calendar">Academic Event Calendar</Link>
           </div>

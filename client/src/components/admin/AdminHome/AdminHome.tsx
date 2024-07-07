@@ -33,7 +33,14 @@ const AdminHome = () => {
   return (
     <div className="home">
       <h1 className="">SWEAT Admin Home</h1>
-
+      <button
+        className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        onClick={() => {
+          window.history.back();
+        }}
+      >
+        Home
+      </button>
       {!isLoggedIn ? (
         <div className="linkContainer">
           <form action="submit">

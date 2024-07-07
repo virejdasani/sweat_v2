@@ -161,48 +161,58 @@ const CreateModule: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Heading as="h1" mb={8}>
-        Create Module
-      </Heading>
-      <Stepper index={activeStep} sx={createModuleStyles.stepper}>
-        {steps.map((step, index) => (
-          <Step key={index}>
-            <StepIndicator>
-              <StepStatus
-                complete={<StepIcon />}
-                incomplete={<StepNumber />}
-                active={<StepNumber />}
-              />
-            </StepIndicator>
-            <Box flexShrink="0" ml={2}>
-              <StepTitle>{step.title}</StepTitle>
-              <StepDescription>{step.description}</StepDescription>
-            </Box>
-            {index < steps.length - 1 && <StepSeparator />}
-          </Step>
-        ))}
-      </Stepper>
-      <Box mb={8}>{renderStepComponent()}</Box>
-      <Box sx={createModuleStyles.buttons}>
-        <Button
-          onClick={() => handlePrev(activeStep, prevStep, setActiveStep)}
-          disabled={activeStep === 0}
+    <>
+      <Box className="mt-5 mx-5 pt-4 px-1">
+        <button
+          className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+          onClick={() => {
+            window.history.back();
+          }}
         >
-          Previous
-        </Button>
-        <Button
-          onClick={
-            activeStep === MAX_STEPS - 1
-              ? () => handleSave(formData, templateData, courseworkList)
-              : handleNextStep
-          }
-          disabled={activeStep === MAX_STEPS}
-        >
-          {activeStep === MAX_STEPS - 1 ? 'Submit' : 'Next'}
-        </Button>
+          Back
+        </button>
+        <Heading as="h1" mb={8}>
+          Create Module
+        </Heading>
+        <Stepper index={activeStep} sx={createModuleStyles.stepper}>
+          {steps.map((step, index) => (
+            <Step key={index}>
+              <StepIndicator>
+                <StepStatus
+                  complete={<StepIcon />}
+                  incomplete={<StepNumber />}
+                  active={<StepNumber />}
+                />
+              </StepIndicator>
+              <Box flexShrink="0" ml={2}>
+                <StepTitle>{step.title}</StepTitle>
+                <StepDescription>{step.description}</StepDescription>
+              </Box>
+              {index < steps.length - 1 && <StepSeparator />}
+            </Step>
+          ))}
+        </Stepper>
+        <Box mb={8}>{renderStepComponent()}</Box>
+        <Box sx={createModuleStyles.buttons}>
+          <Button
+            onClick={() => handlePrev(activeStep, prevStep, setActiveStep)}
+            disabled={activeStep === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            onClick={
+              activeStep === MAX_STEPS - 1
+                ? () => handleSave(formData, templateData, courseworkList)
+                : handleNextStep
+            }
+            disabled={activeStep === MAX_STEPS}
+          >
+            {activeStep === MAX_STEPS - 1 ? 'Submit' : 'Next'}
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

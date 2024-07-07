@@ -6,7 +6,7 @@ const ProgrammeDesignPage: React.FC = () => {
   return (
     <ChakraProvider>
       <div>
-        <h1>Programme Design</h1>
+        <h1 className="mt-5 mx-5 pt-4 px-1 text-center">Programme Design</h1>
         <ProgrammeDesigner />
       </div>
     </ChakraProvider>

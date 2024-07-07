@@ -800,6 +800,14 @@ function DateSetter() {
         theme="colored"
       />
       <div className="calendar">
+        <button
+          className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+          onClick={() => {
+            window.history.back();
+          }}
+        >
+          Back
+        </button>
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>
 
@@ -1181,7 +1189,6 @@ function DateSetter() {
             </button>
           </div>
         </div>
-
         {/* delete all events from mongodb */}
         <button
           className="eventButton"
@@ -1202,10 +1209,8 @@ function DateSetter() {
         >
           Delete all dates (irreversible)
         </button>
-
         {/* divider */}
         <hr className="rounded"></hr>
-
         {/* Calendar View */}
         <Calendar
           localizer={localizer}
@@ -1225,7 +1230,6 @@ function DateSetter() {
             marginBottom: '20px',
           }}
         />
-
         <EditTermDateModal
           eventTitle={eventTitle}
           showModal={showModal}

@@ -683,6 +683,14 @@ function AcademicEventCalendar() {
         theme="colored"
       />
       <div className="calendar">
+        <button
+          className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+          onClick={() => {
+            window.history.back();
+          }}
+        >
+          Back
+        </button>
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Event Calendar</h1>
 

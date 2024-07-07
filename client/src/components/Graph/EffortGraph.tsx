@@ -110,7 +110,15 @@ function EffortGraph() {
 
   return (
     <div>
-      <h1 className="text-center my-4">
+      <button
+        className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        onClick={() => {
+          window.history.back();
+        }}
+      >
+        Back
+      </button>
+      <h1 className="text-center my-4 mt-5">
         Total modelled effort (timetabled + private study)
       </h1>
 

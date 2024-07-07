@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './AdminHome.css';
 import { toast } from 'react-toastify';
@@ -9,11 +9,21 @@ const AdminHome = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  useEffect(() => {
+    // Check local storage for admin login status on component mount
+    const isAdmin = localStorage.getItem('isAdmin');
+    if (isAdmin === 'true') {
+      toast.success('Welcome back admin!');
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const password = document.querySelector('input')?.value;
     if (password === adminPassword) {
       setIsLoggedIn(true);
+      localStorage.setItem('isAdmin', 'true');
       toast.success('Welcome admin!');
     } else {
       toast.error('Incorrect password');
@@ -21,8 +31,6 @@ const AdminHome = () => {
   };
 
   return (
-    // if user is not admin logged in, display password entry field
-    // else display the admin home page
     <div className="home">
       <h1 className="">SWEAT Admin Home</h1>
 

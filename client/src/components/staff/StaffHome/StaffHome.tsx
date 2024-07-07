@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './StaffHome.css';
 import { toast } from 'react-toastify';
@@ -9,11 +9,21 @@ const StaffHome = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  useEffect(() => {
+    // Check local storage for staff login status on component mount
+    const isStaff = localStorage.getItem('isStaff');
+    if (isStaff === 'true') {
+      toast.success('Welcome back staff!');
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const password = document.querySelector('input')?.value;
     if (password === staffPassword) {
       setIsLoggedIn(true);
+      localStorage.setItem('isStaff', 'true');
       toast.success('Welcome staff!');
     } else {
       toast.error('Incorrect password');

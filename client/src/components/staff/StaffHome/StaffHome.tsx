@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const StaffHome = () => {
   const staffPassword = import.meta.env.VITE_STAFF_PASSWORD;
+  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -21,7 +22,7 @@ const StaffHome = () => {
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const password = document.querySelector('input')?.value;
-    if (password === staffPassword) {
+    if (password === staffPassword || password === adminPassword) {
       setIsLoggedIn(true);
       localStorage.setItem('isStaff', 'true');
       toast.success('Welcome staff!');

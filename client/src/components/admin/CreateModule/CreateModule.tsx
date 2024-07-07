@@ -169,7 +169,7 @@ const CreateModule: React.FC = () => {
             window.history.back();
           }}
         >
-          Back
+          Home
         </button>
         <Heading as="h1" mb={8}>
           Create Module

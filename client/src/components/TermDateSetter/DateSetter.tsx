@@ -806,7 +806,7 @@ function DateSetter() {
             window.history.back();
           }}
         >
-          Back
+          Home
         </button>
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>

@@ -116,7 +116,7 @@ function EffortGraph() {
           window.history.back();
         }}
       >
-        Back
+        Home
       </button>
       <h1 className="text-center my-4 mt-5">
         Total modelled effort (timetabled + private study)

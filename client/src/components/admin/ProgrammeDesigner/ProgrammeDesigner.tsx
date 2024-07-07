@@ -58,7 +58,7 @@ function ProgrammeDesigner() {
             window.history.back();
           }}
         >
-          Back
+          Home
         </button>
         <div className="search-bar-container">
           <SearchBar

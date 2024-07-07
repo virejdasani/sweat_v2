@@ -9,10 +9,10 @@ const Home = () => {
         <Link to="/student">Students go here</Link>
       </div>
       <div className="linkContainer">
-        <Link to="/admin/">Admin (passkey required)</Link>
+        <Link to="/staff">Staff (passkey required)</Link>
       </div>
       <div className="linkContainer">
-        <Link to="/staff">Staff (passkey required)</Link>
+        <Link to="/admin/">Admin (passkey required)</Link>
       </div>
     </div>
   );

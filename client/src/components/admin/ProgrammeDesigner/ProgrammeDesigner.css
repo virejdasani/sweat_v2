@@ -1,3 +1,29 @@
+.programme-layout {
+  display: flex;
+  /* if we want all modules box to go to the right side */
+  /* flex-direction: row-reverse; */
+}
+
+.programme-box {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  flex: 1;
+}
+
+.all-modules-box {
+  flex: 1;
+  max-width: 400px;
+  margin-left: 40px;
+}
+
+.module-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
 .add-module-button-container {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -17,10 +43,10 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 24px;
+  gap: 10px;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 0 32px;
+  /* padding: 0 32px; */
   overflow-x: auto;
 }
 
@@ -31,7 +57,7 @@
   padding: 24px;
   box-sizing: border-box;
   flex: 0 0 calc(25% - 24px);
-  max-width: calc(25% - 24px);
+  max-width: 100%;
 }
 
 .programme-box h2 {
@@ -82,9 +108,12 @@
     flex: 0 0 calc(50% - 24px);
     max-width: calc(50% - 24px);
   }
+
   .save-programme-button {
-    padding: 0.5rem 0.8rem; /* Slightly smaller padding */
-    font-size: 0.9rem; /* Slightly smaller font size */
+    padding: 0.5rem 0.8rem;
+    /* Slightly smaller padding */
+    font-size: 0.9rem;
+    /* Slightly smaller font size */
   }
 }
 
@@ -93,8 +122,11 @@
     flex: 0 0 100%;
     max-width: 100%;
   }
+
   .save-programme-button {
-    padding: 0.4rem 0.6rem; /* Smaller padding */
-    font-size: 0.8rem; /* Smaller font size */
+    padding: 0.4rem 0.6rem;
+    /* Smaller padding */
+    font-size: 0.8rem;
+    /* Smaller font size */
   }
 }

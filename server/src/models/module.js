@@ -7,12 +7,13 @@ const distributionSchema = new mongoose.Schema({
 });
 
 const courseworkSchema = new mongoose.Schema({
-  title: { type: String },
+  shortTitle: { type: String },
+  longTitle: { type: String },
   weight: { type: Number },
   type: { type: String },
   deadlineWeek: { type: Number },
   deadlineDate: { type: Date },
-  releasedWeekEarlier: { type: Number, default: null },
+  releaseWeek: { type: Number, default: null },
   deadlineDay: { type: String, default: null },
   deadlineTime: { type: String, default: null },
   contactTimeLectures: { type: Number, default: 0 },
@@ -43,6 +44,8 @@ const moduleSetupSchema = new mongoose.Schema({
   programme: { type: [String] },
   semester: { type: String },
   type: { type: String },
+  teachingStaff: { type: [String] },
+  formFactor: { type: Number },
 });
 
 const moduleSchema = new mongoose.Schema({

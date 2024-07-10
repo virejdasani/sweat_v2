@@ -1,12 +1,13 @@
 import { ModuleSetupFormData } from '../ModuleSetup';
 
 export interface Coursework {
-  title: string;
+  shortTitle: string;
+  longTitle: string;
   weight: number;
   type: string;
   deadlineWeek: number;
   deadlineDate?: Date;
-  releasedWeekEarlier: number;
+  releaseWeek: number;
   deadlineDay?: string;
   deadlineTime?: string;
   contactTimeLectures?: number;

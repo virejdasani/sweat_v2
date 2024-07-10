@@ -9,11 +9,12 @@ export const CourseworkSetupFunctions = ({
 }: CourseworkSetupFunctionsProps) => {
   const handleAddCoursework = () => {
     const newCoursework: Coursework = {
-      title: '',
+      shortTitle: '',
+      longTitle: '',
       weight: 0,
       type: 'assignment',
       deadlineWeek: 1,
-      releasedWeekEarlier: 1,
+      releaseWeek: 1,
       feedbackTime: 1,
       deadlineDay: 'Monday', // Set default value
       deadlineTime: '09:00', // Set default value
@@ -36,15 +37,19 @@ export const CourseworkSetupFunctions = ({
     let updatedValue = value === null ? undefined : value;
 
     if (field === 'deadlineTime' && typeof value === 'string') {
+      // Ensure 24-hour format
       const isValidTime = /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
       if (!isValidTime) {
-        alert('Please enter a valid time in HH:mm format');
+        alert('Please enter a valid time in 24-hour HH:mm format');
         return;
       }
+      // optionally format it to ensure consistency
+      const [hours, minutes] = value.split(':');
+      updatedValue = `${hours.padStart(2, '0')}:${minutes}`;
     }
 
     if (field === 'weight' && typeof value === 'string') {
-      updatedValue = parseInt(value, 10);
+      updatedValue = parseFloat(value);
     }
 
     updatedList[index] = {
@@ -56,7 +61,7 @@ export const CourseworkSetupFunctions = ({
   };
 
   const totalWeight = courseworkList.reduce(
-    (total, coursework) => total + coursework.weight,
+    (total, coursework) => total + (coursework.weight || 0),
     0,
   );
 
@@ -66,7 +71,7 @@ export const CourseworkSetupFunctions = ({
       (coursework) =>
         coursework.weight >= 1 &&
         coursework.weight <= 100 &&
-        coursework.releasedWeekEarlier <= coursework.deadlineWeek,
+        coursework.releaseWeek <= coursework.deadlineWeek,
     );
 
   return {
@@ -81,22 +86,36 @@ export const CourseworkSetupFunctions = ({
 export const addExamCoursework = (
   examPercentage: number,
   courseworkList: Coursework[],
-  onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void,
-) => {
-  if (
-    examPercentage > 0 &&
-    !courseworkList.some((coursework) => coursework.type === 'exam')
-  ) {
-    const examCoursework: Coursework = {
-      title: 'Exam',
-      weight: examPercentage,
-      type: 'exam',
-      deadlineWeek: 15,
-      releasedWeekEarlier: 1,
-      feedbackTime: 1,
-      deadlineDay: '',
-      deadlineTime: '',
-    };
-    onCourseworkListChange([...courseworkList, examCoursework]);
+): Coursework[] | null => {
+  let updatedCourseworkList = [...courseworkList];
+  const examIndex = updatedCourseworkList.findIndex(
+    (coursework) => coursework.type === 'exam',
+  );
+
+  if (examPercentage > 0) {
+    if (examIndex >= 0) {
+      // Update existing exam coursework
+      updatedCourseworkList[examIndex].weight = examPercentage;
+    } else {
+      // Add new exam coursework
+      const examCoursework: Coursework = {
+        shortTitle: 'Exam',
+        longTitle: 'Final Exam',
+        weight: examPercentage,
+        type: 'exam',
+        deadlineWeek: 15,
+        releaseWeek: 1,
+        feedbackTime: 1,
+        deadlineDay: '',
+        deadlineTime: '',
+      };
+      updatedCourseworkList = [...updatedCourseworkList, examCoursework];
+    }
+    return updatedCourseworkList;
+  } else if (examIndex >= 0) {
+    // Remove exam coursework if examPercentage is 0
+    updatedCourseworkList.splice(examIndex, 1);
+    return updatedCourseworkList;
   }
+  return null;
 };

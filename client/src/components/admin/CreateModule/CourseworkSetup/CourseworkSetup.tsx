@@ -14,8 +14,12 @@ import {
   Icon,
   Flex,
   Box,
+  IconButton,
 } from '@chakra-ui/react';
-import { QuestionOutlineIcon } from '@chakra-ui/icons';
+import { QuestionOutlineIcon, DeleteIcon } from '@chakra-ui/icons';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { setHours, setMinutes, format } from 'date-fns';
 import {
   CourseworkSetupFunctions,
   addExamCoursework,
@@ -54,8 +58,14 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   } = CourseworkSetupFunctions({ courseworkList, onCourseworkListChange });
 
   useEffect(() => {
-    addExamCoursework(examPercentage, courseworkList, onCourseworkListChange);
-  }, [examPercentage, courseworkList, onCourseworkListChange]);
+    const updatedCourseworkList = addExamCoursework(
+      examPercentage,
+      courseworkList,
+    );
+    if (updatedCourseworkList) {
+      onCourseworkListChange(updatedCourseworkList);
+    }
+  }, [examPercentage]);
 
   const numWeeks =
     formData.semester === 'whole session' ||
@@ -63,16 +73,22 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       ? 30
       : 15;
 
+  const handleTimeChange = (index: number, date: Date) => {
+    const timeString = format(date, 'HH:mm');
+    handleInputChange(index, 'deadlineTime', timeString);
+  };
+
   return (
     <div>
       <Table style={courseworkSetupStyles.table}>
         <Thead>
           <Tr>
-            <Th style={courseworkSetupStyles.th}>Coursework Title</Th>
+            <Th style={courseworkSetupStyles.th}>Short Title</Th>
+            <Th style={courseworkSetupStyles.th}>Long Title</Th>
             <Th style={courseworkSetupStyles.th}>Weight</Th>
             <Th style={courseworkSetupStyles.th}>Type</Th>
             <Th style={courseworkSetupStyles.th}>Deadline Week</Th>
-            <Th style={courseworkSetupStyles.th}>Released Week Earlier</Th>
+            <Th style={courseworkSetupStyles.th}>Release Week</Th>
             <Th style={courseworkSetupStyles.th}>Actions</Th>
             <Th style={courseworkSetupStyles.th}>Day of Week</Th>
             <Th style={courseworkSetupStyles.th}>Time</Th>
@@ -84,9 +100,20 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               <Td style={courseworkSetupStyles.td}>
                 <Input
                   type="text"
-                  value={coursework.title}
+                  value={coursework.shortTitle || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'title', e.target.value)
+                    handleInputChange(index, 'shortTitle', e.target.value)
+                  }
+                  style={courseworkSetupStyles.input}
+                  disabled={coursework.type === 'exam'}
+                />
+              </Td>
+              <Td style={courseworkSetupStyles.td}>
+                <Input
+                  type="text"
+                  value={coursework.longTitle || ''}
+                  onChange={(e) =>
+                    handleInputChange(index, 'longTitle', e.target.value)
                   }
                   style={courseworkSetupStyles.input}
                   disabled={coursework.type === 'exam'}
@@ -95,17 +122,23 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               <Td style={courseworkSetupStyles.td}>
                 <Input
                   type="number"
-                  value={coursework.weight}
+                  step="0.01"
+                  value={coursework.weight || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'weight', e.target.value)
+                    handleInputChange(
+                      index,
+                      'weight',
+                      parseFloat(e.target.value),
+                    )
                   }
                   style={courseworkSetupStyles.input}
                   disabled={coursework.type === 'exam'}
                 />
               </Td>
+
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.type}
+                  value={coursework.type || ''}
                   onChange={(e) =>
                     handleInputChange(index, 'type', e.target.value)
                   }
@@ -122,7 +155,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.deadlineWeek}
+                  value={coursework.deadlineWeek || ''}
                   onChange={(e) =>
                     handleInputChange(index, 'deadlineWeek', e.target.value)
                   }
@@ -181,17 +214,14 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.releasedWeekEarlier}
+                  value={coursework.releaseWeek || ''}
                   onChange={(e) =>
-                    handleInputChange(
-                      index,
-                      'releasedWeekEarlier',
-                      e.target.value,
-                    )
+                    handleInputChange(index, 'releaseWeek', e.target.value)
                   }
                   style={courseworkSetupStyles.select}
                   disabled={coursework.type === 'exam'}
                 >
+                  <option value="N/A">N/A</option>
                   {Array.from({ length: 15 }, (_, i) => (
                     <option key={i + 1} value={i + 1}>
                       {i + 1}
@@ -200,13 +230,13 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 </Select>
               </Td>
               <Td style={courseworkSetupStyles.td}>
-                <Button
+                <IconButton
                   onClick={() => handleDeleteCoursework(index)}
                   style={courseworkSetupStyles.button}
-                  disabled={coursework.type === 'exam'}
-                >
-                  Delete
-                </Button>
+                  aria-label="Delete Coursework"
+                  icon={<DeleteIcon />}
+                  isDisabled={coursework.type === 'exam'}
+                />
               </Td>
               {coursework.type !== 'exam' && (
                 <>
@@ -230,13 +260,28 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                     </Select>
                   </Td>
                   <Td style={courseworkSetupStyles.td}>
-                    <Input
-                      type="time"
-                      value={coursework.deadlineTime}
-                      onChange={(e) =>
-                        handleInputChange(index, 'deadlineTime', e.target.value)
+                    <DatePicker
+                      selected={
+                        coursework.deadlineTime
+                          ? setHours(
+                              setMinutes(
+                                new Date(),
+                                parseInt(coursework.deadlineTime.split(':')[1]),
+                              ),
+                              parseInt(coursework.deadlineTime.split(':')[0]),
+                            )
+                          : new Date()
                       }
-                      style={courseworkSetupStyles.input}
+                      onChange={(date: Date) => handleTimeChange(index, date)}
+                      showTimeSelect
+                      showTimeSelectOnly
+                      timeIntervals={15} // Set time intervals to 15 minutes
+                      timeCaption="Time"
+                      dateFormat="HH:mm" // Set dateFormat to 24-hour format
+                      timeFormat="HH:mm" // Ensure timeFormat is set to 24-hour format
+                      className="chakra-input css-1c6d0i3"
+                      popperPlacement="bottom-end"
+                      customInput={<Input style={{ width: '80px' }} />}
                     />
                   </Td>
                 </>
@@ -256,7 +301,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 : 'inherit',
         }}
       >
-        Total Weight: {totalWeight}
+        Total Weight: {totalWeight}%
         {totalWeight > 100 && (
           <Text as="span" style={{ color: 'red' }}>
             {' '}

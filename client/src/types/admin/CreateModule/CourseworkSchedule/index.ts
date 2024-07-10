@@ -7,7 +7,7 @@ export interface CourseworkScheduleProps {
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
     >,
     value: number | undefined,
   ) => void;

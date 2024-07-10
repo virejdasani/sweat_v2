@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -39,6 +39,7 @@ const MAX_STEPS = 5;
 
 const CreateModule: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { module, templateData: initialTemplateData } = location.state || {};
 
   const [formData, setFormData] = useState<ModuleSetupFormData>({
@@ -51,13 +52,14 @@ const CreateModule: React.FC = () => {
     programme: [],
     semester: '',
     type: '',
+    teachingStaff: [],
+    formFactor: 0, // Include formFactor in formData
   });
 
   const [courseworkList, setCourseworkList] = useState<Coursework[]>([]);
   const [templateData, setTemplateData] = useState<number[][][]>(
     initialTemplateData || [],
   );
-  const [formFactor, setFormFactor] = useState(0);
 
   useEffect(() => {
     if (module) {
@@ -111,8 +113,13 @@ const CreateModule: React.FC = () => {
             }
             semester={formData.semester}
             examPercentage={100 - formData.courseworkPercentage}
-            formFactor={formFactor}
-            onFormFactorChange={setFormFactor}
+            formFactor={formData.formFactor} // Pass formFactor from formData
+            onFormFactorChange={(value) =>
+              setFormData((prevData) => ({
+                ...prevData,
+                formFactor: value,
+              }))
+            }
             formData={formData}
           />
         );
@@ -137,7 +144,7 @@ const CreateModule: React.FC = () => {
                 setCourseworkList,
               )
             }
-            formFactor={formFactor}
+            formFactor={formData.formFactor} // Pass formFactor from formData
             isEditing={!!module}
           />
         );
@@ -172,7 +179,7 @@ const CreateModule: React.FC = () => {
           Home
         </button>
         <Heading as="h1" mb={8}>
-          Create Module
+          Edit Module Details
         </Heading>
         <Stepper index={activeStep} sx={createModuleStyles.stepper}>
           {steps.map((step, index) => (
@@ -203,12 +210,13 @@ const CreateModule: React.FC = () => {
           <Button
             onClick={
               activeStep === MAX_STEPS - 1
-                ? () => handleSave(formData, templateData, courseworkList)
+                ? () =>
+                    handleSave(formData, templateData, courseworkList, navigate)
                 : handleNextStep
             }
             disabled={activeStep === MAX_STEPS}
           >
-            {activeStep === MAX_STEPS - 1 ? 'Submit' : 'Next'}
+            {activeStep === MAX_STEPS - 1 ? 'Save to database' : 'Next'}
           </Button>
         </Box>
       </Box>

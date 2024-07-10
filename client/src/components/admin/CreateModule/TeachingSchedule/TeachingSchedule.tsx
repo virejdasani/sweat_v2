@@ -9,7 +9,6 @@ import {
   Td,
   Input,
   Heading,
-  Flex,
 } from '@chakra-ui/react';
 import {
   tableStyle,
@@ -33,34 +32,32 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
   editingScheduleData,
 }) => {
   useEffect(() => {
-    if (templateData.length === 0 && !editingScheduleData) {
-      const fetchData = async () => {
+    const fetchData = async () => {
+      if (editingScheduleData) {
+        const transformedData = transformEditingDataToTemplateData(
+          editingScheduleData,
+          semester === 'whole session',
+        );
+        setTemplateData(transformedData);
+      } else if (templateData.length === 0) {
         await fetchTemplateData(moduleCredit, semester, setTemplateData);
-      };
-      fetchData();
-    }
-  }, [
-    moduleCredit,
-    semester,
-    templateData,
-    setTemplateData,
-    editingScheduleData,
-  ]);
-
-  useEffect(() => {
-    if (editingScheduleData) {
-      const transformedData =
-        transformEditingDataToTemplateData(editingScheduleData);
-      setTemplateData(transformedData);
-    }
-  }, [editingScheduleData, setTemplateData]);
+      }
+    };
+    fetchData();
+  }, [moduleCredit, semester, setTemplateData, editingScheduleData]);
 
   const renderTableHeader = () => (
     <Thead>
       <Tr>
         <Th sx={headerStyle}></Th>
         {Array.from({ length: 15 }, (_, i) => (
-          <Th key={i} sx={headerStyle}>
+          <Th
+            key={i}
+            sx={{
+              ...headerStyle,
+              color: i >= 12 ? 'red' : 'inherit',
+            }}
+          >
             Week {i + 1}
           </Th>
         ))}
@@ -118,7 +115,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
 
   return (
     <Box>
-      {semester === 'Whole Session' ? (
+      {semester === 'whole session' ? (
         <>
           <Heading size="md" mb={4}>
             First Semester
@@ -134,11 +131,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
           <Heading size="md" mb={4}>
             {semesterHeading}
           </Heading>
-          <Flex direction="column" gap={8}>
-            {templateData.map((_, tableIndex) => (
-              <Box key={tableIndex}>{renderTable(tableIndex)}</Box>
-            ))}
-          </Flex>
+          {renderTable(0)}
         </>
       )}
     </Box>

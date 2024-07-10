@@ -74,23 +74,72 @@ export const transformTemplateDataToSaveData = (
       teachingScheduleSaveData[activityKey].distribution!.push(...distribution);
     });
   });
-
   return teachingScheduleSaveData;
 };
 
 export const transformEditingDataToTemplateData = (
   scheduleData: TeachingScheduleSaveData,
+  isWholeSession: boolean,
 ): number[][][] => {
-  const transformedData = [
-    createWeekArray(scheduleData.lectures?.distribution),
-    createWeekArray(scheduleData.tutorials?.distribution),
-    createWeekArray(scheduleData.labs?.distribution),
-    createWeekArray(scheduleData.seminars?.distribution),
-    createWeekArray(scheduleData.fieldworkPlacement?.distribution),
-    createWeekArray(scheduleData.other?.distribution),
-  ];
+  const splitDistribution = (
+    distribution: Distribution[] = [],
+  ): [Distribution[], Distribution[]] => {
+    const firstSemester = distribution.slice(0, 12);
+    const secondSemester = distribution.slice(12);
+    return [firstSemester, secondSemester];
+  };
 
-  return [transformedData, transformedData];
+  if (isWholeSession) {
+    const [lecturesFirst, lecturesSecond] = splitDistribution(
+      scheduleData.lectures?.distribution,
+    );
+    const [tutorialsFirst, tutorialsSecond] = splitDistribution(
+      scheduleData.tutorials?.distribution,
+    );
+    const [labsFirst, labsSecond] = splitDistribution(
+      scheduleData.labs?.distribution,
+    );
+    const [seminarsFirst, seminarsSecond] = splitDistribution(
+      scheduleData.seminars?.distribution,
+    );
+    const [fieldworkFirst, fieldworkSecond] = splitDistribution(
+      scheduleData.fieldworkPlacement?.distribution,
+    );
+    const [otherFirst, otherSecond] = splitDistribution(
+      scheduleData.other?.distribution,
+    );
+
+    const firstSemesterData = [
+      createWeekArray(lecturesFirst),
+      createWeekArray(tutorialsFirst),
+      createWeekArray(labsFirst),
+      createWeekArray(seminarsFirst),
+      createWeekArray(fieldworkFirst),
+      createWeekArray(otherFirst),
+    ];
+
+    const secondSemesterData = [
+      createWeekArray(lecturesSecond),
+      createWeekArray(tutorialsSecond),
+      createWeekArray(labsSecond),
+      createWeekArray(seminarsSecond),
+      createWeekArray(fieldworkSecond),
+      createWeekArray(otherSecond),
+    ];
+
+    return [firstSemesterData, secondSemesterData];
+  } else {
+    const transformedData = [
+      createWeekArray(scheduleData.lectures?.distribution),
+      createWeekArray(scheduleData.tutorials?.distribution),
+      createWeekArray(scheduleData.labs?.distribution),
+      createWeekArray(scheduleData.seminars?.distribution),
+      createWeekArray(scheduleData.fieldworkPlacement?.distribution),
+      createWeekArray(scheduleData.other?.distribution),
+    ];
+
+    return [transformedData];
+  }
 };
 
 const createWeekArray = (distribution: Distribution[] = []): number[] => {

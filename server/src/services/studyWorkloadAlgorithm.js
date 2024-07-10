@@ -52,7 +52,7 @@ exports.studyWorkloadSimulatorAlgorithm = (data) => {
         weight,
         type,
         deadlineWeek,
-        releasedWeekEarlier,
+        releaseWeek,
         studyHours,
       } = coursework;
       const {
@@ -66,7 +66,7 @@ exports.studyWorkloadSimulatorAlgorithm = (data) => {
         weight,
         type,
         deadlineWeek,
-        releasedWeekEarlier,
+        releaseWeek,
         studyHours,
         distribution: {
           earlybird: earlyBirdDistribution,

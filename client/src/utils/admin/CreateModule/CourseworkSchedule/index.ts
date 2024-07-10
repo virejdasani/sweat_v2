@@ -347,14 +347,14 @@ export const handleInputChangeUtil = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
   >,
   value: number | undefined,
   handleScheduleChange: (
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
     >,
     value: number | undefined,
   ) => void,
@@ -371,17 +371,78 @@ export const handleInputBlurUtil = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
   >,
   handleScheduleChange: (
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
     >,
     value: number | undefined,
   ) => void,
 ) => {
   const value = Number(internalCourseworkList[index][field]);
   handleScheduleChange(index, field, value);
+};
+
+export const initializeCourseworkList = (
+  courseworkList: Coursework[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  templateData: any[],
+  moduleCredit: number,
+  formFactor: number,
+  isEditing: boolean,
+): Coursework[] => {
+  if (isEditing) {
+    return courseworkList;
+  }
+
+  let updatedCourseworkList = updateCourseworkList(
+    courseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  updatedCourseworkList = updateExamContactTime(
+    updatedCourseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  return updatedCourseworkList.map((coursework) => {
+    const { preparationTime, privateStudyTime } =
+      getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
+    return { ...coursework, preparationTime, privateStudyTime };
+  });
+};
+
+export const recalculateCourseworkList = (
+  courseworkList: Coursework[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  templateData: any[],
+  moduleCredit: number,
+  formFactor: number,
+): Coursework[] => {
+  let updatedCourseworkList = updateCourseworkList(
+    courseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  updatedCourseworkList = updateExamContactTime(
+    updatedCourseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  return updatedCourseworkList.map((coursework) => {
+    const { preparationTime, privateStudyTime } =
+      getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
+    return { ...coursework, preparationTime, privateStudyTime };
+  });
 };

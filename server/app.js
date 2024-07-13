@@ -21,6 +21,7 @@ const programmeController = require('./src/controllers/programmeController');
 const calendarController = require('./src/controllers/calendarController');
 
 // Module routes
+app.post('/modules/workload-graph', moduleController.getWorkloadGraphData);
 app.get('/modules/module-template', moduleController.getModuleTemplate);
 app.get('/modules', moduleController.getAllModules);
 app.get('/modules/ids', moduleController.getAllModuleIds);

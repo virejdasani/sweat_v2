@@ -33,9 +33,10 @@ import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import ModuleReview from './ModuleReview/ModuleReview';
+import WorkloadGraph from './WorkloadGraph/WorkloadGraph';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
 
-const MAX_STEPS = 5;
+const MAX_STEPS = 6; // Update MAX_STEPS
 
 const CreateModule: React.FC = () => {
   const location = useLocation();
@@ -53,7 +54,7 @@ const CreateModule: React.FC = () => {
     semester: '',
     type: '',
     teachingStaff: [],
-    formFactor: 0, // Include formFactor in formData
+    formFactor: 0,
   });
 
   const [courseworkList, setCourseworkList] = useState<Coursework[]>([]);
@@ -113,7 +114,7 @@ const CreateModule: React.FC = () => {
             }
             semester={formData.semester}
             examPercentage={100 - formData.courseworkPercentage}
-            formFactor={formData.formFactor} // Pass formFactor from formData
+            formFactor={formData.formFactor}
             onFormFactorChange={(value) =>
               setFormData((prevData) => ({
                 ...prevData,
@@ -151,6 +152,14 @@ const CreateModule: React.FC = () => {
       case 4:
         return (
           <ModuleReview
+            formData={formData}
+            courseworkList={courseworkList}
+            templateData={templateData}
+          />
+        );
+      case 5:
+        return (
+          <WorkloadGraph
             formData={formData}
             courseworkList={courseworkList}
             templateData={templateData}

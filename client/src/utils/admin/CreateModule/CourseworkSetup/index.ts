@@ -14,7 +14,7 @@ export const CourseworkSetupFunctions = ({
       weight: 0,
       type: 'assignment',
       deadlineWeek: 1,
-      releaseWeek: 1,
+      releaseWeek: 2,
       feedbackTime: 1,
       deadlineDay: 'Monday', // Set default value
       deadlineTime: '09:00', // Set default value

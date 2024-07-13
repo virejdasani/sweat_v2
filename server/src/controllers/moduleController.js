@@ -4,6 +4,9 @@ const { handleError } = require('../utils/errorHandler');
 const { createOrUpdateModule } = require('../utils/helpers');
 const path = require('path');
 const fs = require('fs');
+const {
+  calculateWorkloadGraphData,
+} = require('../utils/distributionsGenerator');
 
 const templatesDir = path.join(__dirname, '../templates'); // Ensure this path is correct
 
@@ -153,6 +156,23 @@ const getModuleTemplate = (req, res) => {
   }
 };
 
+const getWorkloadGraphData = async (req, res) => {
+  try {
+    const { formData, courseworkList, templateData, studyStyle } = req.body;
+    console.log('Request body:', req.body);
+    const workloadData = calculateWorkloadGraphData(
+      formData,
+      courseworkList,
+      templateData,
+      studyStyle,
+    );
+    res.json(workloadData);
+  } catch (error) {
+    console.error('Error generating workload graph data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   getAllModules,
   getAllModuleIds,
@@ -161,4 +181,5 @@ module.exports = {
   deleteModuleById,
   updateProgrammeArrayInModules,
   getModuleTemplate,
+  getWorkloadGraphData,
 };

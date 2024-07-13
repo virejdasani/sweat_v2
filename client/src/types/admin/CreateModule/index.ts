@@ -6,7 +6,6 @@ export interface Step {
   title: string;
   description: string;
 }
-
 export const steps: Step[] = [
   { title: 'Module Setup', description: 'Set up module' },
   {
@@ -19,6 +18,7 @@ export const steps: Step[] = [
     description: 'Modify coursework properties',
   },
   { title: 'Review', description: 'Review module details' },
+  { title: 'Workload Graph', description: 'View workload graph' },
 ];
 
 export interface ModuleDocument {

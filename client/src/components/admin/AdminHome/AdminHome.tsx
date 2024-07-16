@@ -32,7 +32,7 @@ const AdminHome = () => {
 
   return (
     <div className="home">
-      <h1 className="">SWEAT Admin Home</h1>
+      <h1 className="">Admin Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
         onClick={() => {
@@ -81,7 +81,7 @@ const AdminHome = () => {
             <Link to="/academic-event-calendar">Academic Event Calendar</Link>
           </div>
           <div className="linkContainer">
-            <Link to="/Graph">Graph</Link>
+            <Link to="/Graph">Workload Profiles</Link>
           </div>
         </>
       )}

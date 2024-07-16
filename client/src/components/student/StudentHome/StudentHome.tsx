@@ -4,7 +4,7 @@ import './StudentHome.css';
 const StudentHome = () => {
   return (
     <div className="home">
-      <h1>SWEAT Student Home</h1>
+      <h1>Student Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
         onClick={() => {
@@ -15,7 +15,7 @@ const StudentHome = () => {
       </button>
       {/* student */}
       <div className="linkContainer">
-        <Link to="/Graph">Graph</Link>
+        <Link to="/Graph">Workload Profiles</Link>
       </div>
     </div>
   );

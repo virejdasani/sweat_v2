@@ -13,6 +13,7 @@ import StudentHome from './components/student/StudentHome/StudentHome';
 import Home from './components/Home/Home';
 import EffortGraph from './components/Graph/EffortGraph';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import About from './components/About/About';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/admin" element={<AdminHome />} />
         <Route path="/staff" element={<StaffHome />} />
         <Route path="/student" element={<StudentHome />} />
+        <Route path="/about" element={<About />} />
 
         <Route path="/admin/set-key-dates" element={<DateSetter />} />
         <Route path="/coursework-calendar" element={<CourseworkCalendar />} />

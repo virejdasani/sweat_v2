@@ -7,12 +7,19 @@ const Home = () => {
     <div className="home">
       <Branding />
 
-      {/* top level selection of faculty, and department */}
-      <div>
-        {/* label */}
-        <label htmlFor="faculty">Faculty:</label>
+      {/* small about icon top right opens About/ page component */}
+      <button
+        className="aboutButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        onClick={() => {
+          // open About.tsx
+          window.location.href = '/about';
+        }}
+      >
+        About
+      </button>
 
-        {/* dropdown */}
+      <div>
+        <label htmlFor="faculty">Faculty:</label>
         <select
           name="faculty"
           id="faculty"

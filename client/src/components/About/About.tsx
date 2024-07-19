@@ -4,6 +4,7 @@ const About = () => {
   return (
     <div>
       {/* <Branding /> */}
+      {/* TODO: add team links */}
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
         onClick={() => {

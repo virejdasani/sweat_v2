@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import './AdminHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import uniLogo from '../../Branding/uniLogo.png';
 import Branding from '../../Branding/Branding';
 
 const AdminHome = () => {

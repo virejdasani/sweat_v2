@@ -8,15 +8,27 @@ const Home = () => {
       <Branding />
 
       {/* small about icon top right opens About/ page component */}
-      <button
-        className="aboutButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
-        onClick={() => {
-          // open About.tsx
-          window.location.href = '/about';
-        }}
-      >
-        About
-      </button>
+      {/* <button className="aboutButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"> */}
+      <div className="linkContainer">
+        <Link
+          to="/about"
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            margin: '10px',
+            textDecoration: 'none',
+            backgroundColor: '#333',
+            padding: '5px',
+            fontSize: '1.2em',
+            paddingLeft: '10px',
+            paddingRight: '10px',
+          }}
+        >
+          About
+        </Link>
+      </div>
+      {/* </button> */}
 
       <div>
         <label htmlFor="faculty">Faculty:</label>

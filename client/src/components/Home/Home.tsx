@@ -23,8 +23,8 @@ const Home = () => {
             marginLeft: '6px',
           }}
         >
-          <option value="faculty1">EEE</option>
-          <option value="faculty2">CS</option>
+          <option value="faculty1">CS</option>
+          <option value="faculty2">EEE</option>
           <option value="faculty3">Some other faculty goes here</option>
         </select>
         <label htmlFor="department" style={{ marginLeft: '20px' }}>

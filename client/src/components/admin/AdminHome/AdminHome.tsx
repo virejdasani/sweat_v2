@@ -4,6 +4,7 @@ import './AdminHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import uniLogo from '../../Branding/uniLogo.png';
+import Branding from '../../Branding/Branding';
 
 const AdminHome = () => {
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
@@ -33,6 +34,7 @@ const AdminHome = () => {
 
   return (
     <div className="home">
+      <Branding />
       <h1 className="">Admin Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
@@ -84,17 +86,6 @@ const AdminHome = () => {
           <div className="linkContainer">
             <Link to="/Graph">Workload Profiles</Link>
           </div>
-          <img
-            src={uniLogo}
-            alt="University Logo"
-            className="uniLogo"
-            style={{
-              width: '190px',
-              position: 'absolute',
-              bottom: '0',
-              left: '22px',
-            }}
-          />
         </>
       )}
     </div>

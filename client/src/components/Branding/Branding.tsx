@@ -9,12 +9,11 @@ const Branding = () => {
         alt="Logo"
         className="logo"
         style={{
-          width: '190px',
-          height: '190px',
+          width: '100px',
+          height: '100px',
           position: 'absolute',
-          top: '0',
-          left: '51%',
-          transform: 'translateX(-50%)',
+          bottom: '0',
+          right: '0',
         }}
       />
       <img

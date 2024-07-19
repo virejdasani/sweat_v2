@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './AdminHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import uniLogo from '../../Branding/uniLogo.png';
 
 const AdminHome = () => {
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
@@ -83,6 +84,17 @@ const AdminHome = () => {
           <div className="linkContainer">
             <Link to="/Graph">Workload Profiles</Link>
           </div>
+          <img
+            src={uniLogo}
+            alt="University Logo"
+            className="uniLogo"
+            style={{
+              width: '190px',
+              position: 'absolute',
+              bottom: '0',
+              left: '22px',
+            }}
+          />
         </>
       )}
     </div>

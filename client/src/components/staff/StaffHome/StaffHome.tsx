@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './StaffHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Branding from '../../Branding/Branding';
 
 const StaffHome = () => {
   const staffPassword = import.meta.env.VITE_STAFF_PASSWORD;
@@ -33,6 +34,7 @@ const StaffHome = () => {
 
   return (
     <div className="home">
+      <Branding />
       <h1 className="">Staff Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"

@@ -65,7 +65,6 @@ const Home = () => {
         </select>
       </div>
 
-      <h1>Home</h1>
       <div className="linkContainer">
         <Link to="/student">Students go here</Link>
       </div>

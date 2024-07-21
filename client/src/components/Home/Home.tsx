@@ -81,7 +81,7 @@ const Home = () => {
           >
             <img
               className="buttonImage"
-              src="https://via.placeholder.com/150"
+              src="https://raw.githubusercontent.com/virejdasani/sweat_v2/master/client/src/components/Home/student.png"
               alt="Student"
               style={{ width: '150px', height: '150px', borderRadius: '50%' }}
             />
@@ -100,7 +100,7 @@ const Home = () => {
           >
             <img
               className="buttonImage"
-              src="https://via.placeholder.com/150"
+              src="https://raw.githubusercontent.com/virejdasani/sweat_v2/master/client/src/components/Home/staff.png"
               alt="staff"
               style={{
                 width: '150px',
@@ -123,7 +123,7 @@ const Home = () => {
           >
             <img
               className="buttonImage"
-              src="https://via.placeholder.com/150"
+              src="https://raw.githubusercontent.com/virejdasani/sweat_v2/master/client/src/components/Home/admin.png"
               alt="Student"
               style={{ width: '150px', height: '150px', borderRadius: '50%' }}
             />

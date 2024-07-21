@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import './StaffHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Branding from '../../Branding/Branding';
+// import Branding from '../../Branding/Branding';
+import logo from '../../Branding/logo.png';
+import uniLogo from '../../Branding/uniLogo.png';
 
 const StaffHome = () => {
   const staffPassword = import.meta.env.VITE_STAFF_PASSWORD;
@@ -34,10 +36,32 @@ const StaffHome = () => {
 
   return (
     <div className="home">
-      <Branding />
+      <img
+        src={logo}
+        alt="Logo"
+        className="logo"
+        style={{
+          width: '150px',
+          height: '150px',
+          position: 'absolute',
+          bottom: '0',
+          right: '0',
+        }}
+      />
+      <img
+        src={uniLogo}
+        alt="University Logo"
+        className="uniLogo"
+        style={{
+          width: '190px',
+          position: 'absolute',
+          bottom: '0',
+          left: '22px',
+        }}
+      />
       <h1 className="">Staff Home</h1>
       <button
-        className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        style={{ position: 'absolute', top: '0', left: '0' }}
         onClick={() => {
           window.history.back();
         }}
@@ -63,7 +87,17 @@ const StaffHome = () => {
           </form>
         </div>
       ) : (
-        <>
+        <div
+          className="makeResponsiveScrollable"
+          style={{
+            overflowY: 'scroll',
+            // display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
           <div className="linkContainer">
             <Link to="/coursework-calendar">
               Coursework Calendar (for testing)
@@ -81,7 +115,7 @@ const StaffHome = () => {
           <div className="linkContainer">
             <Link to="/Graph">Workload Profiles</Link>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

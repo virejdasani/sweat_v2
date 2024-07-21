@@ -31,7 +31,7 @@ const Home = () => {
       {/* </button> */}
 
       <div>
-        <label htmlFor="faculty">Faculty:</label>
+        {/* <label htmlFor="faculty">Faculty:</label>
         <select
           name="faculty"
           id="faculty"
@@ -45,34 +45,90 @@ const Home = () => {
           <option value="faculty1">CS</option>
           <option value="faculty2">EEE</option>
           <option value="faculty3">Some other faculty goes here</option>
-        </select>
-        <label htmlFor="department" style={{ marginLeft: '20px' }}>
+        </select> */}
+        {/* <label htmlFor="department" style={{ marginLeft: '20px' }}>
           Department:
-        </label>
+        </label> */}
         <select
           name="department"
           id="department"
           style={{
-            width: '100px',
+            width: '220px',
             height: '30px',
             marginBottom: '20px',
             marginLeft: '6px',
+            position: 'absolute',
+            top: '180px',
+            left: '20px',
           }}
         >
-          <option value="department1">EEE</option>
-          <option value="department2">CS</option>
-          <option value="department3">Some other department goes here</option>
+          <option value="department1">Science & Engineering</option>
+          <option value="department2">Other</option>
         </select>
       </div>
 
-      <div className="linkContainer">
-        <Link to="/student">Students go here</Link>
-      </div>
-      <div className="linkContainer">
-        <Link to="/staff">Staff (passkey required)</Link>
-      </div>
-      <div className="linkContainer">
-        <Link to="/admin/">Admin (passkey required)</Link>
+      <div className="buttonContainer">
+        <div className="">
+          <Link
+            className="button"
+            to="/student"
+            style={{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              backgroundColor: 'white',
+            }}
+          >
+            <img
+              className="buttonImage"
+              src="https://via.placeholder.com/150"
+              alt="Student"
+              style={{ width: '150px', height: '150px', borderRadius: '50%' }}
+            />
+          </Link>
+        </div>
+        <div className="">
+          <Link
+            className="button"
+            to="/staff"
+            style={{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              backgroundColor: 'white',
+            }}
+          >
+            <img
+              className="buttonImage"
+              src="https://via.placeholder.com/150"
+              alt="staff"
+              style={{
+                width: '150px',
+                height: '150px',
+                borderRadius: '50%',
+              }}
+            />
+          </Link>
+        </div>
+        <div className="">
+          <Link
+            className="button"
+            to="/admin"
+            style={{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              backgroundColor: 'white',
+            }}
+          >
+            <img
+              className="buttonImage"
+              src="https://via.placeholder.com/150"
+              alt="Student"
+              style={{ width: '150px', height: '150px', borderRadius: '50%' }}
+            />
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,30 @@
+/* Default styles for larger screens */
+.buttonContainer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 100px;
+}
+
+.buttonContainer .button {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: white;
+  margin: 10px;
+}
+
+/* Styles for mobile view */
+@media (max-width: 768px) {
+  .buttonContainer {
+    display: block;
+    text-align: center;
+  }
+
+  .buttonContainer .button {
+    margin: 20px auto;
+  }
+}
+
 .home {
   display: flex;
   flex-direction: column;

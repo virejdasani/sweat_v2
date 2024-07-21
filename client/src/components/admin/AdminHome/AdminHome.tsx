@@ -87,7 +87,17 @@ const AdminHome = () => {
           </form>
         </div>
       ) : (
-        <>
+        <div
+          className="makeResponsiveScrollable"
+          style={{
+            overflowY: 'scroll',
+            // display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
           <div className="linkContainer">
             <Link to="/admin/set-key-dates">
               Set Key Dates (Admin access only)
@@ -110,7 +120,7 @@ const AdminHome = () => {
           <div className="linkContainer">
             <Link to="/Graph">Workload Profiles</Link>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

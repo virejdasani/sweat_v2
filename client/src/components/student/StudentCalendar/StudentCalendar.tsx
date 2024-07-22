@@ -5,7 +5,7 @@ import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
 import { useState, useEffect } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import DatePicker from 'react-datepicker';
+// import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import './StudentCalendar.css';
@@ -47,6 +47,9 @@ function StudentCalendar() {
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
   const [searchResults, setSearchResults] = useState<ModuleDocument[]>([]);
 
+  console.log('Programme state:', programmeState); // this is to avoid typescript errors
+  console.log('Search results:', searchResults); // this is to avoid typescript errors
+
   const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
 
   useEffect(() => {
@@ -63,12 +66,12 @@ function StudentCalendar() {
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
   const [course, setCourse] = useState('CS'); // State for selected course
 
-  const [holidayEvent, setHolidayEvent] = useState({
-    title: '',
-    allDay: true,
-    start: new Date(),
-    end: new Date(),
-  });
+  // const [holidayEvent, setHolidayEvent] = useState({
+  //   title: '',
+  //   allDay: true,
+  //   start: new Date(),
+  //   end: new Date(),
+  // });
 
   const [semester1Event, setSemester1Event] = useState({
     title: 'Semester 1 Start Date', // hardcoded to prevent changing the title to anything else
@@ -91,12 +94,16 @@ function StudentCalendar() {
     end: new Date(),
   });
 
+  console.log('easterBreakEvent:', easterBreakEvent); // this is to avoid typescript errors
+
   const [christmasBreakEvent, setChristmasBreakEvent] = useState({
     title: 'Christmas Break',
     allDay: true,
     start: new Date(),
     end: new Date(),
   });
+
+  console.log('christmasBreakEvent:', christmasBreakEvent); // this is to avoid typescript errors
 
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -114,6 +121,8 @@ function StudentCalendar() {
   // State for managing calendar versions
   const [currentVersion, setCurrentVersion] = useState(1);
   const [versions, setVersions] = useState<number[]>([1]);
+
+  console.log('versions:', versions); // this is to avoid typescript errors
 
   // fetch events from the server and set the events state
   useEffect(() => {
@@ -307,205 +316,205 @@ function StudentCalendar() {
     setCourse(selectedCourse);
   };
 
-  const getSemesterWeekNumber = (
-    date: Date,
-    sem1Start: Date,
-    sem2Start: Date,
-    easterBreakStart: Date,
-    easterBreakEnd: Date,
-    christmasBreakStart: Date,
-    christmasBreakEnd: Date,
-  ) => {
-    console.log('Date:', date);
+  // const getSemesterWeekNumber = (
+  //   date: Date,
+  //   sem1Start: Date,
+  //   sem2Start: Date,
+  //   easterBreakStart: Date,
+  //   easterBreakEnd: Date,
+  //   christmasBreakStart: Date,
+  //   christmasBreakEnd: Date,
+  // ) => {
+  //   console.log('Date:', date);
 
-    const semester1StartDate = sem1Start;
-    const semester2StartDate = sem2Start;
-    const easterBreakStartDate = easterBreakStart;
-    const easterBreakEndDate = easterBreakEnd;
-    const christmasBreakStartDate = christmasBreakStart;
-    const christmasBreakEndDate = christmasBreakEnd;
+  //   const semester1StartDate = sem1Start;
+  //   const semester2StartDate = sem2Start;
+  //   const easterBreakStartDate = easterBreakStart;
+  //   const easterBreakEndDate = easterBreakEnd;
+  //   const christmasBreakStartDate = christmasBreakStart;
+  //   const christmasBreakEndDate = christmasBreakEnd;
 
-    // Calculate the difference in milliseconds between the date and the semester 1 start date
-    const millisecondsDifferenceSem1 =
-      date.getTime() - semester1StartDate.getTime();
+  //   // Calculate the difference in milliseconds between the date and the semester 1 start date
+  //   const millisecondsDifferenceSem1 =
+  //     date.getTime() - semester1StartDate.getTime();
 
-    // Calculate the difference in milliseconds between the date and the semester 2 start date
-    const millisecondsDifferenceSem2 =
-      date.getTime() - semester2StartDate.getTime();
+  //   // Calculate the difference in milliseconds between the date and the semester 2 start date
+  //   const millisecondsDifferenceSem2 =
+  //     date.getTime() - semester2StartDate.getTime();
 
-    // if date is semester 1
-    if (date >= semester1StartDate && date < semester2StartDate) {
-      console.log('Date is in semester 1');
+  //   // if date is semester 1
+  //   if (date >= semester1StartDate && date < semester2StartDate) {
+  //     console.log('Date is in semester 1');
 
-      // Check if the date is in semester 1 and not in christmas break
-      if (
-        date >= semester1StartDate &&
-        !(date >= christmasBreakStartDate && date <= christmasBreakEndDate)
-      ) {
-        console.log('Date is in semester 1, not in Christmas break');
-        // Calculate the number of full weeks elapsed
-        const fullWeeksElapsed = Math.floor(
-          millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
-        );
+  //     // Check if the date is in semester 1 and not in christmas break
+  //     if (
+  //       date >= semester1StartDate &&
+  //       !(date >= christmasBreakStartDate && date <= christmasBreakEndDate)
+  //     ) {
+  //       console.log('Date is in semester 1, not in Christmas break');
+  //       // Calculate the number of full weeks elapsed
+  //       const fullWeeksElapsed = Math.floor(
+  //         millisecondsDifferenceSem1 / (7 * 24 * 60 * 60 * 1000),
+  //       );
 
-        console.log('weeks elapsed: ' + fullWeeksElapsed);
+  //       console.log('weeks elapsed: ' + fullWeeksElapsed);
 
-        // Add 1 to start counting from week 1
-        const weekNumber = fullWeeksElapsed + 1;
+  //       // Add 1 to start counting from week 1
+  //       const weekNumber = fullWeeksElapsed + 1;
 
-        // Subtract 3 to account for the Christmas break weeks
-        if (date > christmasBreakEndDate) {
-          return weekNumber - 3;
-        }
+  //       // Subtract 3 to account for the Christmas break weeks
+  //       if (date > christmasBreakEndDate) {
+  //         return weekNumber - 3;
+  //       }
 
-        return weekNumber;
-      }
+  //       return weekNumber;
+  //     }
 
-      // calculate the number of days between the date and the christmas break start date
-      // Math.ceil because daysDifference give numbers like 6.9 which should be 7
-      const christmasDaysDifference = Math.ceil(
-        (date.getTime() - christmasBreakStartDate.getTime()) /
-          (24 * 60 * 60 * 1000),
-      );
+  //     // calculate the number of days between the date and the christmas break start date
+  //     // Math.ceil because daysDifference give numbers like 6.9 which should be 7
+  //     const christmasDaysDifference = Math.ceil(
+  //       (date.getTime() - christmasBreakStartDate.getTime()) /
+  //         (24 * 60 * 60 * 1000),
+  //     );
 
-      console.log('Days difference:', christmasDaysDifference);
+  //     console.log('Days difference:', christmasDaysDifference);
 
-      // if date is in week 1 of christmas break
-      if (christmasDaysDifference >= 0 && christmasDaysDifference < 7) {
-        return 'C1';
-      }
+  //     // if date is in week 1 of christmas break
+  //     if (christmasDaysDifference >= 0 && christmasDaysDifference < 7) {
+  //       return 'C1';
+  //     }
 
-      // if date is in week 2 of christmas break
-      if (christmasDaysDifference >= 7 && christmasDaysDifference < 14) {
-        return 'C2';
-      }
+  //     // if date is in week 2 of christmas break
+  //     if (christmasDaysDifference >= 7 && christmasDaysDifference < 14) {
+  //       return 'C2';
+  //     }
 
-      // if date is in week 3 of christmas break
+  //     // if date is in week 3 of christmas break
 
-      if (christmasDaysDifference >= 14 && christmasDaysDifference < 21) {
-        return 'C3';
-      }
-    }
+  //     if (christmasDaysDifference >= 14 && christmasDaysDifference < 21) {
+  //       return 'C3';
+  //     }
+  //   }
 
-    if (date >= semester2StartDate) {
-      console.log('Date is in semester 2');
+  //   if (date >= semester2StartDate) {
+  //     console.log('Date is in semester 2');
 
-      // Check if the date is in semester 2 and not in Easter break
-      if (
-        date >= semester2StartDate &&
-        !(date >= easterBreakStartDate && date <= easterBreakEndDate)
-      ) {
-        console.log('Date is in semester 2, not in Easter break');
-        // Calculate the number of full weeks elapsed
-        const fullWeeksElapsed = Math.floor(
-          millisecondsDifferenceSem2 / (7 * 24 * 60 * 60 * 1000) + 0.01,
-        );
+  //     // Check if the date is in semester 2 and not in Easter break
+  //     if (
+  //       date >= semester2StartDate &&
+  //       !(date >= easterBreakStartDate && date <= easterBreakEndDate)
+  //     ) {
+  //       console.log('Date is in semester 2, not in Easter break');
+  //       // Calculate the number of full weeks elapsed
+  //       const fullWeeksElapsed = Math.floor(
+  //         millisecondsDifferenceSem2 / (7 * 24 * 60 * 60 * 1000) + 0.01,
+  //       );
 
-        console.log('weeks elapsed: ' + fullWeeksElapsed);
+  //       console.log('weeks elapsed: ' + fullWeeksElapsed);
 
-        // Add 1 to start counting from week 1
-        const weekNumber = fullWeeksElapsed + 1;
+  //       // Add 1 to start counting from week 1
+  //       const weekNumber = fullWeeksElapsed + 1;
 
-        // Subtract 3 to account for the Easter break weeks
-        if (date > easterBreakEndDate) {
-          return weekNumber - 3;
-        }
+  //       // Subtract 3 to account for the Easter break weeks
+  //       if (date > easterBreakEndDate) {
+  //         return weekNumber - 3;
+  //       }
 
-        return weekNumber;
-      }
+  //       return weekNumber;
+  //     }
 
-      // Calculate the number of days between the date and the Easter break start date
-      // Math.ceil because daysDifference give numbers like 6.9 which should be 7
-      const easterDaysDifference = Math.ceil(
-        (date.getTime() - easterBreakStartDate.getTime()) /
-          (24 * 60 * 60 * 1000),
-      );
+  //     // Calculate the number of days between the date and the Easter break start date
+  //     // Math.ceil because daysDifference give numbers like 6.9 which should be 7
+  //     const easterDaysDifference = Math.ceil(
+  //       (date.getTime() - easterBreakStartDate.getTime()) /
+  //         (24 * 60 * 60 * 1000),
+  //     );
 
-      console.log('Days difference:', easterDaysDifference);
+  //     console.log('Days difference:', easterDaysDifference);
 
-      // if date is in week 1 of Easter break
-      if (easterDaysDifference >= 0 && easterDaysDifference < 7) {
-        return 'E1';
-      }
+  //     // if date is in week 1 of Easter break
+  //     if (easterDaysDifference >= 0 && easterDaysDifference < 7) {
+  //       return 'E1';
+  //     }
 
-      // if date is in week 2 of Easter break
-      if (easterDaysDifference >= 7 && easterDaysDifference < 14) {
-        return 'E2';
-      }
+  //     // if date is in week 2 of Easter break
+  //     if (easterDaysDifference >= 7 && easterDaysDifference < 14) {
+  //       return 'E2';
+  //     }
 
-      // if date is in week 3 of Easter break
-      if (easterDaysDifference >= 14 && easterDaysDifference < 21) {
-        return 'E3';
-      }
-    }
-  };
+  //     // if date is in week 3 of Easter break
+  //     if (easterDaysDifference >= 14 && easterDaysDifference < 21) {
+  //       return 'E3';
+  //     }
+  //   }
+  // };
 
   // Called when the user clicks the add event button (for semester start dates and holidays)
-  const handleAddEvent = (event: CalendarKeyDateEvent) => {
-    // check that event title is not empty (so bank holidays can't be added without a title)
-    if (!event.title) {
-      toast('Please enter a name for the date');
-      return;
-    }
+  // const handleAddEvent = (event: CalendarKeyDateEvent) => {
+  //   // check that event title is not empty (so bank holidays can't be added without a title)
+  //   if (!event.title) {
+  //     toast('Please enter a name for the date');
+  //     return;
+  //   }
 
-    // Ensure currentVersion is defined - should always be defined this is for testing
-    if (!currentVersion) {
-      toast('Current version is not set');
-      return;
-    }
+  //   // Ensure currentVersion is defined - should always be defined this is for testing
+  //   if (!currentVersion) {
+  //     toast('Current version is not set');
+  //     return;
+  //   }
 
-    event.start.setHours(0, 0, 0, 0);
+  //   event.start.setHours(0, 0, 0, 0);
 
-    // Calculate week number based on difference between event start date and Semester 1 start date
-    const weekNumber = getSemesterWeekNumber(
-      event.start,
-      semester1Event.start,
-      semester2Event.start,
-      easterBreakEvent.start,
-      easterBreakEvent.end,
-      christmasBreakEvent.start,
-      christmasBreakEvent.end,
-    );
+  //   // Calculate week number based on difference between event start date and Semester 1 start date
+  //   const weekNumber = getSemesterWeekNumber(
+  //     event.start,
+  //     semester1Event.start,
+  //     semester2Event.start,
+  //     easterBreakEvent.start,
+  //     easterBreakEvent.end,
+  //     christmasBreakEvent.start,
+  //     christmasBreakEvent.end,
+  //   );
 
-    // when adding easter break, don't add week number to the title
-    if (!event.title.includes('Easter Break')) {
-      // Add week number to the event title
-      event.title += ` (Week ${weekNumber})`;
-    }
+  //   // when adding easter break, don't add week number to the title
+  //   if (!event.title.includes('Easter Break')) {
+  //     // Add week number to the event title
+  //     event.title += ` (Week ${weekNumber})`;
+  //   }
 
-    event.title += ` CV${currentVersion}`;
+  //   event.title += ` CV${currentVersion}`;
 
-    // add academic year to the event title
-    event.title += ` (${academicYear})`;
+  //   // add academic year to the event title
+  //   event.title += ` (${academicYear})`;
 
-    // Check for clashes with existing events and warn user
-    const clashDetected = checkClash(event, events);
+  //   // Check for clashes with existing events and warn user
+  //   const clashDetected = checkClash(event, events);
 
-    // Make POST request to add the event to MongoDB
-    axios
-      .post(baseURL + 'add-event', event)
-      .then((res: { data: CalendarKeyDateEvent }) => {
-        console.log('Event added to MongoDB: ', event);
-        console.log(res);
+  //   // Make POST request to add the event to MongoDB
+  //   axios
+  //     .post(baseURL + 'add-event', event)
+  //     .then((res: { data: CalendarKeyDateEvent }) => {
+  //       console.log('Event added to MongoDB: ', event);
+  //       console.log(res);
 
-        // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
-        const newEvent = { ...event, _id: res.data._id };
-        // Add the new event to the events array in the local state
-        setEvents([...events, newEvent]);
-      })
-      .catch((err: { data: CalendarKeyDateEvent }) => {
-        console.error('Error adding event to MongoDB: ', err);
-      });
+  //       // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
+  //       const newEvent = { ...event, _id: res.data._id };
+  //       // Add the new event to the events array in the local state
+  //       setEvents([...events, newEvent]);
+  //     })
+  //     .catch((err: { data: CalendarKeyDateEvent }) => {
+  //       console.error('Error adding event to MongoDB: ', err);
+  //     });
 
-    // Add the new event to the calendar even if there is a clash
-    setEvents([...events, event]);
+  //   // Add the new event to the calendar even if there is a clash
+  //   setEvents([...events, event]);
 
-    if (clashDetected) {
-      toast('Clash with another event detected'); // warning
-    }
+  //   if (clashDetected) {
+  //     toast('Clash with another event detected'); // warning
+  //   }
 
-    toast(event.title + ' added');
-  };
+  //   toast(event.title + ' added');
+  // };
 
   // deletes from mongodb and updates the events state locally
   function deleteEvents() {
@@ -636,23 +645,23 @@ function StudentCalendar() {
     return false; // No clash detected
   }
 
-  const archiveCurrentCalendar = () => {
-    // Determine the maximum version number from the existing versions array
-    const maxVersion = Math.max(...versions);
+  // const archiveCurrentCalendar = () => {
+  //   // Determine the maximum version number from the existing versions array
+  //   const maxVersion = Math.max(...versions);
 
-    // Create a new version that is one higher than the maximum version number
-    const newVersion = maxVersion + 1;
+  //   // Create a new version that is one higher than the maximum version number
+  //   const newVersion = maxVersion + 1;
 
-    // Update the current version and versions state
-    setCurrentVersion(newVersion);
-    setVersions((prevVersions) => [...prevVersions, newVersion]);
+  //   // Update the current version and versions state
+  //   setCurrentVersion(newVersion);
+  //   setVersions((prevVersions) => [...prevVersions, newVersion]);
 
-    // Clear current events (if that's intended)
-    setEvents([]);
+  //   // Clear current events (if that's intended)
+  //   setEvents([]);
 
-    // Show a toast notification to inform the user
-    toast(`Archived current calendar. Now viewing version ${newVersion}`);
-  };
+  //   // Show a toast notification to inform the user
+  //   toast(`Archived current calendar. Now viewing version ${newVersion}`);
+  // };
 
   // moduleInstances data:
   //   {
@@ -735,7 +744,11 @@ function StudentCalendar() {
   ];
 
   // Function to get the date of a specific week and day in the semester
-  const getDateForWeekAndDay = (semesterStart, week, day) => {
+  const getDateForWeekAndDay = (
+    semesterStart: Date,
+    week: number,
+    day: string,
+  ) => {
     const startDate = new Date(semesterStart);
     const dayOffset = DAYS_OF_WEEK.indexOf(day);
     const date = new Date(
@@ -746,11 +759,11 @@ function StudentCalendar() {
 
   // Function to populate the database with coursework events
   const populateCourseworkEvents = (
-    moduleInstances,
-    semester1Start,
-    semester2Start,
-    currentVersion,
-    academicYear,
+    moduleInstances: ModuleInstance[],
+    semester1Start: Date,
+    semester2Start: Date,
+    currentVersion: number,
+    academicYear: string,
   ) => {
     // Iterate over all module instances
     moduleInstances.forEach((moduleInstance) => {
@@ -781,14 +794,14 @@ function StudentCalendar() {
         const deadlineDate = getDateForWeekAndDay(
           deadlineWeek === 1 ? semester1Start : semester2Start,
           deadlineWeek,
-          deadlineDay,
+          deadlineDay || '',
         );
 
         // Get the date of the release date
         const releaseDate = getDateForWeekAndDay(
           deadlineWeek === 1 ? semester1Start : semester2Start,
           deadlineWeek - releasedWeekEarlier,
-          deadlineDay,
+          deadlineDay || '',
         );
 
         // Create the coursework event
@@ -1052,7 +1065,7 @@ function StudentCalendar() {
           deleteEvents={deleteEvents}
         />
 
-        <EffortGraph moduleInstances={moduleInstances} />
+        <EffortGraph />
       </div>
     </>
   );

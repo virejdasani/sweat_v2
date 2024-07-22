@@ -69,6 +69,7 @@ const Home = () => {
 
       <div className="buttonContainer">
         <div className="">
+          Student
           <Link
             className="button"
             to="/student"
@@ -88,6 +89,7 @@ const Home = () => {
           </Link>
         </div>
         <div className="">
+          Staff
           <Link
             className="button"
             to="/staff"
@@ -111,6 +113,7 @@ const Home = () => {
           </Link>
         </div>
         <div className="">
+          Admin
           <Link
             className="button"
             to="/admin"

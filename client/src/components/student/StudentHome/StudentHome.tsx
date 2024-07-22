@@ -43,6 +43,9 @@ const StudentHome = () => {
       <div className="linkContainer">
         <Link to="/Graph">Workload Profiles</Link>
       </div>
+      <div className="linkContainer">
+        <Link to="/cwcalendar">Your CW Calendar</Link>
+      </div>
     </div>
   );
 };

@@ -8,13 +8,22 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import DatePicker from 'react-datepicker';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-datepicker/dist/react-datepicker.css';
-import './DateSetter.css';
+import './StudentCalendar.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import EditTermDateModal from './EditTermDateModal';
-import { CalendarKeyDateEvent } from '../shared/types/';
+import EditTermDateModal from './EditCourseworkCalendarModal';
+import { CalendarKeyDateEvent } from '../../shared/types';
+// for getting abus module data
 
-// bootstrap css
+import { Programme } from '../../../shared/types';
+import { fetchData } from '../../../utils/admin/ProgrammeDesigner';
+
+import { ModuleInstance } from '../../../types/admin/ProgrammeDesigner';
+import { ModuleDocument } from '../../../types/admin/CreateModule';
+
+import EffortGraph from '../../Graph/EffortGraph';
+
+// import { TeachingSchedule, InputData } from '../../Graph/GraphTypes';
 
 const locales = {};
 
@@ -34,8 +43,20 @@ const baseURL = import.meta.env.VITE_API_BASE_URL + 'calendar/';
 // TODO: move the bank holidays fetching func to a separate file
 // TODO: move code to respective components
 
-function DateSetter() {
-  // state to store the current academic year being viewed
+function StudentCalendar() {
+  const [programmeState, setProgrammeState] = useState<Programme[]>([]);
+  const [searchResults, setSearchResults] = useState<ModuleDocument[]>([]);
+
+  const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
+
+  useEffect(() => {
+    fetchData(setProgrammeState, setSearchResults, setModuleInstances);
+  }, []);
+
+  console.log(moduleInstances);
+  // console.log(programmeState); // this is to avoid typescript errors
+  // console.log(searchResults); // this is to avoid typescript errors
+
   const [academicYear, setAcademicYear] = useState<string>('2024/25');
 
   // course CS means no reading week, EE means reading week.
@@ -77,13 +98,6 @@ function DateSetter() {
     end: new Date(),
   });
 
-  const [readingWeekEvent, setReadingWeekEvent] = useState({
-    title: 'Reading Week',
-    allDay: true,
-    start: new Date(),
-    end: new Date(),
-  });
-
   const [newEvent, setNewEvent] = useState({
     title: '',
     allDay: true,
@@ -97,22 +111,25 @@ function DateSetter() {
 
   const [fetchedItems, setFetchedItems] = useState<CalendarKeyDateEvent[]>([]);
 
+  // State for managing calendar versions
+  const [currentVersion, setCurrentVersion] = useState(1);
+  const [versions, setVersions] = useState<number[]>([1]);
+
   // fetch events from the server and set the events state
   useEffect(() => {
+    // Clear existing events when changing the calendar version
+    setEvents([]);
+
     const fetchData = async () => {
       const res = await fetch(baseURL);
       const data = await res.json();
 
       // Search for events with titles "Semester 1 Start Date" and "Semester 2 Start Date"
-      const semester1StartDateEvent = data.find(
-        (event: CalendarKeyDateEvent) =>
-          event.title.includes('Semester 1 Start Date') &&
-          event.title.includes(academicYear),
+      const semester1StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Semester 1 Start Date'),
       );
-      const semester2StartDateEvent = data.find(
-        (event: CalendarKeyDateEvent) =>
-          event.title.includes('Semester 2 Start Date') &&
-          event.title.includes(academicYear),
+      const semester2StartDateEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Semester 2 Start Date'),
       );
 
       // Extract semester start dates
@@ -132,8 +149,6 @@ function DateSetter() {
           ...semester1Event,
           start: semester1Start,
         });
-      } else {
-        console.log('Semester 1 start date not found');
       }
       if (semester2Start) {
         console.log('Semester 2 start date:', semester2Start);
@@ -141,15 +156,11 @@ function DateSetter() {
           ...semester2Event,
           start: semester2Start,
         });
-      } else {
-        console.log('Semester 2 start date not found');
       }
 
       // extract easter start and end dates
-      const easterBreakEvent = data.find(
-        (event: CalendarKeyDateEvent) =>
-          event.title.includes('Easter Break') &&
-          event.title.includes(academicYear),
+      const easterBreakEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Easter Break'),
       );
 
       if (easterBreakEvent) {
@@ -160,15 +171,11 @@ function DateSetter() {
           start: new Date(easterBreakEvent.start),
           end: new Date(easterBreakEvent.end),
         });
-      } else {
-        console.log('Easter break dates not found');
       }
 
       // extract christmas start and end dates
-      const christmasBreakEvent = data.find(
-        (event: CalendarKeyDateEvent) =>
-          event.title.includes('Christmas Break') &&
-          event.title.includes(academicYear),
+      const christmasBreakEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Christmas Break'),
       );
 
       if (christmasBreakEvent) {
@@ -179,41 +186,56 @@ function DateSetter() {
           start: new Date(christmasBreakEvent.start),
           end: new Date(christmasBreakEvent.end),
         });
-      } else {
-        console.log('Christmas break dates not found');
       }
 
       // extract reading week start and end dates
-      const readingWeekEvent = data.find(
-        (event: CalendarKeyDateEvent) =>
-          event.title.includes('Reading Week') &&
-          event.title.includes(academicYear),
+      const readingWeekEvent = data.find((event: CalendarKeyDateEvent) =>
+        event.title.includes('Reading Week'),
       );
 
       if (readingWeekEvent) {
         console.log('Reading week start date:', readingWeekEvent.start);
         console.log('Reading week end date:', readingWeekEvent.end);
-        setReadingWeekEvent({
-          ...readingWeekEvent,
-          start: new Date(readingWeekEvent.start),
-          end: new Date(readingWeekEvent.end),
-        });
-      } else {
-        console.log('Reading week dates not found');
       }
 
       setFetchedItems(data);
       console.log('Fetched items: ', data);
+
+      // Extract all version numbers from the fetched events
+      const versionNumbers = new Set<number>();
+      data.forEach((event: CalendarKeyDateEvent) => {
+        const match = event.title.match(/CV(\d+)/);
+        if (match) {
+          versionNumbers.add(Number(match[1]));
+        }
+      });
+
+      // Sort the version numbers in ascending order
+      const versionsArray = Array.from(versionNumbers).sort((a, b) => a - b);
+      setVersions(versionsArray.length > 0 ? versionsArray : [1]);
+
+      // Set default version to 1 if it exists, otherwise use the last version
+      setCurrentVersion(
+        versionsArray.includes(1) ? 1 : versionsArray[versionsArray.length - 1],
+      );
     };
     fetchData();
-  }, [academicYear]);
+  }, []);
+
+  // Ensure currentVersion defaults to 1 if it's not set
+  // this is because if there are no events with CV* in the title, the currentVersion will be undefined, so we set it to 1 (CV1)
+  useEffect(() => {
+    if (!currentVersion) {
+      setCurrentVersion(1);
+    }
+  }, [currentVersion]);
 
   // this if we want to keep the fetched bank holidays stored only locally (not in MongoDB)
   // Add the fetched items to existing events
   useEffect(() => {
     const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
       _id: item._id,
-      title: item.title,
+      title: `${item.title}`,
       start: new Date(item.start),
       end: new Date(item.end),
       allDay: item.allDay,
@@ -227,33 +249,34 @@ function DateSetter() {
           )
         : localNewEvents;
 
-    const academicYearFilteredEvents = filteredEvents.filter((event) => {
-      return event.title.includes(academicYear);
+    const versionFilteredEvents = filteredEvents.filter((event) => {
+      const titleSuffix = `CV${currentVersion}`;
+      // Filter out events that don't have the current version suffix
+      return event.title.includes(titleSuffix) || !event.title.includes('CV');
     });
 
-    // set the events state to the fetched items ONLY
+    const academicYearFilteredEvents = versionFilteredEvents.filter((event) =>
+      event.title.includes(academicYear),
+    );
+
     setEvents(academicYearFilteredEvents);
 
     setEvents((prevEvents) => {
-      // Filter out events that already exist in the events array
       const uniqueNewEvents = academicYearFilteredEvents.filter((newEvent) =>
         prevEvents.every((existingEvent) => existingEvent._id !== newEvent._id),
       );
 
-      // Concatenate unique new events with existing events
       const updatedEvents = [...prevEvents, ...uniqueNewEvents];
 
-      // If switching from EE to CS, remove the Reading Week event locally
       if (course === 'CS') {
         return updatedEvents.filter(
           (event) => !event.title.includes('Reading Week'),
         );
       }
 
-      // Concatenate unique new events with existing events
       return [...prevEvents, ...uniqueNewEvents];
     });
-  }, [fetchedItems, course, academicYear]);
+  }, [fetchedItems, course, currentVersion, academicYear]);
 
   // function to handle academic year change
   const handleAcademicYearChange = (
@@ -261,78 +284,7 @@ function DateSetter() {
   ) => {
     const selectedYear = e.target.value;
     setAcademicYear(selectedYear);
-
-    // this is needed to reset the dates to the current year
-    setSemester1Event({
-      title: 'Semester 1 Start Date',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-    setSemester2Event({
-      title: 'Semester 2 Start Date',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-    setEasterBreakEvent({
-      title: 'Easter Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-    setChristmasBreakEvent({
-      title: 'Christmas Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-    setReadingWeekEvent({
-      title: 'Reading Week',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
   };
-
-  // Add a state for the selected week number
-  const [selectedWeek, setSelectedWeek] = useState<number>(1);
-
-  // Calculate and set the Reading Week start and end dates based on the selected week
-  useEffect(() => {
-    const calculateStartDate = (weekNumber: number) => {
-      const startDate = new Date(semester1Event.start);
-      startDate.setDate(startDate.getDate() + 7 * (weekNumber - 1));
-      return startDate;
-    };
-
-    const calculateEndDate = (weekNumber: number) => {
-      const endDate = new Date(semester1Event.start);
-      endDate.setDate(endDate.getDate() + 7 * weekNumber);
-      return endDate;
-    };
-
-    // Set the Reading Week start and end dates based on the selected week number
-    setReadingWeekEvent({
-      ...readingWeekEvent,
-      start: calculateStartDate(selectedWeek),
-      end: calculateEndDate(selectedWeek),
-    });
-  }, [selectedWeek, semester1Event.start]);
-
-  // this is if we have added all bank holidays to MongoDB
-  // this replaces the existing events with the fetched items so only events from the server are displayed
-  // Update events state with fetched items
-  // useEffect(() => {
-  //   const localNewEvents = fetchedItems.map((item: CalendarKeyDateEvent) => ({
-  //     _id: item._id,
-  //     title: item.title,
-  //     start: new Date(item.start),
-  //     end: new Date(item.end),
-  //     allDay: item.allDay,
-  //   }));
-  //   setEvents(localNewEvents); // Update events directly with fetched items
-  // }, [fetchedItems]);
 
   const [showModal, setShowModal] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
@@ -348,51 +300,6 @@ function DateSetter() {
   const [selectedEventEndDate, setSelectedEventEndDate] = useState<Date>(
     new Date(),
   );
-
-  const handleAddChristmasBreak = () => {
-    if (!christmasBreakEvent.start || !christmasBreakEvent.end) {
-      toast('Please select both start and end dates for the Christmas break');
-      return;
-    }
-    if (christmasBreakEvent.start >= christmasBreakEvent.end) {
-      toast('Christmas break start date must be before end date');
-      return;
-    }
-    handleAddEvent(christmasBreakEvent);
-
-    // Reset the Christmas break input fields
-    setChristmasBreakEvent({
-      title: 'Christmas Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-  };
-
-  const handleAddEasterBreak = () => {
-    // Check that both start and end dates are selected
-    if (!easterBreakEvent.start || !easterBreakEvent.end) {
-      toast('Please select both start and end dates for the Easter break');
-      return;
-    }
-
-    // Make sure start date is before end date
-    if (easterBreakEvent.start >= easterBreakEvent.end) {
-      toast('Easter break start date must be before end date');
-      return;
-    }
-
-    // Add the Easter break event
-    handleAddEvent(easterBreakEvent);
-
-    // Reset the Easter break input fields
-    setEasterBreakEvent({
-      title: 'Easter Break',
-      allDay: true,
-      start: new Date(),
-      end: new Date(),
-    });
-  };
 
   // Function to handle course selection
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -541,6 +448,12 @@ function DateSetter() {
       return;
     }
 
+    // Ensure currentVersion is defined - should always be defined this is for testing
+    if (!currentVersion) {
+      toast('Current version is not set');
+      return;
+    }
+
     event.start.setHours(0, 0, 0, 0);
 
     // Calculate week number based on difference between event start date and Semester 1 start date
@@ -555,22 +468,18 @@ function DateSetter() {
     );
 
     // when adding easter break, don't add week number to the title
-    if (
-      !event.title.includes('Semester') &&
-      !event.title.includes('Easter Break') &&
-      !event.title.includes('Christmas Break')
-    ) {
+    if (!event.title.includes('Easter Break')) {
       // Add week number to the event title
       event.title += ` (Week ${weekNumber})`;
     }
 
-    // add current year to the title
+    event.title += ` CV${currentVersion}`;
+
+    // add academic year to the event title
     event.title += ` (${academicYear})`;
 
     // Check for clashes with existing events and warn user
     const clashDetected = checkClash(event, events);
-
-    // let posted = false;
 
     // Make POST request to add the event to MongoDB
     axios
@@ -578,7 +487,6 @@ function DateSetter() {
       .then((res: { data: CalendarKeyDateEvent }) => {
         console.log('Event added to MongoDB: ', event);
         console.log(res);
-        // posted = true;
 
         // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
         const newEvent = { ...event, _id: res.data._id };
@@ -597,30 +505,17 @@ function DateSetter() {
     }
 
     toast(event.title + ' added');
-
-    // netlify breaks if we reload the page
-    // if (posted) {
-    //   // reload the page to show the new event
-    //   window.location.reload();
-    // } else {
-    //   setTimeout(() => {
-    //     window.location.reload();
-    //   }, 1000);
-    // }
   };
 
   // deletes from mongodb and updates the events state locally
   function deleteEvents() {
     if (selectEvent) {
-      // let deleted = false;
-
       // Make DELETE request to backend API endpoint to delete the event from MongoDB
       axios
         .delete(baseURL + `delete-event/${selectEvent._id}`)
         .then((res: { data: CalendarKeyDateEvent }) => {
           console.log('Event deleted from MongoDB: ', selectEvent);
           console.log(res);
-          // deleted = true;
         })
         .catch((err: { data: CalendarKeyDateEvent }) => {
           console.error('Error deleting event from MongoDB: ', err);
@@ -632,16 +527,6 @@ function DateSetter() {
       setShowModal(false);
 
       toast(selectEvent.title + ' deleted');
-
-      // netlify breaks if we reload the page
-      // if (deleted) {
-      //   // reload the page to show the event has been deleted
-      //   window.location.reload();
-      // } else {
-      //   setTimeout(() => {
-      //     window.location.reload();
-      //   }, 1000);
-      // }
     }
   }
 
@@ -689,7 +574,7 @@ function DateSetter() {
 
     // check if there is a clash only if saving a new event not editing an existing event
     if (!selectEvent && checkClash(updatedEvent, events)) {
-      toast('Clash with another event');
+      toast('Date clash with another event');
     }
 
     // If it's an existing event (selectEvent is defined), update the event
@@ -751,6 +636,237 @@ function DateSetter() {
     return false; // No clash detected
   }
 
+  const archiveCurrentCalendar = () => {
+    // Determine the maximum version number from the existing versions array
+    const maxVersion = Math.max(...versions);
+
+    // Create a new version that is one higher than the maximum version number
+    const newVersion = maxVersion + 1;
+
+    // Update the current version and versions state
+    setCurrentVersion(newVersion);
+    setVersions((prevVersions) => [...prevVersions, newVersion]);
+
+    // Clear current events (if that's intended)
+    setEvents([]);
+
+    // Show a toast notification to inform the user
+    toast(`Archived current calendar. Now viewing version ${newVersion}`);
+  };
+
+  // moduleInstances data:
+  //   {
+  //     "module": {
+  //         "_id": "668a7e2a96afc1668e168a73",
+  //         "moduleSetup": {
+  //             "moduleCode": "compidk",
+  //             "moduleTitle": "123123",
+  //             "moduleCredit": 15,
+  //             "courseworkPercentage": 20,
+  //             "examPercentage": 80,
+  //             "studyYear": 1,
+  //             "programme": [
+  //                 "CSEE"
+  //             ],
+  //             "semester": "first",
+  //             "type": "core",
+  //             "_id": "668a7e2a96afc1668e168a74"
+  //         },
+  //         "courseworkList": [
+  //             {
+  //                 "title": "CW1",
+  //                 "weight": 20,
+  //                 "type": "assignment",
+  //                 "deadlineWeek": 1,
+  //                 "releasedWeekEarlier": 1,
+  //                 "deadlineDay": "Monday",
+  //                 "deadlineTime": "09:00",
+  //                 "contactTimeLectures": 0,
+  //                 "contactTimeTutorials": 0,
+  //                 "contactTimeLabs": 0,
+  //                 "contactTimeSeminars": 0,
+  //                 "contactTimeFieldworkPlacement": 0,
+  //                 "contactTimeOthers": 0,
+  //                 "formativeAssessmentTime": 1,
+  //                 "privateStudyTime": 0,
+  //                 "preparationTime": 20,
+  //                 "keyboardTime": 8,
+  //                 "feedbackTime": 1,
+  //                 "_id": "668a7e2a96afc1668e168a93"
+  //             },
+  //             {
+  //                 "title": "Exam",
+  //                 "weight": 80,
+  //                 "type": "exam",
+  //                 "deadlineWeek": 15,
+  //                 "releasedWeekEarlier": 1,
+  //                 "deadlineDay": "",
+  //                 "deadlineTime": "",
+  //                 "contactTimeLectures": 24,
+  //                 "contactTimeTutorials": 12,
+  //                 "contactTimeLabs": 0,
+  //                 "contactTimeSeminars": 0,
+  //                 "contactTimeFieldworkPlacement": 0,
+  //                 "contactTimeOthers": 0,
+  //                 "formativeAssessmentTime": 0,
+  //                 "privateStudyTime": 81,
+  //                 "preparationTime": 0,
+  //                 "keyboardTime": 3,
+  //                 "feedbackTime": 0,
+  //                 "_id": "668a7e2a96afc1668e168a94"
+  //             }
+  //         ],
+  //         "id": "31bf511a-46df-4c34-865f-e6237898d0ae",
+  //         "__v": 0
+  //     },
+  //     "programmeId": "CSEE",
+  //     "uniqueId": "compidk-CSEE"
+  // }
+
+  // HERE
+  const DAYS_OF_WEEK = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  // Function to get the date of a specific week and day in the semester
+  const getDateForWeekAndDay = (semesterStart, week, day) => {
+    const startDate = new Date(semesterStart);
+    const dayOffset = DAYS_OF_WEEK.indexOf(day);
+    const date = new Date(
+      startDate.setDate(startDate.getDate() + (week - 1) * 7 + dayOffset),
+    );
+    return date;
+  };
+
+  // Function to populate the database with coursework events
+  const populateCourseworkEvents = (
+    moduleInstances,
+    semester1Start,
+    semester2Start,
+    currentVersion,
+    academicYear,
+  ) => {
+    // Iterate over all module instances
+    moduleInstances.forEach((moduleInstance) => {
+      // Extract the module setup and coursework list from the module instance
+      console.log('Module instance:', moduleInstance);
+      // the above console logs all the module instances one by one
+
+      const { module } = moduleInstance;
+
+      // Extract the module setup data
+      const { moduleSetup } = module;
+
+      // Extract the coursework list data
+      const { courseworkList } = module;
+
+      // Get all the courseworks from every module instance and add them to the calendar
+      courseworkList.forEach((coursework) => {
+        // Extract the coursework data
+        const {
+          title,
+          deadlineWeek,
+          deadlineDay,
+          // deadlineTime,
+          releasedWeekEarlier,
+        } = coursework;
+
+        // Get the date of the deadline
+        const deadlineDate = getDateForWeekAndDay(
+          deadlineWeek === 1 ? semester1Start : semester2Start,
+          deadlineWeek,
+          deadlineDay,
+        );
+
+        // Get the date of the release date
+        const releaseDate = getDateForWeekAndDay(
+          deadlineWeek === 1 ? semester1Start : semester2Start,
+          deadlineWeek - releasedWeekEarlier,
+          deadlineDay,
+        );
+
+        // Create the coursework event
+        const courseworkEvent = {
+          title: title,
+          start: releaseDate,
+          end: deadlineDate,
+          allDay: false,
+        };
+
+        if (courseworkEvent.title === '') {
+          courseworkEvent.title = 'Coursework';
+        }
+
+        // append the module code to the event title
+        courseworkEvent.title =
+          `${moduleSetup.moduleCode} ` + courseworkEvent.title;
+
+        // Add the academic year to the event title
+        courseworkEvent.title += ` (${academicYear})`;
+
+        // Add the version number to the event title
+        courseworkEvent.title += ` CV${currentVersion}`;
+
+        // Check for clashes with existing events and warn user
+        const clashDetected = checkClash(courseworkEvent, events);
+
+        // if these events are not already in the calendar, add them
+        if (
+          !events.some(
+            (event) =>
+              event.title === courseworkEvent.title &&
+              event.start.getTime() === courseworkEvent.start.getTime(),
+          )
+        ) {
+          console.log('Adding event to calendar:', courseworkEvent);
+          // Make POST request to add the event to MongoDB
+          axios
+            .post(baseURL + 'add-event', courseworkEvent)
+            .then((res: { data: CalendarKeyDateEvent }) => {
+              console.log('Event added to MongoDB: ', courseworkEvent);
+              console.log(res);
+
+              // Update the event with the _id returned from MongoDB locally, to allow deletion without refreshing the page
+              const newEvent = { ...courseworkEvent, _id: res.data._id };
+              // Add the new event to the events array in the local state
+              setEvents([...events, newEvent]);
+            })
+            .catch((err: { data: CalendarKeyDateEvent }) => {
+              console.error('Error adding event to MongoDB: ', err);
+            });
+
+          // Add the new event to the calendar even if there is a clash
+          setEvents([...events, courseworkEvent]);
+
+          if (clashDetected) {
+            // toast('Clash with another event detected'); // warning
+          }
+
+          // toast(courseworkEvent.title + ' added');
+        } else {
+          // console.log('Event already exists in the calendar:', courseworkEvent);
+        }
+      });
+    });
+  };
+
+  // Call the function to populate the database with coursework events
+  useEffect(() => {
+    populateCourseworkEvents(
+      moduleInstances,
+      semester1Event.start,
+      semester2Event.start,
+      currentVersion,
+      academicYear,
+    );
+  }, [moduleInstances, semester1Event, semester2Event, currentVersion]);
+
   // fetch bank holidays from api and add to calendar
   useEffect(() => {
     fetch('https://www.gov.uk/bank-holidays.json')
@@ -810,17 +926,7 @@ function DateSetter() {
           Home
         </button>
         <div className="calendarHeader">
-          <h1 className="mb-4">Academic Calendar</h1>
-
-          <a
-            href="https://www.liverpool.ac.uk/term-dates/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            University of Liverpool Term Dates
-          </a>
-
-          <hr className="lightRounded"></hr>
+          <h1 className="mb-4">Your Coursework Calendar</h1>
 
           <div>
             {/* dropdown for selecting current academic year */}
@@ -843,312 +949,29 @@ function DateSetter() {
             <option value="EE">Yes</option>
           </select>
 
-          {/* dont let user set new dates, if dates already exist */}
-          {
-            // check that there is an event with title that includes "Semester 1 Start Date" in the fetched items in this academic year
-            fetchedItems.filter(
-              (event) =>
-                event.title.includes('Semester 1') &&
-                event.title.includes(academicYear),
-            ).length === 1 &&
-            // check that there is an event with title that includes "Semester 2 Start Date" in the fetched items in this academic year
-            fetchedItems.filter(
-              (event) =>
-                event.title.includes('Semester 2') &&
-                event.title.includes(academicYear),
-            ).length === 1 ? (
-              // show semester 1 and 2 dates
-              <div className="mb-4">
-                <div>
-                  Semester 1 Start Date: {semester1Event.start.toDateString()}
-                </div>
-                <div className="ml-4">
-                  Semester 2 Start Date: {semester2Event.start.toDateString()}
-                </div>
-                <div className="mt-2">
-                  <div>Semester dates have been set</div>
-                  To edit these, navigate to the date and click it
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Input field for adding semester 1 start date */}
-                <div className="formInput">
-                  <span>Semester 1 Start Date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Start Date"
-                      selected={semester1Event.start}
-                      onChange={(start: Date) =>
-                        // Set end date to start date because it's a one day event element
-                        setSemester1Event({
-                          ...semester1Event,
-                          start,
-                          end: start,
-                        })
-                      }
-                    />
-                  </div>
-                  <button
-                    className="eventButton"
-                    onClick={() => handleAddEvent(semester1Event)}
-                  >
-                    Set Semester 1 Start Date
-                  </button>
-                </div>
+          {/* <div>
+            <label>Calendar Version: </label>
+            <select
+              value={currentVersion}
+              onChange={(e) => setCurrentVersion(Number(e.target.value))}
+            >
+              {versions.map((version) => (
+                <option key={version} value={version}>
+                  CV{version}
+                </option>
+              ))}
+            </select>
+            <button onClick={archiveCurrentCalendar}>
+              Archive Current Calendar
+            </button>
+          </div> */}
 
-                {/* Input field for adding semester 2 start date */}
-                <div className="formInput">
-                  <span>Semester 2 Start Date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Start Date"
-                      selected={semester2Event.start}
-                      onChange={(start: Date) =>
-                        // Set end date to start date because it's a one day event element
-                        setSemester2Event({
-                          ...semester2Event,
-                          start,
-                          end: start,
-                        })
-                      }
-                    />
-                  </div>
-                  <button
-                    className="eventButton"
-                    onClick={() => handleAddEvent(semester2Event)}
-                  >
-                    Set Semester 2 Start Date
-                  </button>
-                </div>
-              </>
-            )
-          }
-
-          <hr className="lightRounded"></hr>
-
-          {
-            // check if there is an event with title that includes "Christmas Break" in the fetched items
-            fetchedItems.filter(
-              (event) =>
-                event.title.includes('Christmas Break') &&
-                event.title.includes(academicYear),
-            ).length === 1 ? (
-              // show christmas break date
-              <div className="mb-4">
-                <div>
-                  Christmas Break: {christmasBreakEvent.start.toDateString()} -{' '}
-                  {christmasBreakEvent.end.toDateString()}
-                </div>
-                <div className="mt-2">
-                  <div>Christmas dates have been set</div>
-                  To edit these, navigate to the date and click it
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Christmas break section */}
-                <div className="datePickers">
-                  <span>Christmas start date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Start Date"
-                      selected={christmasBreakEvent.start}
-                      onChange={(start: Date) =>
-                        setChristmasBreakEvent({
-                          ...christmasBreakEvent,
-                          start,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="datePickers">
-                  <span>Christmas end date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="End Date"
-                      selected={christmasBreakEvent.end}
-                      onChange={(end: Date) =>
-                        setChristmasBreakEvent({ ...christmasBreakEvent, end })
-                      }
-                    />
-                  </div>
-                </div>
-                <button
-                  className="eventButton mb-2"
-                  onClick={handleAddChristmasBreak}
-                >
-                  Set Christmas Break
-                </button>
-              </>
-            )
-          }
-
-          {/* Easter break section */}
-          <hr className="lightRounded"></hr>
-
-          {
-            // check if there is an event with title that includes "Easter Break" in the fetched items
-            fetchedItems.filter(
-              (event) =>
-                event.title.includes('Easter Break') &&
-                event.title.includes(academicYear),
-            ).length === 1 ? (
-              // show easter break date
-              <div className="mb-4">
-                <div>
-                  Easter Break: {easterBreakEvent.start.toDateString()} -{' '}
-                  {easterBreakEvent.end.toDateString()}
-                </div>
-                <div className="mt-2">
-                  <div>Easter dates have been set</div>
-                  To edit these, navigate to the date and click it
-                </div>
-              </div>
-            ) : (
-              <>
-                <div>
-                  <div className="datePickers">
-                    <span>Easter start date: </span>
-                    <div className="d-inline">
-                      <DatePicker
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText="Start Date"
-                        selected={easterBreakEvent.start}
-                        onChange={(start: Date) =>
-                          setEasterBreakEvent({ ...easterBreakEvent, start })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="datePickers">
-                    <span>Easter end date: </span>
-                    <div className="d-inline">
-                      <DatePicker
-                        dateFormat="dd/MM/yyyy"
-                        placeholderText="End Date"
-                        selected={easterBreakEvent.end}
-                        onChange={(end: Date) =>
-                          setEasterBreakEvent({ ...easterBreakEvent, end })
-                        }
-                      />
-                    </div>
-                  </div>
-                  <button
-                    className="eventButton mb-2"
-                    onClick={handleAddEasterBreak}
-                  >
-                    Set Easter Break
-                  </button>
-                </div>
-              </>
-            )
-          }
-
-          {/* reading week section with conditional rendering */}
-          {/* {course === 'EE' && (
-            <>
-              <hr className="lightRounded"></hr>
-              <div>
-                <div className="datePickers">
-                  <span>Reading Week Start Date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="Start Date"
-                      selected={readingWeekEvent.start}
-                      onChange={(start: Date) =>
-                        setReadingWeekEvent({ ...readingWeekEvent, start })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="datePickers">
-                  <span>Reading Week End Date: </span>
-                  <div className="d-inline">
-                    <DatePicker
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="End Date"
-                      selected={readingWeekEvent.end}
-                      onChange={(end: Date) => {
-                        setReadingWeekEvent({ ...readingWeekEvent, end });
-                      }}
-                    />
-                  </div>
-                </div>
-                <button
-                  className="eventButton"
-                  onClick={() =>
-                    handleAddEvent({
-                      title: 'Reading Week',
-                      allDay: true,
-                      start: readingWeekEvent.start,
-                      end: readingWeekEvent.end,
-                    })
-                  }
-                >
-                  Set Reading Week
-                </button>
-              </div>
-            </>
-          )} */}
-
-          {course === 'EE' && (
-            <>
-              <hr className="lightRounded"></hr>
-              <div>
-                <div className="datePickers">
-                  <span>Reading Week: </span>
-                  <select
-                    value={selectedWeek}
-                    onChange={(e) => setSelectedWeek(Number(e.target.value))}
-                  >
-                    {Array.from(
-                      { length: 12 },
-                      (
-                        _,
-                        i, // this is because semester is 15 weeks long but reading week is only in first 12 weeks
-                      ) => (
-                        <option key={i + 1} value={i + 1}>
-                          Week {i + 1}
-                        </option>
-                      ),
-                    )}
-                    <option value={0}>None</option>
-                  </select>
-                </div>
-                <button
-                  className="eventButton"
-                  onClick={() => {
-                    if (selectedWeek !== 0) {
-                      handleAddEvent({
-                        title: 'Reading Week',
-                        allDay: true,
-                        start: readingWeekEvent.start,
-                        end: readingWeekEvent.end,
-                      });
-                    }
-                  }}
-                >
-                  Set Reading Week
-                </button>
-              </div>
-            </>
-          )}
-
-          <hr className="lightRounded"></hr>
-
-          {/* Input field for adding holidays */}
-          <div>
-            <span>Add holiday: </span>
+          {/* Input field for adding courseworks */}
+          {/* <div>
+            <span>Add coursework: </span>
             <input
               type="text"
-              placeholder="Holiday name"
+              placeholder="Coursework name"
               style={{ width: '20%', marginRight: '10px' }}
               value={holidayEvent.title}
               onChange={(e) =>
@@ -1156,7 +979,7 @@ function DateSetter() {
               }
             />
             <div className="datePickers">
-              <span>Holiday start date: </span>
+              <span>Coursework start date: </span>
               <div className="d-inline">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -1169,7 +992,7 @@ function DateSetter() {
               </div>
             </div>
             <div className="datePickers">
-              <span>Holiday end date: </span>
+              <span>Coursework end date: </span>
               <div className="d-inline">
                 <DatePicker
                   dateFormat="dd/MM/yyyy"
@@ -1186,85 +1009,14 @@ function DateSetter() {
               className="eventButton"
               onClick={() => handleAddEvent(holidayEvent)}
             >
-              Set new Holiday
+              Set coursework
             </button>
-          </div>
+          </div> */}
         </div>
-        {/* delete all events from mongodb */}
-        <button
-          className="eventButton"
-          onClick={() => {
-            axios
-              .delete(baseURL + 'delete-all-events')
-              .then((res: { data: CalendarKeyDateEvent }) => {
-                console.log('All events deleted from MongoDB');
-                console.log(res);
-              })
-              .catch((err: { data: CalendarKeyDateEvent }) => {
-                console.error('Error deleting all events from MongoDB: ', err);
-              });
-
-            setEvents([]); // Update local state to reflect the event deletion
-            toast('All events deleted');
-          }}
-        >
-          Delete all dates (irreversible)
-        </button>
-
-        <button
-          className="setDefaultDates eventButton"
-          onClick={() => {
-            handleAddEvent({
-              title: 'Semester 1 Start Date',
-              allDay: true,
-              start: new Date('2024-09-23'),
-              end: new Date('2024-09-23'),
-            });
-
-            handleAddEvent({
-              title: 'Semester 2 Start Date',
-              allDay: true,
-              start: new Date('2025-01-06'),
-              end: new Date('2025-01-06'),
-            });
-
-            handleAddEvent({
-              title: 'Christmas Break',
-              allDay: true,
-              start: new Date('2024-12-16'),
-              end: new Date('2025-01-03'),
-            });
-
-            handleAddEvent({
-              title: 'Easter Break',
-              allDay: true,
-              start: new Date('2025-04-07'),
-              end: new Date('2025-04-25'),
-            });
-
-            handleAddEvent({
-              title: 'Reading Week',
-              allDay: true,
-              start: new Date('2025-02-17'),
-              end: new Date('2025-02-21'),
-            });
-
-            handleAddEvent({
-              title: 'Reading Week',
-              allDay: true,
-              start: new Date('2025-05-12'),
-              end: new Date('2025-05-16'),
-            });
-
-            toast('Default dates set for 2024/25');
-          }}
-        >
-          Set Default Dates for 2024/25 from University of Liverpool Term Dates
-          website
-        </button>
 
         {/* divider */}
         <hr className="rounded"></hr>
+
         {/* Calendar View */}
         <Calendar
           localizer={localizer}
@@ -1284,6 +1036,7 @@ function DateSetter() {
             marginBottom: '20px',
           }}
         />
+
         <EditTermDateModal
           eventTitle={eventTitle}
           showModal={showModal}
@@ -1298,9 +1051,11 @@ function DateSetter() {
           saveEvent={saveEvent}
           deleteEvents={deleteEvents}
         />
+
+        <EffortGraph moduleInstances={moduleInstances} />
       </div>
     </>
   );
 }
 
-export default DateSetter;
+export default StudentCalendar;

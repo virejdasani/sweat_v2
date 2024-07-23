@@ -11,6 +11,11 @@
   scrollbar-color: #5050ff #1b819e;
 }
 
+.horizontalScrollDiv {
+  /* scrollbar-width: thin;
+  scrollbar-color: #5050ff #1b819e; */
+}
+
 
 
 /* #root {

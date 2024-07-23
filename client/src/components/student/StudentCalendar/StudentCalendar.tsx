@@ -820,6 +820,9 @@ function StudentCalendar() {
         courseworkEvent.title =
           `${moduleSetup.moduleCode} ` + courseworkEvent.title;
 
+        // add the week number to the event title
+        courseworkEvent.title += ` (Week ${deadlineWeek})`;
+
         // Add the academic year to the event title
         courseworkEvent.title += ` (${academicYear})`;
 
@@ -939,7 +942,7 @@ function StudentCalendar() {
           Home
         </button>
         <div className="calendarHeader">
-          <h1 className="mb-4">Your Coursework Calendar</h1>
+          <h1 className="mb-4 mt-4">Your Coursework Calendar</h1>
 
           <div>
             {/* dropdown for selecting current academic year */}
@@ -1026,26 +1029,154 @@ function StudentCalendar() {
             </button>
           </div> */}
         </div>
-
-        {/* divider */}
         <hr className="rounded"></hr>
 
-        <h2 className="mx-4">Your Courseworks, Exams and Key Dates</h2>
-        {/* shows all the courseworks and exams */}
-        <ul className="list-group mx-4">
-          {events.map((event, index) => (
-            <li
-              key={index}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              {event.title}
-              <span>
-                {event.start.toLocaleDateString()} -{' '}
-                {event.end.toLocaleDateString()}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {/* All modules in a table with module names on y axis and weeks 1 to 15 for each semester on the x axis at the top */}
+        {/* show No Event when there is no coursework or exam on the week, and show the event title when there is an event */}
+        {/* get the semester value from the module setup and show only the modules that are in the selected semester */}
+        {/* semester 1 modules: */}
+
+        <div className="cwbody mx-4">
+          <div
+            className="horizontalScrollDiv"
+            style={{
+              overflowX: 'auto',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <h3 className="mx-4">Semester 1</h3>
+            <table className="table table-bordered mx-4">
+              <thead>
+                <tr>
+                  <th></th>
+                  {Array.from({ length: 15 }, (_, i) => i + 1).map((week) => (
+                    <th key={week}>Week {week}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {moduleInstances.map((moduleInstance, index) => {
+                  const { module } = moduleInstance;
+                  const { moduleSetup } = module;
+                  const { semester } = moduleSetup;
+                  if (semester === 'first') {
+                    return (
+                      <tr key={index}>
+                        <td>{moduleSetup.moduleCode}</td>
+                        {Array.from({ length: 15 }, (_, i) => i + 1).map(
+                          (week) => {
+                            const event = events.find(
+                              (event) =>
+                                event.title.includes(moduleSetup.moduleCode) &&
+                                event.title.includes(`Week ${week})`),
+                            );
+                            return (
+                              // show the first 2 words of the event title only (removes the week number, academic year and version number)
+                              <td key={week}>
+                                {event
+                                  ? event.title
+                                      .split(' ')
+                                      .slice(0, 2)
+                                      .join(' ') +
+                                    // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
+                                    (event.title.includes('Coursework')
+                                      ? ` (${moduleSetup.courseworkPercentage}%)`
+                                      : event.title.includes('Exam')
+                                        ? ` (${moduleSetup.examPercentage}%)`
+                                        : '')
+                                  : '-'}
+                              </td>
+                            );
+                          },
+                        )}
+                      </tr>
+                    );
+                  }
+                  return null;
+                })}
+              </tbody>
+            </table>
+
+            {/* semester 2 modules: */}
+            {/* <h3 className="mx-4">Semester 2</h3>
+            <table className="table table-bordered mx-4">
+              <thead>
+                <tr>
+                  <th></th>
+                  {Array.from({ length: 15 }, (_, i) => i + 1).map((week) => (
+                    <th key={week}>Week {week}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {moduleInstances.map((moduleInstance, index) => {
+                  const { module } = moduleInstance;
+                  const { moduleSetup } = module;
+                  const { semester } = moduleSetup;
+                  if (semester === 'second') {
+                    return (
+                      <tr key={index}>
+                        <td>{moduleSetup.moduleCode}</td>
+                        {Array.from({ length: 15 }, (_, i) => i + 1).map(
+                          (week) => {
+                            const event = events.find(
+                              (event) =>
+                                event.title.includes(moduleSetup.moduleCode) &&
+                                event.title.includes(`Week ${week})`),
+                            );
+                            return (
+                              // show the first 2 words of the event title only (removes the week number, academic year and version number)
+                              <td key={week}>
+                                {event
+                                  ? event.title
+                                      .split(' ')
+                                      .slice(0, 2)
+                                      .join(' ') +
+                                    // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
+                                    (event.title.includes('Coursework')
+                                      ? ` (${moduleSetup.courseworkPercentage}%)`
+                                      : event.title.includes('Exam')
+                                        ? ` (${moduleSetup.examPercentage}%)`
+                                        : '')
+                                  : '-'}
+                              </td>
+                            );
+                          },
+                        )}
+                      </tr>
+                    );
+                  }
+                  return null;
+                })}
+              </tbody>
+            </table> */}
+          </div>
+
+          <hr className="rounded"></hr>
+
+          <h2 className="mx-4">Your Courseworks, Exams and Key Dates</h2>
+          {/* shows all the courseworks and exams */}
+          <ul className="list-group mx-4">
+            {events.map((event, index) => (
+              <li
+                key={index}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                {event.title}
+                <span>
+                  {event.start.toLocaleDateString()} -{' '}
+                  {event.end.toLocaleDateString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <hr className="rounded"></hr>
+
+        <EffortGraph />
 
         <hr className="rounded"></hr>
 
@@ -1083,8 +1214,6 @@ function StudentCalendar() {
           saveEvent={saveEvent}
           deleteEvents={deleteEvents}
         />
-
-        <EffortGraph />
       </div>
     </>
   );

@@ -829,7 +829,7 @@ function StudentCalendar() {
         // Check for clashes with existing events and warn user
         const clashDetected = checkClash(courseworkEvent, events);
 
-        // if these events are not already in the calendar, add them
+        // if these events are not already in the calendar after fetching from the database, add them
         if (
           !events.some(
             (event) =>
@@ -1028,6 +1028,25 @@ function StudentCalendar() {
         </div>
 
         {/* divider */}
+        <hr className="rounded"></hr>
+
+        <h2 className="mx-4">Your Courseworks, Exams and Key Dates</h2>
+        {/* shows all the courseworks and exams */}
+        <ul className="list-group mx-4">
+          {events.map((event, index) => (
+            <li
+              key={index}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
+              {event.title}
+              <span>
+                {event.start.toLocaleDateString()} -{' '}
+                {event.end.toLocaleDateString()}
+              </span>
+            </li>
+          ))}
+        </ul>
+
         <hr className="rounded"></hr>
 
         {/* Calendar View */}

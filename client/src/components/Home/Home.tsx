@@ -65,6 +65,23 @@ const Home = () => {
           <option value="department1">Science & Engineering</option>
           <option value="department2">Other</option>
         </select>
+
+        <select
+          name="department"
+          id="department"
+          style={{
+            width: '220px',
+            height: '30px',
+            marginBottom: '20px',
+            marginLeft: '6px',
+            position: 'absolute',
+            top: '220px',
+            left: '20px',
+          }}
+        >
+          <option value="department1">Faculty</option>
+          <option value="department2">Other</option>
+        </select>
       </div>
 
       <div className="buttonContainer">

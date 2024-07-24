@@ -1079,7 +1079,7 @@ function StudentCalendar() {
                               {getDateForWeekAndDay(
                                 semester1Event.start,
                                 week,
-                                'Sunday',
+                                'Monday',
                               ).toLocaleDateString()}
                             </th>
                           ),
@@ -1147,7 +1147,7 @@ function StudentCalendar() {
                               {getDateForWeekAndDay(
                                 semester2Event.start,
                                 week,
-                                'Sunday',
+                                'Tuesday',
                               ).toLocaleDateString()}
                             </th>
                           ),

@@ -1311,8 +1311,8 @@ function DateSetter() {
             handleAddEvent({
               title: 'Semester 2 Start Date',
               allDay: true,
-              start: new Date('2025-01-06'),
-              end: new Date('2025-01-06'),
+              start: new Date('2025-01-27'),
+              end: new Date('2025-01-27'),
             });
 
             handleAddEvent({

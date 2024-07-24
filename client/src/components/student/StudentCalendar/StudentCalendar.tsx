@@ -52,6 +52,9 @@ function StudentCalendar() {
 
   const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
 
+  const [showKeyDatesTable, setShowKeyDatesTable] = useState(false);
+  const [showDatesCalendar, setShowDatesCalendar] = useState(false);
+
   const [currentChosenSemester, setCurrentChosenSemester] =
     useState<string>('sem1');
 
@@ -1102,7 +1105,8 @@ function StudentCalendar() {
                                       event.title.includes(
                                         moduleSetup.moduleCode,
                                       ) &&
-                                      event.title.includes(`Week ${week})`),
+                                      event.title.includes(`Week ${week})`) &&
+                                      !event.title.includes('Exam'),
                                   );
                                   return (
                                     // show the first 2 words of the event title only (removes the week number, academic year and version number)
@@ -1116,7 +1120,7 @@ function StudentCalendar() {
                                           (event.title.includes('Coursework')
                                             ? ` (${moduleSetup.courseworkPercentage}%)`
                                             : event.title.includes('Exam')
-                                              ? ` (${moduleSetup.examPercentage}%)`
+                                              ? ``
                                               : '')
                                         : '-'}
                                     </td>
@@ -1170,7 +1174,8 @@ function StudentCalendar() {
                                       event.title.includes(
                                         moduleSetup.moduleCode,
                                       ) &&
-                                      event.title.includes(`Week ${week})`),
+                                      event.title.includes(`Week ${week})`) &&
+                                      !event.title.includes('Exam'),
                                   );
                                   return (
                                     // show the first 2 words of the event title only (removes the week number, academic year and version number)
@@ -1204,66 +1209,86 @@ function StudentCalendar() {
           </div>
 
           <hr className="rounded"></hr>
-
-          <h2 className="mx-4">Your Courseworks, Exams and Key Dates</h2>
-          {/* shows all the courseworks and exams */}
-          <ul className="list-group mx-4">
-            {events.map((event, index) => (
-              <li
-                key={index}
-                className="list-group-item d-flex justify-content-between align-items-center"
-              >
-                {event.title}
-                <span>
-                  {event.start.toLocaleDateString()} -{' '}
-                  {event.end.toLocaleDateString()}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
+        {/* button called show dates, that when pressed shows the key dates and deadlines table */}
+        <button
+          className="btn btn-secondary mx-4"
+          onClick={() => setShowKeyDatesTable(!showKeyDatesTable)}
+        >
+          Toggle Key Dates and Deadlines table
+        </button>
 
-        <hr className="rounded"></hr>
+        {/* key dates and deadlines table */}
+        {showKeyDatesTable && (
+          <div>
+            <h2 className="mx-4">Key Dates and Deadlines</h2>
+            <ul className="list-group mx-4">
+              {events.map((event, index) => (
+                <li
+                  key={index}
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  {event.title}
+                  <span>
+                    {event.start.toLocaleDateString()} -{' '}
+                    {event.end.toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-        <EffortGraph />
+        {/* when button called show calendar view is pressed, toggle the calendar */}
+        <button
+          className="btn btn-secondary mx-4"
+          onClick={() => setShowDatesCalendar(!showDatesCalendar)}
+        >
+          Toggle Deadline Calendar View
+        </button>
 
-        <hr className="rounded"></hr>
+        {showDatesCalendar && (
+          <div>
+            {/* Calendar View */}
+            <Calendar
+              localizer={localizer}
+              events={events}
+              views={['month', 'week', 'day']}
+              defaultView="month"
+              startAccessor="start"
+              endAccessor="end"
+              // selectable={true} // this is being able to select a date slot (not event)
+              onSelectSlot={handleSelectSlot}
+              onSelectEvent={handleSelectedEvent}
+              style={{
+                height: 800,
+                marginLeft: '50px',
+                marginRight: '50px',
+                marginTop: '20px',
+                marginBottom: '20px',
+              }}
+            />
 
-        {/* Calendar View */}
-        <Calendar
-          localizer={localizer}
-          events={events}
-          views={['month', 'week', 'day']}
-          defaultView="month"
-          startAccessor="start"
-          endAccessor="end"
-          // selectable={true} // this is being able to select a date slot (not event)
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectedEvent}
-          style={{
-            height: 800,
-            marginLeft: '50px',
-            marginRight: '50px',
-            marginTop: '20px',
-            marginBottom: '20px',
-          }}
-        />
-
-        <EditTermDateModal
-          eventTitle={eventTitle}
-          showModal={showModal}
-          selectEvent={selectEvent}
-          newEvent={newEvent}
-          selectedEventStartDate={selectedEventStartDate}
-          selectedEventEndDate={selectedEventEndDate}
-          setShowModal={setShowModal}
-          setEventTitle={setEventTitle}
-          setSelectEvent={setSelectEvent}
-          setNewEvent={setNewEvent}
-          saveEvent={saveEvent}
-          deleteEvents={deleteEvents}
-        />
+            <EditTermDateModal
+              eventTitle={eventTitle}
+              showModal={showModal}
+              selectEvent={selectEvent}
+              newEvent={newEvent}
+              selectedEventStartDate={selectedEventStartDate}
+              selectedEventEndDate={selectedEventEndDate}
+              setShowModal={setShowModal}
+              setEventTitle={setEventTitle}
+              setSelectEvent={setSelectEvent}
+              setNewEvent={setNewEvent}
+              saveEvent={saveEvent}
+              deleteEvents={deleteEvents}
+            />
+          </div>
+        )}
       </div>
+      <hr className="rounded"></hr>
+
+      <EffortGraph />
     </>
   );
 }

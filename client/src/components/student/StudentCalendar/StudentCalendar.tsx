@@ -64,7 +64,7 @@ function StudentCalendar() {
 
   // course CS means no reading week, EE means reading week.
   // This is used to filter out reading week events, but this distinction is not shown to the user, they can just select yes or no for reading week
-  const [course, setCourse] = useState('CS'); // State for selected course
+  // const [course, setCourse] = useState('CS'); // State for selected course
 
   // const [holidayEvent, setHolidayEvent] = useState({
   //   title: '',

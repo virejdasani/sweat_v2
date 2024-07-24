@@ -70,6 +70,20 @@ function DateSetter() {
     end: new Date(),
   });
 
+  const [sem1ReadingWeek, setSem1ReadingWeek] = useState({
+    title: 'Sem 1 Reading Week',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
+  const [sem2ReadingWeek, setSem2ReadingWeek] = useState({
+    title: 'Sem 2 Reading Week',
+    allDay: true,
+    start: new Date(),
+    end: new Date(),
+  });
+
   const [christmasBreakEvent, setChristmasBreakEvent] = useState({
     title: 'Christmas Break',
     allDay: true,
@@ -281,6 +295,18 @@ function DateSetter() {
       start: new Date(),
       end: new Date(),
     });
+    setSem1ReadingWeek({
+      title: 'Sem 1 Reading Week',
+      allDay: true,
+      start: new Date(),
+      end: new Date(),
+    });
+    setSem2ReadingWeek({
+      title: 'Sem 2 Reading Week',
+      allDay: true,
+      start: new Date(),
+      end: new Date(),
+    });
     setChristmasBreakEvent({
       title: 'Christmas Break',
       allDay: true,
@@ -395,6 +421,7 @@ function DateSetter() {
   };
 
   // Function to handle course selection
+  //@ts-expect-error // typescript error fix
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCourse = e.target.value;
     setCourse(selectedCourse);
@@ -811,7 +838,6 @@ function DateSetter() {
         </button>
         <div className="calendarHeader">
           <h1 className="mb-4">Academic Calendar</h1>
-
           <a
             href="https://www.liverpool.ac.uk/term-dates/"
             target="_blank"
@@ -819,9 +845,7 @@ function DateSetter() {
           >
             University of Liverpool Term Dates
           </a>
-
           <hr className="lightRounded"></hr>
-
           <div>
             {/* dropdown for selecting current academic year */}
             <span>Academic Year: </span>
@@ -835,14 +859,12 @@ function DateSetter() {
               <option value="2025/26">2025/26</option>
             </select>
           </div>
-
           {/* Dropdown for selecting course */}
-          <span>Show reading week </span>
+          {/* <span>Show reading week </span>
           <select className="mb-4" value={course} onChange={handleCourseChange}>
             <option value="CS">No</option>
             <option value="EE">Yes</option>
-          </select>
-
+          </select> */}
           {/* dont let user set new dates, if dates already exist */}
           {
             // check that there is an event with title that includes "Semester 1 Start Date" in the fetched items in this academic year
@@ -926,9 +948,80 @@ function DateSetter() {
               </>
             )
           }
+          <hr className="lightRounded"></hr>
+          <div className="datePickers">
+            <span>Sem 1 Reading Week start date: </span>
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Start Date"
+                selected={sem1ReadingWeek.start}
+                onChange={(start: Date) =>
+                  setSem1ReadingWeek({
+                    ...sem1ReadingWeek,
+                    start,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div className="datePickers">
+            <span>Sem 1 Reading Week end date: </span>
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="End Date"
+                selected={sem1ReadingWeek.end}
+                onChange={(end: Date) =>
+                  setSem1ReadingWeek({ ...sem1ReadingWeek, end })
+                }
+              />
+            </div>
+          </div>
+          <button
+            className="eventButton mb-2"
+            onClick={() => handleAddEvent(sem1ReadingWeek)}
+          >
+            Set Sem 1 Reading Week
+          </button>
+
+          <div className="datePickers">
+            <span>Sem 2 Reading Week start date: </span>
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Start Date"
+                selected={sem2ReadingWeek.start}
+                onChange={(start: Date) =>
+                  setSem2ReadingWeek({
+                    ...sem2ReadingWeek,
+                    start,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div className="datePickers">
+            <span>Sem 2 Reading Week end date: </span>
+            <div className="d-inline">
+              <DatePicker
+                dateFormat="dd/MM/yyyy"
+                placeholderText="End Date"
+                selected={sem2ReadingWeek.end}
+                onChange={(end: Date) =>
+                  setSem2ReadingWeek({ ...sem2ReadingWeek, end })
+                }
+              />
+            </div>
+          </div>
+          <button
+            className="eventButton mb-2"
+            onClick={() => handleAddEvent(sem2ReadingWeek)}
+          >
+            Set Sem 2 Reading Week
+          </button>
 
           <hr className="lightRounded"></hr>
-
           {
             // check if there is an event with title that includes "Christmas Break" in the fetched items
             fetchedItems.filter(
@@ -988,10 +1081,8 @@ function DateSetter() {
               </>
             )
           }
-
           {/* Easter break section */}
           <hr className="lightRounded"></hr>
-
           {
             // check if there is an event with title that includes "Easter Break" in the fetched items
             fetchedItems.filter(
@@ -1049,7 +1140,6 @@ function DateSetter() {
               </>
             )
           }
-
           {/* reading week section with conditional rendering */}
           {/* {course === 'EE' && (
             <>
@@ -1097,7 +1187,6 @@ function DateSetter() {
               </div>
             </>
           )} */}
-
           {course === 'EE' && (
             <>
               <hr className="lightRounded"></hr>
@@ -1140,9 +1229,7 @@ function DateSetter() {
               </div>
             </>
           )}
-
           <hr className="lightRounded"></hr>
-
           {/* Input field for adding holidays */}
           <div>
             <span>Add holiday: </span>

@@ -52,6 +52,9 @@ function StudentCalendar() {
 
   const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
 
+  const [currentChosenSemester, setCurrentChosenSemester] =
+    useState<string>('sem1');
+
   useEffect(() => {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
   }, []);
@@ -947,15 +950,27 @@ function StudentCalendar() {
 
           <div>
             {/* dropdown for selecting current academic year */}
-            <span>Academic Year: </span>
+            <span>Current Academic Year: </span>
             <select
               className="mb-4"
               value={academicYear}
               onChange={handleAcademicYearChange}
             >
-              <option value="2023/24">2023/24</option>
               <option value="2024/25">2024/25</option>
-              <option value="2025/26">2025/26</option>
+            </select>
+          </div>
+
+          <div>
+            {/* dropdown for selecting current academic year */}
+            <span>Choose Semester: </span>
+
+            <select
+              className="mb-4"
+              value={currentChosenSemester}
+              onChange={(e) => setCurrentChosenSemester(e.target.value)}
+            >
+              <option value="sem1">Semester 1</option>
+              <option value="sem2">Semester 2</option>
             </select>
           </div>
 
@@ -1047,112 +1062,145 @@ function StudentCalendar() {
               flexDirection: 'column',
             }}
           >
-            <h3 className="mx-4">Semester 1</h3>
-            <table className="table table-bordered mx-4">
-              <thead>
-                <tr>
-                  <th></th>
-                  {Array.from({ length: 15 }, (_, i) => i + 1).map((week) => (
-                    <th key={week}>Week {week}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {moduleInstances.map((moduleInstance, index) => {
-                  const { module } = moduleInstance;
-                  const { moduleSetup } = module;
-                  const { semester } = moduleSetup;
-                  if (semester === 'first') {
-                    return (
-                      <tr key={index}>
-                        <td>{moduleSetup.moduleCode}</td>
+            <div className="currentChosenSemester">
+              {currentChosenSemester === 'sem1' ? (
+                <>
+                  <h3 className="mx-4">Semester 1</h3>
+                  <table className="table table-bordered mx-4">
+                    <thead>
+                      <tr>
+                        <th></th>
                         {Array.from({ length: 15 }, (_, i) => i + 1).map(
-                          (week) => {
-                            const event = events.find(
-                              (event) =>
-                                event.title.includes(moduleSetup.moduleCode) &&
-                                event.title.includes(`Week ${week})`),
-                            );
-                            return (
-                              // show the first 2 words of the event title only (removes the week number, academic year and version number)
-                              <td key={week}>
-                                {event
-                                  ? event.title
-                                      .split(' ')
-                                      .slice(0, 2)
-                                      .join(' ') +
-                                    // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
-                                    (event.title.includes('Coursework')
-                                      ? ` (${moduleSetup.courseworkPercentage}%)`
-                                      : event.title.includes('Exam')
-                                        ? ` (${moduleSetup.examPercentage}%)`
-                                        : '')
-                                  : '-'}
-                              </td>
-                            );
-                          },
+                          (week) => (
+                            <th key={week}>
+                              Week {week}
+                              {/* show the week commence date */}
+                              <br />
+                              {getDateForWeekAndDay(
+                                semester1Event.start,
+                                week,
+                                'Sunday',
+                              ).toLocaleDateString()}
+                            </th>
+                          ),
                         )}
                       </tr>
-                    );
-                  }
-                  return null;
-                })}
-              </tbody>
-            </table>
-
-            {/* semester 2 modules: */}
-            <h3 className="mx-4">Semester 2</h3>
-            <table className="table table-bordered mx-4">
-              <thead>
-                <tr>
-                  <th></th>
-                  {Array.from({ length: 15 }, (_, i) => i + 1).map((week) => (
-                    <th key={week}>Week {week}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {moduleInstances.map((moduleInstance, index) => {
-                  const { module } = moduleInstance;
-                  const { moduleSetup } = module;
-                  const { semester } = moduleSetup;
-                  if (semester === 'second') {
-                    return (
-                      <tr key={index}>
-                        <td>{moduleSetup.moduleCode}</td>
+                    </thead>
+                    <tbody>
+                      {moduleInstances.map((moduleInstance, index) => {
+                        const { module } = moduleInstance;
+                        const { moduleSetup } = module;
+                        const { semester } = moduleSetup;
+                        if (semester === 'first') {
+                          return (
+                            <tr key={index}>
+                              <td>{moduleSetup.moduleCode}</td>
+                              {Array.from({ length: 15 }, (_, i) => i + 1).map(
+                                (week) => {
+                                  const event = events.find(
+                                    (event) =>
+                                      event.title.includes(
+                                        moduleSetup.moduleCode,
+                                      ) &&
+                                      event.title.includes(`Week ${week})`),
+                                  );
+                                  return (
+                                    // show the first 2 words of the event title only (removes the week number, academic year and version number)
+                                    <td key={week}>
+                                      {event
+                                        ? event.title
+                                            .split(' ')
+                                            .slice(0, 2)
+                                            .join(' ') +
+                                          // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
+                                          (event.title.includes('Coursework')
+                                            ? ` (${moduleSetup.courseworkPercentage}%)`
+                                            : event.title.includes('Exam')
+                                              ? ` (${moduleSetup.examPercentage}%)`
+                                              : '')
+                                        : '-'}
+                                    </td>
+                                  );
+                                },
+                              )}
+                            </tr>
+                          );
+                        }
+                        return null;
+                      })}
+                    </tbody>
+                  </table>
+                </>
+              ) : (
+                <>
+                  <h3 className="mx-4">Semester 2</h3>
+                  <table className="table table-bordered mx-4">
+                    <thead>
+                      <tr>
+                        <th></th>
                         {Array.from({ length: 15 }, (_, i) => i + 1).map(
-                          (week) => {
-                            const event = events.find(
-                              (event) =>
-                                event.title.includes(moduleSetup.moduleCode) &&
-                                event.title.includes(`Week ${week})`),
-                            );
-                            return (
-                              // show the first 2 words of the event title only (removes the week number, academic year and version number)
-                              <td key={week}>
-                                {event
-                                  ? event.title
-                                      .split(' ')
-                                      .slice(0, 2)
-                                      .join(' ') +
-                                    // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
-                                    (event.title.includes('Coursework')
-                                      ? ` (${moduleSetup.courseworkPercentage}%)`
-                                      : event.title.includes('Exam')
-                                        ? ` (${moduleSetup.examPercentage}%)`
-                                        : '')
-                                  : '-'}
-                              </td>
-                            );
-                          },
+                          (week) => (
+                            <th key={week}>
+                              Week {week}
+                              {/* show the week commence date */}
+                              <br />
+                              {getDateForWeekAndDay(
+                                semester2Event.start,
+                                week,
+                                'Sunday',
+                              ).toLocaleDateString()}
+                            </th>
+                          ),
                         )}
                       </tr>
-                    );
-                  }
-                  return null;
-                })}
-              </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                      {moduleInstances.map((moduleInstance, index) => {
+                        const { module } = moduleInstance;
+                        const { moduleSetup } = module;
+                        const { semester } = moduleSetup;
+                        if (semester === 'second') {
+                          return (
+                            <tr key={index}>
+                              <td>{moduleSetup.moduleCode}</td>
+                              {Array.from({ length: 15 }, (_, i) => i + 1).map(
+                                (week) => {
+                                  const event = events.find(
+                                    (event) =>
+                                      event.title.includes(
+                                        moduleSetup.moduleCode,
+                                      ) &&
+                                      event.title.includes(`Week ${week})`),
+                                  );
+                                  return (
+                                    // show the first 2 words of the event title only (removes the week number, academic year and version number)
+                                    <td key={week}>
+                                      {event
+                                        ? event.title
+                                            .split(' ')
+                                            .slice(0, 2)
+                                            .join(' ') +
+                                          // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
+                                          (event.title.includes('Coursework')
+                                            ? ` (${moduleSetup.courseworkPercentage}%)`
+                                            : event.title.includes('Exam')
+                                              ? ` (${moduleSetup.examPercentage}%)`
+                                              : '')
+                                        : '-'}
+                                    </td>
+                                  );
+                                },
+                              )}
+                            </tr>
+                          );
+                        }
+                        return null;
+                      })}
+                    </tbody>
+                  </table>
+                </>
+              )}
+            </div>
           </div>
 
           <hr className="rounded"></hr>

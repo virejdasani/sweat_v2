@@ -59,7 +59,7 @@ const StaffHome = () => {
           left: '22px',
         }}
       />
-      <h1 className="">Staff Home</h1>
+      <h1 className="">Staff Portal</h1>
       <button
         style={{ position: 'absolute', top: '0', left: '0' }}
         onClick={() => {
@@ -87,35 +87,57 @@ const StaffHome = () => {
           </form>
         </div>
       ) : (
-        <div
-          className="makeResponsiveScrollable"
-          style={{
-            overflowY: 'scroll',
-            // display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '10px',
-          }}
-        >
-          <div className="linkContainer">
-            <Link to="/coursework-calendar">
-              Coursework Calendar (for testing)
-            </Link>
+        <>
+          <div>
+            {/* dropdown for selecting current academic year */}
+            <span>Academic Year: </span>
+            <select className="mb-4">
+              <option value="2023/24">2023/24</option>
+              <option value="2024/25">2024/25</option>
+              <option value="2025/26">2025/26</option>
+            </select>
           </div>
-          <div className="linkContainer">
-            <Link to="/admin/create-module">Create Module</Link>
+
+          <div>
+            <label>Calendar Version: </label>
+            {/* Dropdown for selecting calendar version */}
+            <select className="mb-4">
+              <option value="CV1">CV1</option>
+            </select>
           </div>
-          <div className="linkContainer">
-            <Link to="/admin/programme-design">Programme Design</Link>
+          <div
+            className="makeResponsiveScrollable"
+            style={{
+              overflowY: 'scroll',
+              // display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <div className="linkContainer">
+              <Link to="/admin/set-key-dates">Set Key Dates</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/coursework-calendar">
+                Coursework Calendar (for testing)
+              </Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/admin/create-module">Create Module</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/admin/programme-design">Programme Design</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/academic-event-calendar">Academic Event Calendar</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/Graph">Workload Profiles</Link>
+            </div>
           </div>
-          <div className="linkContainer">
-            <Link to="/academic-event-calendar">Academic Event Calendar</Link>
-          </div>
-          <div className="linkContainer">
-            <Link to="/Graph">Workload Profiles</Link>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -958,12 +958,11 @@ function StudentCalendar() {
             </select>
           </div>
 
-          {/* Dropdown for selecting course */}
-          <span>Show reading week </span>
+          {/* <span>Show reading week </span>
           <select className="mb-4" value={course} onChange={handleCourseChange}>
             <option value="CS">No</option>
             <option value="EE">Yes</option>
-          </select>
+          </select> */}
 
           {/* <div>
             <label>Calendar Version: </label>
@@ -1100,7 +1099,7 @@ function StudentCalendar() {
             </table>
 
             {/* semester 2 modules: */}
-            {/* <h3 className="mx-4">Semester 2</h3>
+            <h3 className="mx-4">Semester 2</h3>
             <table className="table table-bordered mx-4">
               <thead>
                 <tr>
@@ -1151,7 +1150,7 @@ function StudentCalendar() {
                   return null;
                 })}
               </tbody>
-            </table> */}
+            </table>
           </div>
 
           <hr className="rounded"></hr>

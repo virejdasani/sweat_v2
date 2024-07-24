@@ -79,7 +79,8 @@ const Home = () => {
             left: '20px',
           }}
         >
-          <option value="department1">Faculty</option>
+          <option value="department1">EEE</option>
+          <option value="department2">CS</option>
           <option value="department2">Other</option>
         </select>
       </div>

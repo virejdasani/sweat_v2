@@ -311,10 +311,10 @@ function StudentCalendar() {
   );
 
   // Function to handle course selection
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCourse = e.target.value;
-    setCourse(selectedCourse);
-  };
+  // const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const selectedCourse = e.target.value;
+  //   setCourse(selectedCourse);
+  // };
 
   // const getSemesterWeekNumber = (
   //   date: Date,

@@ -1229,10 +1229,7 @@ function StudentCalendar() {
                   className="list-group-item d-flex justify-content-between align-items-center"
                 >
                   {event.title}
-                  <span>
-                    {event.start.toLocaleDateString()} -{' '}
-                    {event.end.toLocaleDateString()}
-                  </span>
+                  <span>{event.end.toLocaleDateString()}</span>
                 </li>
               ))}
             </ul>

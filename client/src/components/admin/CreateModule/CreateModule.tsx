@@ -32,11 +32,10 @@ import { ModuleSetupFormData } from '../../../types/admin/CreateModule/ModuleSet
 import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
-import ModuleReview from './ModuleReview/ModuleReview';
-import WorkloadGraph from './WorkloadGraph/WorkloadGraph';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
+import ModuleReview from './ModuleReview/ModuleReview';
 
-const MAX_STEPS = 6; // Update MAX_STEPS
+const MAX_STEPS = 5;
 
 const CreateModule: React.FC = () => {
   const location = useLocation();
@@ -149,20 +148,12 @@ const CreateModule: React.FC = () => {
             isEditing={!!module}
           />
         );
-      case 4:
+      case 4: // New case for module review
         return (
           <ModuleReview
+            templateData={templateData}
             formData={formData}
             courseworkList={courseworkList}
-            templateData={templateData}
-          />
-        );
-      case 5:
-        return (
-          <WorkloadGraph
-            formData={formData}
-            courseworkList={courseworkList}
-            templateData={templateData}
           />
         );
       default:
@@ -174,6 +165,10 @@ const CreateModule: React.FC = () => {
     if (activeStep < MAX_STEPS - 1) {
       handleNext(activeStep, nextStep, setActiveStep, steps.length);
     }
+  };
+
+  const handleDiscardAndExit = () => {
+    navigate('/admin');
   };
 
   return (
@@ -227,6 +222,7 @@ const CreateModule: React.FC = () => {
           >
             {activeStep === MAX_STEPS - 1 ? 'Save to database' : 'Next'}
           </Button>
+          <Button onClick={handleDiscardAndExit}>Discard and Exit</Button>
         </Box>
       </Box>
     </>

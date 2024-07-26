@@ -43,8 +43,13 @@ export const mergeTemplateDataWithWorkloadData = (
 
   // Add coursework data with formatted shortTitle
   courseworkList.forEach((coursework) => {
-    const { shortTitle, deadlineWeek, weight, preparationTime, releaseWeek } =
-      coursework;
+    const {
+      shortTitle,
+      deadlineWeek,
+      weight,
+      preparationTime,
+      releasedWeekPrior,
+    } = coursework;
     if (!shortTitle || preparationTime === undefined) return;
 
     const formattedTitle = `${shortTitle} (Week: ${deadlineWeek}, Weight: ${weight}%)`;
@@ -55,7 +60,7 @@ export const mergeTemplateDataWithWorkloadData = (
       }
     }
 
-    const actualStartWeek = deadlineWeek - releaseWeek;
+    const actualStartWeek = deadlineWeek - (releasedWeekPrior ?? 2);
     const weeksToDistribute = deadlineWeek - actualStartWeek + 1;
     const timePerWeek = preparationTime / weeksToDistribute;
 

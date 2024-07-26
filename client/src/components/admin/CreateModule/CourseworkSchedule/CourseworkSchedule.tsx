@@ -22,8 +22,6 @@ import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup
 import {
   calculateTotalTime,
   expectedTotalTime,
-  handleInputBlurUtil,
-  handleInputChangeUtil,
   initializeCourseworkList,
   recalculateCourseworkList,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
@@ -39,19 +37,24 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
 }) => {
   const [internalCourseworkList, setInternalCourseworkList] =
     useState<Coursework[]>(courseworkList);
+  const [manualChanges, setManualChanges] = useState<Record<string, boolean>>(
+    {},
+  );
   const isInitialized = useRef(false);
 
   useEffect(() => {
-    const initialList = initializeCourseworkList(
-      courseworkList,
-      templateData,
-      moduleCredit,
-      formFactor,
-      isEditing,
-    );
-    setInternalCourseworkList(initialList);
-    handleCourseworkListChange(initialList);
-    isInitialized.current = true;
+    if (!isInitialized.current) {
+      const initialList = initializeCourseworkList(
+        courseworkList,
+        templateData,
+        moduleCredit,
+        formFactor,
+        isEditing,
+      );
+      setInternalCourseworkList(initialList);
+      handleCourseworkListChange(initialList);
+      isInitialized.current = true;
+    }
   }, [
     courseworkList,
     templateData,
@@ -62,7 +65,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   ]);
 
   useEffect(() => {
-    if (isEditing) {
+    if (isEditing && isInitialized.current) {
       const recalculatedList = recalculateCourseworkList(
         internalCourseworkList,
         templateData,
@@ -84,6 +87,40 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   const handleRestoreDefaults = () => {
     setInternalCourseworkList(courseworkList);
     handleCourseworkListChange(courseworkList);
+  };
+
+  const handleInputChange = (
+    index: number,
+    field: keyof Omit<
+      Coursework,
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
+    >,
+    value: number | undefined,
+  ) => {
+    const updatedCourseworkList = [...internalCourseworkList];
+    updatedCourseworkList[index][field] = value;
+    setInternalCourseworkList(updatedCourseworkList);
+
+    const manualChangesCopy = { ...manualChanges };
+    manualChangesCopy[`${index}-${field}`] = true;
+    setManualChanges(manualChangesCopy);
+
+    handleScheduleChange(index, field, value);
+  };
+
+  const handleInputBlur = (
+    index: number,
+    field: keyof Omit<
+      Coursework,
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
+    >,
+  ) => {
+    const value = Number(internalCourseworkList[index][field]);
+    handleScheduleChange(index, field, value);
+
+    const manualChangesCopy = { ...manualChanges };
+    manualChangesCopy[`${index}-${field}`] = false;
+    setManualChanges(manualChangesCopy);
   };
 
   return (
@@ -122,25 +159,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.contactTimeLectures ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'contactTimeLectures',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'contactTimeLectures',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'contactTimeLectures')}
                   style={courseworkScheduleStyles.input}
                 />
               </Td>
@@ -154,25 +181,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.contactTimeTutorials ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'contactTimeTutorials',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'contactTimeTutorials',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'contactTimeTutorials')}
                   style={courseworkScheduleStyles.input}
                 />
               </Td>
@@ -186,25 +203,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.contactTimeLabs ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'contactTimeLabs',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'contactTimeLabs',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'contactTimeLabs')}
                   style={courseworkScheduleStyles.input}
                 />
               </Td>
@@ -218,25 +225,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.contactTimeSeminars ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'contactTimeSeminars',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'contactTimeSeminars',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'contactTimeSeminars')}
                   style={courseworkScheduleStyles.input}
                 />
               </Td>
@@ -252,24 +249,16 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.contactTimeFieldworkPlacement ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'contactTimeFieldworkPlacement',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
                   onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'contactTimeFieldworkPlacement',
-                      handleScheduleChange,
-                    )
+                    handleInputBlur(index, 'contactTimeFieldworkPlacement')
                   }
                   style={courseworkScheduleStyles.input}
                 />
@@ -284,25 +273,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.contactTimeOthers ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'contactTimeOthers',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'contactTimeOthers',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'contactTimeOthers')}
                   style={courseworkScheduleStyles.input}
                 />
               </Td>
@@ -318,24 +297,16 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.formativeAssessmentTime ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'formativeAssessmentTime',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
                   onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'formativeAssessmentTime',
-                      handleScheduleChange,
-                    )
+                    handleInputBlur(index, 'formativeAssessmentTime')
                   }
                   style={courseworkScheduleStyles.input}
                 />
@@ -354,25 +325,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                       : ''
                   }
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'privateStudyTime',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'privateStudyTime',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'privateStudyTime')}
                   style={courseworkScheduleStyles.input}
                   disabled={coursework.type !== 'exam'}
                 />
@@ -391,25 +352,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                       : ''
                   }
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'preparationTime',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'preparationTime',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'preparationTime')}
                   style={courseworkScheduleStyles.input}
                   disabled={coursework.type === 'exam'}
                 />
@@ -426,25 +377,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.keyboardTime ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'keyboardTime',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'keyboardTime',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'keyboardTime')}
                   style={courseworkScheduleStyles.input}
                 />
               </Td>
@@ -458,25 +399,15 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   type="number"
                   value={coursework.feedbackTime ?? ''}
                   onChange={(e) =>
-                    handleInputChangeUtil(
-                      internalCourseworkList,
+                    handleInputChange(
                       index,
                       'feedbackTime',
                       e.target.value === ''
                         ? undefined
                         : Number(e.target.value),
-                      handleScheduleChange,
-                      setInternalCourseworkList,
                     )
                   }
-                  onBlur={() =>
-                    handleInputBlurUtil(
-                      internalCourseworkList,
-                      index,
-                      'feedbackTime',
-                      handleScheduleChange,
-                    )
-                  }
+                  onBlur={() => handleInputBlur(index, 'feedbackTime')}
                   style={courseworkScheduleStyles.input}
                   disabled={coursework.type === 'exam'}
                 />

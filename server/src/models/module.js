@@ -6,6 +6,11 @@ const distributionSchema = new mongoose.Schema({
   hours: { type: Number },
 });
 
+const studyStyleDistributionSchema = new mongoose.Schema({
+  type: { type: String },
+  distribution: { type: [distributionSchema] },
+});
+
 const courseworkSchema = new mongoose.Schema({
   shortTitle: { type: String },
   longTitle: { type: String },
@@ -13,9 +18,9 @@ const courseworkSchema = new mongoose.Schema({
   type: { type: String },
   deadlineWeek: { type: Number },
   deadlineDate: { type: Date },
-  releaseWeek: { type: Number, default: null },
-  deadlineDay: { type: String, default: null },
-  deadlineTime: { type: String, default: null },
+  releasedWeekPrior: { type: Number || String, default: 2 },
+  deadlineDay: { type: String, default: 'Friday' },
+  deadlineTime: { type: String, default: '23:59' },
   contactTimeLectures: { type: Number, default: 0 },
   contactTimeTutorials: { type: Number, default: 0 },
   contactTimeLabs: { type: Number, default: 0 },
@@ -27,6 +32,10 @@ const courseworkSchema = new mongoose.Schema({
   preparationTime: { type: Number, default: 0 },
   keyboardTime: { type: Number, default: 0 },
   feedbackTime: { type: Number, default: 0 },
+  preparationTimeDistributions: {
+    type: [studyStyleDistributionSchema],
+    default: [],
+  },
 });
 
 const scheduleSchema = new mongoose.Schema({
@@ -46,6 +55,7 @@ const moduleSetupSchema = new mongoose.Schema({
   type: { type: String },
   teachingStaff: { type: [String] },
   formFactor: { type: Number },
+  archived: { type: Boolean, default: false },
 });
 
 const moduleSchema = new mongoose.Schema({
@@ -60,6 +70,10 @@ const moduleSchema = new mongoose.Schema({
     other: { type: scheduleSchema },
   },
   courseworkList: { type: [courseworkSchema] },
+  privateStudyDistributions: {
+    type: [studyStyleDistributionSchema],
+    default: [],
+  },
 });
 
 const Module = mongoose.model('Module', moduleSchema);

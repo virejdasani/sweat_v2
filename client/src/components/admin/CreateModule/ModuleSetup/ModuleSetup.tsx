@@ -83,7 +83,6 @@ const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
               <option value={7.5}>7.5</option>
               <option value={15}>15</option>
               <option value={30}>30</option>
-              <option value={60}>60</option>
             </Select>
           </FormControl>
         </GridItem>

@@ -1,102 +1,114 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Box, Select } from '@chakra-ui/react';
+import DistributionTable from './DistributionTable';
+import DistributionGraph from './DistributionGraph';
+import { ModuleSetupFormData } from '../../../../types/admin/CreateModule/ModuleSetup';
 import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Heading,
-} from '@chakra-ui/react';
-import { ModuleReviewProps } from '../../../../types/admin/CreateModule/ModuleReview';
-import {
-  calculateContactTime,
-  calculateFormativeAssessmentTime,
-  calculatePrivateStudyTime,
-  calculatePreparationTime,
-  calculateKeyboardTime,
-  calculateFeedbackTime,
-  calculateTotalTime,
-  calculateOverallTime,
-} from '../../../../utils/admin/CreateModule/ModuleReview';
+  Coursework,
+  StudyStyleDistribution,
+} from '../../../../types/admin/CreateModule/CourseworkSetup';
+import httpClient from '../../../../shared/api/httpClient';
+import { transformTemplateDataToSaveData } from '../../../../utils/admin/CreateModule/TeachingSchedule';
+
+interface ModuleReviewProps {
+  templateData: number[][][];
+  formData: ModuleSetupFormData;
+  courseworkList: Coursework[];
+}
 
 const ModuleReview: React.FC<ModuleReviewProps> = ({
+  templateData,
   formData,
-  courseworkList = [],
-  templateData = [],
+  courseworkList,
 }) => {
-  const [overallTime, setOverallTime] = useState(0);
-  const [totalTime, setTotalTime] = useState(0);
-  const [contactTime, setContactTime] = useState(0);
-  const [formativeAssessmentTime, setFormativeAssessmentTime] = useState(0);
-  const [privateStudyTime, setPrivateStudyTime] = useState(0);
-  const [preparationTime, setPreparationTime] = useState(0);
-  const [keyboardTime, setKeyboardTime] = useState(0);
-  const [feedbackTime, setFeedbackTime] = useState(0);
+  const [studyStyle, setStudyStyle] = useState<string>('earlyStarter');
+  const [ratio, setRatio] = useState<string>('0');
+  const [courseworkData, setCourseworkData] = useState<Coursework[]>([]);
+  const [privateStudyData, setPrivateStudyData] = useState<
+    StudyStyleDistribution[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setOverallTime(calculateOverallTime(templateData, courseworkList));
-    setTotalTime(calculateTotalTime(formData));
-    setContactTime(calculateContactTime(templateData));
-    setFormativeAssessmentTime(
-      calculateFormativeAssessmentTime(courseworkList),
-    );
-    setPrivateStudyTime(calculatePrivateStudyTime(courseworkList));
-    setPreparationTime(calculatePreparationTime(courseworkList));
-    setKeyboardTime(calculateKeyboardTime(courseworkList));
-    setFeedbackTime(calculateFeedbackTime(courseworkList));
-  }, [formData, courseworkList, templateData]);
+    const fetchData = async () => {
+      try {
+        const moduleDocument = {
+          moduleSetup: formData,
+          teachingSchedule: transformTemplateDataToSaveData(templateData),
+          courseworkList,
+        };
+        const response = await httpClient.post(
+          '/private-study-distributions',
+          moduleDocument,
+        );
+        setCourseworkData(response.data.courseworkList);
+        setPrivateStudyData(response.data.privateStudyDistributions);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching distributions:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [templateData, formData, courseworkList]);
+
+  if (loading) {
+    return <Box>Loading...</Box>;
+  }
+
+  // Filter private study distributions based on the selected ratio
+  const filteredPrivateStudyData = privateStudyData.filter(
+    (dist) => dist.type === `ratio${ratio}`,
+  );
+
+  // Filter preparation time distributions based on the selected study style for each coursework
+  const filteredPreparationData = courseworkData.map((coursework) => ({
+    ...coursework,
+    preparationTimeDistributions: (
+      coursework.preparationTimeDistributions || []
+    ).filter((dist) => {
+      if (coursework.type !== 'exam') {
+        return dist.type === studyStyle;
+      } else {
+        return dist.type === `${studyStyle}_ratio${ratio}`;
+      }
+    }),
+  }));
 
   return (
     <Box>
-      <Heading as="h2" size="lg" mb={4}>
-        Module Review
-      </Heading>
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Category</Th>
-            <Th>Time (hours)</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>Contact Time</Td>
-            <Td>{contactTime}</Td>
-          </Tr>
-          <Tr>
-            <Td>Formative Assessment Time</Td>
-            <Td>{formativeAssessmentTime}</Td>
-          </Tr>
-          <Tr>
-            <Td>Private Study Time</Td>
-            <Td>{privateStudyTime}</Td>
-          </Tr>
-          <Tr>
-            <Td>Preparation Time</Td>
-            <Td>{preparationTime}</Td>
-          </Tr>
-          <Tr>
-            <Td>Keyboard Time</Td>
-            <Td>{keyboardTime}</Td>
-          </Tr>
-          <Tr>
-            <Td>Feedback Time</Td>
-            <Td>{feedbackTime}</Td>
-          </Tr>
-          <Tr>
-            <Td>Total Time</Td>
-            <Td
-              style={{
-                color: overallTime === totalTime ? 'green' : 'red',
-              }}
-            >
-              {overallTime} / {totalTime}
-            </Td>
-          </Tr>
-        </Tbody>
-      </Table>
+      <Box mb={4}>
+        <Select
+          placeholder="Select Study Style"
+          onChange={(e) => setStudyStyle(e.target.value)}
+          value={studyStyle}
+        >
+          <option value="earlyStarter">Early Starter</option>
+          <option value="steady">Steady</option>
+          <option value="justInTime">Just In Time</option>
+        </Select>
+        <Select
+          placeholder="Select Ratio"
+          onChange={(e) => setRatio(e.target.value)}
+          value={ratio}
+        >
+          <option value="0">0</option>
+          <option value="0_5">0.5</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </Select>
+      </Box>
+      <DistributionTable
+        templateData={templateData}
+        privateStudyDistributions={filteredPrivateStudyData}
+      />
+      <DistributionGraph
+        teachingSchedule={transformTemplateDataToSaveData(templateData)}
+        privateStudyDistributions={filteredPrivateStudyData}
+        preparationTimeDistributions={filteredPreparationData}
+        moduleCredit={formData.moduleCredit}
+      />
     </Box>
   );
 };

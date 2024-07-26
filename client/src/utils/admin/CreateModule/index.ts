@@ -67,7 +67,7 @@ export const handleScheduleChange = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
   >,
   value: number | undefined,
   courseworkList: Coursework[],

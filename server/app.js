@@ -19,9 +19,9 @@ app.use(cors());
 const moduleController = require('./src/controllers/moduleController');
 const programmeController = require('./src/controllers/programmeController');
 const calendarController = require('./src/controllers/calendarController');
+const distributionController = require('./src/controllers/distributionController');
 
 // Module routes
-app.post('/modules/workload-graph', moduleController.getWorkloadGraphData);
 app.get('/modules/module-template', moduleController.getModuleTemplate);
 app.get('/modules', moduleController.getAllModules);
 app.get('/modules/ids', moduleController.getAllModuleIds);
@@ -60,6 +60,9 @@ app.post('/calendar/add-event', calendarController.addEvent);
 app.delete('/calendar/delete-event/:eventId', calendarController.deleteEvent);
 app.put('/calendar/update-event/:eventId', calendarController.updateEvent);
 app.delete('/calendar/delete-all-events', calendarController.deleteAllEvents);
+
+// Distribution routes
+app.post('/private-study-distributions', distributionController.getDistributions);
 
 // MongoDB connection
 mongoose

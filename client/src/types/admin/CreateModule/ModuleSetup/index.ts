@@ -10,6 +10,7 @@ export interface ModuleSetupFormData {
   type: string;
   teachingStaff: string[];
   formFactor: number;
+  archived?: boolean;
 }
 
 export interface ModuleSetupProps {

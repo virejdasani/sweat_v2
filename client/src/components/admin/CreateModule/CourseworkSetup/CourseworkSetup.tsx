@@ -38,6 +38,7 @@ const daysOfWeek = [
   'Friday',
   'Saturday',
   'Sunday',
+  'As Timetabled',
 ];
 
 const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
@@ -88,7 +89,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
             <Th style={courseworkSetupStyles.th}>Weight</Th>
             <Th style={courseworkSetupStyles.th}>Type</Th>
             <Th style={courseworkSetupStyles.th}>Deadline Week</Th>
-            <Th style={courseworkSetupStyles.th}>Release Week</Th>
+            <Th style={courseworkSetupStyles.th}>Released Weeks Prior</Th>
             <Th style={courseworkSetupStyles.th}>Actions</Th>
             <Th style={courseworkSetupStyles.th}>Day of Week</Th>
             <Th style={courseworkSetupStyles.th}>Time</Th>
@@ -145,7 +146,6 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                   style={courseworkSetupStyles.select}
                   disabled={coursework.type === 'exam'}
                 >
-                  <option value="exam">Exam</option>
                   <option value="assignment">Assignment</option>
                   <option value="class test">Class Test</option>
                   <option value="lab report">Lab Report</option>
@@ -214,9 +214,13 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.releaseWeek || ''}
+                  value={coursework.releasedWeekPrior || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'releaseWeek', e.target.value)
+                    handleInputChange(
+                      index,
+                      'releasedWeekPrior',
+                      e.target.value,
+                    )
                   }
                   style={courseworkSetupStyles.select}
                   disabled={coursework.type === 'exam'}

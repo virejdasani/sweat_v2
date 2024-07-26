@@ -14,10 +14,10 @@ export const CourseworkSetupFunctions = ({
       weight: 0,
       type: 'assignment',
       deadlineWeek: 1,
-      releaseWeek: 2,
+      releasedWeekPrior: 2,
       feedbackTime: 1,
       deadlineDay: 'Monday', // Set default value
-      deadlineTime: '09:00', // Set default value
+      deadlineTime: '23:59', // Set default value
     };
     onCourseworkListChange([...courseworkList, newCoursework]);
   };
@@ -71,7 +71,7 @@ export const CourseworkSetupFunctions = ({
       (coursework) =>
         coursework.weight >= 1 &&
         coursework.weight <= 100 &&
-        coursework.releaseWeek <= coursework.deadlineWeek,
+        (coursework.releasedWeekPrior ?? 2) <= coursework.deadlineWeek,
     );
 
   return {
@@ -104,7 +104,7 @@ export const addExamCoursework = (
         weight: examPercentage,
         type: 'exam',
         deadlineWeek: 15,
-        releaseWeek: 1,
+        releasedWeekPrior: 1,
         feedbackTime: 1,
         deadlineDay: '',
         deadlineTime: '',

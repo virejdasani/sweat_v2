@@ -96,13 +96,11 @@ export const updateCourseworkList = (
                   100,
               ),
               contactTimeLabs: Math.round(
-                (templateData.reduce(
+                templateData.reduce(
                   (total, semesterData) =>
                     total + calculateContactTime(semesterData[2]),
                   0,
-                ) *
-                  formFactor) /
-                  100,
+                ), // formFactor not applied here
               ),
               contactTimeSeminars: Math.round(
                 (templateData.reduce(
@@ -156,6 +154,7 @@ export const updateCourseworkList = (
 
   return updatedCourseworkList;
 };
+
 export const updateExamContactTime = (
   courseworkList: Coursework[],
   templateData: number[][][],
@@ -347,14 +346,14 @@ export const handleInputChangeUtil = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
   >,
   value: number | undefined,
   handleScheduleChange: (
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
     >,
     value: number | undefined,
   ) => void,
@@ -371,13 +370,13 @@ export const handleInputBlurUtil = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
   >,
   handleScheduleChange: (
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releaseWeek'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
     >,
     value: number | undefined,
   ) => void,

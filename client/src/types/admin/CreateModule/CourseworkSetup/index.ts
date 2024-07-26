@@ -1,5 +1,15 @@
 import { ModuleSetupFormData } from '../ModuleSetup';
 
+export interface Distribution {
+  week: number;
+  hours: number;
+}
+
+export interface StudyStyleDistribution {
+  type: string;
+  distribution: Distribution[];
+}
+
 export interface Coursework {
   shortTitle: string;
   longTitle: string;
@@ -7,7 +17,7 @@ export interface Coursework {
   type: string;
   deadlineWeek: number;
   deadlineDate?: Date;
-  releaseWeek: number;
+  releasedWeekPrior?: number;
   deadlineDay?: string;
   deadlineTime?: string;
   contactTimeLectures?: number;
@@ -21,7 +31,8 @@ export interface Coursework {
   preparationTime?: number;
   keyboardTime?: number;
   feedbackTime?: number;
-  [key: string]: number | string | Date | undefined;
+  preparationTimeDistributions?: StudyStyleDistribution[];
+  [key: string]: number | string | Date | StudyStyleDistribution[] | undefined;
 }
 
 export interface CourseworkSetupProps {

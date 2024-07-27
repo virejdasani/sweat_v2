@@ -91,11 +91,13 @@ const calculatePrivateStudyDistribution = (
   let totalAllocatedTime = 0;
 
   Object.values(teachingSchedule).forEach((activity) => {
-    activity.distribution.forEach((week) => {
-      const studyHours = roundToNearestHalf(week.hours * ratio);
-      workloadData[week.week - 1].hours += studyHours;
-      totalAllocatedTime += studyHours;
-    });
+    if (activity.distribution && Array.isArray(activity.distribution)) {
+      activity.distribution.forEach((week) => {
+        const studyHours = roundToNearestHalf(week.hours * ratio);
+        workloadData[week.week - 1].hours += studyHours;
+        totalAllocatedTime += studyHours;
+      });
+    }
   });
 
   const remainingTime = Math.max(privateStudyTime - totalAllocatedTime, 0);

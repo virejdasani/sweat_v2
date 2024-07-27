@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Box, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 import { StudyStyleDistribution } from '../../../../types/admin/CreateModule/CourseworkSetup';
 
@@ -15,49 +15,60 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
     const weeks = templateData.length === 2 ? 30 : 15;
     const contactTime = Array(weeks).fill(0);
 
-    templateData.forEach((semesterData) => {
-      semesterData.forEach((weekHoursArray) => {
-        weekHoursArray.forEach((hours, weekIndex) => {
-          contactTime[weekIndex] += hours;
+    const sumContactHours = (semesterData: number[][], startWeek: number) => {
+      semesterData.forEach((contactTypeArray) => {
+        contactTypeArray.forEach((hours, weekIndex) => {
+          contactTime[startWeek + weekIndex] += hours;
         });
       });
-    });
+    };
 
+    if (templateData.length > 0) {
+      sumContactHours(templateData[0], 0);
+    }
+
+    if (templateData.length > 1) {
+      sumContactHours(templateData[1], 15);
+    }
+
+    console.log('Calculated contactTime array:', contactTime);
     return contactTime;
   };
 
-  const contactTime = useMemo(calculateContactTime, [templateData]);
+  const contactTime = React.useMemo(calculateContactTime, [templateData]);
 
   const renderTable = () => {
     const weeks = templateData.length === 2 ? 30 : 15;
 
     return (
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Week</Th>
-            {Array.from({ length: weeks }, (_, i) => (
-              <Th key={i}>{i + 1}</Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>Contact Time</Td>
-            {contactTime.map((hours, index) => (
-              <Td key={index}>{hours}</Td>
-            ))}
-          </Tr>
-          <Tr>
-            <Td>Private Study Time</Td>
-            {privateStudyDistributions.map((dist) =>
-              dist.distribution.map((weekData, index) => (
-                <Td key={index}>{weekData.hours}</Td>
-              )),
-            )}
-          </Tr>
-        </Tbody>
-      </Table>
+      <Box overflowX="auto">
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Week</Th>
+              {Array.from({ length: weeks }, (_, i) => (
+                <Th key={i}>{i + 1}</Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>Contact Time</Td>
+              {contactTime.map((hours, index) => (
+                <Td key={index}>{hours}</Td>
+              ))}
+            </Tr>
+            <Tr>
+              <Td>Private Study Time</Td>
+              {privateStudyDistributions[0].distribution.map(
+                (weekData, index) => (
+                  <Td key={index}>{weekData.hours}</Td>
+                ),
+              )}
+            </Tr>
+          </Tbody>
+        </Table>
+      </Box>
     );
   };
 

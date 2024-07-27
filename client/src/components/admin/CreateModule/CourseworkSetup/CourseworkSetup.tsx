@@ -146,6 +146,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                   style={courseworkSetupStyles.select}
                   disabled={coursework.type === 'exam'}
                 >
+                  <option value="exam">Exam</option>
                   <option value="assignment">Assignment</option>
                   <option value="class test">Class Test</option>
                   <option value="lab report">Lab Report</option>

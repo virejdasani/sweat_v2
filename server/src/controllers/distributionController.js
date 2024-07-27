@@ -10,9 +10,31 @@ const getDistributions = async (req, res) => {
     const semester = moduleSetup.semester;
 
     // Calculate private study distributions and preparation time distributions
-    const completeDistributions = courseworkList.map((coursework) =>
-      calculateCompleteDistributions(teachingSchedule, coursework, semester),
-    );
+    const completeDistributions = courseworkList.map((coursework, index) => {
+      return calculateCompleteDistributions(
+        teachingSchedule,
+        coursework,
+        semester,
+      );
+    });
+
+    // Check if completeDistributions is properly populated
+    if (!completeDistributions || completeDistributions.length === 0) {
+      throw new Error('completeDistributions is empty or undefined');
+    }
+
+    // Check each element in completeDistributions
+    completeDistributions.forEach((dist, index) => {
+      if (
+        !dist ||
+        !dist.privateStudyDistributions ||
+        !dist.preparationTimeDistributions
+      ) {
+        throw new Error(
+          `completeDistributions[${index}] is missing required properties`,
+        );
+      }
+    });
 
     // Collect all private study distributions
     const privateStudyDistributions = completeDistributions.flatMap(

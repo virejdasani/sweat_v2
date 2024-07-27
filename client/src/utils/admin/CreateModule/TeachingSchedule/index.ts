@@ -27,56 +27,67 @@ export const transformTemplateDataToSaveData = (
   templateData: number[][][],
 ): TeachingScheduleSaveData => {
   const teachingScheduleSaveData: TeachingScheduleSaveData = {
-    lectures: { hours: 0, distribution: [] },
-    tutorials: { hours: 0, distribution: [] },
-    labs: { hours: 0, distribution: [] },
-    seminars: { hours: 0, distribution: [] },
-    fieldworkPlacement: { hours: 0, distribution: [] },
-    other: { hours: 0, distribution: [] },
+    lectures: { hours: 0 },
+    tutorials: { hours: 0 },
+    labs: { hours: 0 },
+    seminars: { hours: 0 },
+    fieldworkPlacement: { hours: 0 },
+    other: { hours: 0 },
   };
 
-  templateData.forEach((semesterData) => {
+  const activityKeys: (keyof TeachingScheduleSaveData)[] = [
+    'lectures',
+    'tutorials',
+    'labs',
+    'seminars',
+    'fieldworkPlacement',
+    'other',
+  ];
+
+  const totalWeeks = templateData.length * 15;
+
+  templateData.forEach((semesterData, semesterIndex) => {
     semesterData.forEach((row, rowIndex) => {
-      let activityKey: keyof TeachingScheduleSaveData;
+      const activityKey = activityKeys[rowIndex];
 
-      switch (rowIndex) {
-        case 0:
-          activityKey = 'lectures';
-          break;
-        case 1:
-          activityKey = 'tutorials';
-          break;
-        case 2:
-          activityKey = 'labs';
-          break;
-        case 3:
-          activityKey = 'seminars';
-          break;
-        case 4:
-          activityKey = 'fieldworkPlacement';
-          break;
-        case 5:
-          activityKey = 'other';
-          break;
-        default:
-          return;
+      if (activityKey) {
+        const distribution = row
+          .map((hours, week) => ({
+            week: week + 1 + semesterIndex * 15,
+            hours,
+          }))
+          .filter((item) => item.hours > 0);
+
+        const activity = teachingScheduleSaveData[activityKey];
+        activity.hours += distribution.reduce(
+          (total, dist) => total + dist.hours,
+          0,
+        );
+
+        if (distribution.length > 0) {
+          if (!activity.distribution) {
+            activity.distribution = [];
+          }
+          activity.distribution.push(...distribution);
+        }
       }
-
-      const distribution = row
-        .map((hours, week) => ({ week: week + 1, hours }))
-        .filter((item) => item.hours > 0);
-
-      teachingScheduleSaveData[activityKey].hours += distribution.reduce(
-        (total, dist) => total + dist.hours,
-        0,
-      );
-
-      teachingScheduleSaveData[activityKey].distribution!.push(...distribution);
     });
+  });
+
+  // Ensure all weeks up to totalWeeks are represented
+  activityKeys.forEach((key) => {
+    const activity = teachingScheduleSaveData[key];
+    if (activity.distribution) {
+      for (let week = 1; week <= totalWeeks; week++) {
+        if (!activity.distribution.some((d) => d.week === week)) {
+          activity.distribution.push({ week, hours: 0 });
+        }
+      }
+      activity.distribution.sort((a, b) => a.week - b.week);
+    }
   });
   return teachingScheduleSaveData;
 };
-
 export const transformEditingDataToTemplateData = (
   scheduleData: TeachingScheduleSaveData,
   isWholeSession: boolean,

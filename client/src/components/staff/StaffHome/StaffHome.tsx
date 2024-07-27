@@ -125,9 +125,6 @@ const StaffHome = () => {
               </Link>
             </div>
             <div className="linkContainer">
-              <Link to="/admin/create-module">Create Module</Link>
-            </div>
-            <div className="linkContainer">
               <Link to="/admin/programme-design">Programme Design</Link>
             </div>
             <div className="linkContainer">

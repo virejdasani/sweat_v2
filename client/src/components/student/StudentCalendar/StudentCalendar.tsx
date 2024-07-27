@@ -1286,6 +1286,29 @@ function StudentCalendar() {
       <hr className="rounded"></hr>
 
       <EffortGraph />
+
+      <div
+        className="effortInfo"
+        style={{
+          marginLeft: '50px',
+          marginRight: '50px',
+          marginTop: '20px',
+          marginBottom: '20px',
+          fontSize: 'small',
+          border: '1px solid black',
+          padding: '20px',
+        }}
+      >
+        <h4>Effort Information</h4>
+        <p>
+          In the UK, each credit corresponds to 10 hours of notional learning.
+          Therefore, a 15 credit module requires a total of 150 hours of student
+          effort, including contact time and private study. <></>
+          <a href="https://www.qaa.ac.uk/docs/qaa/quality-code/what-is-credit-guide-for-students.pdf?sfvrsn=4460d981_14">
+            Source
+          </a>
+        </p>
+      </div>
     </>
   );
 }

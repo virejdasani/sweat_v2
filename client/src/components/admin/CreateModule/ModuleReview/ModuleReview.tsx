@@ -44,9 +44,6 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
         );
         setCourseworkData(response.data.courseworkList);
         setPrivateStudyData(response.data.privateStudyDistributions);
-        console.log('Private study data:', response.data);
-
-        console.log('Coursework data:', response.data.courseworkList);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching distributions:', error);

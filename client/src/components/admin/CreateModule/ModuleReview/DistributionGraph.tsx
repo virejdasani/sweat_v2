@@ -1,8 +1,8 @@
 import React, { useMemo, useRef } from 'react';
 import { Box } from '@chakra-ui/react';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -38,10 +38,13 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
   moduleCredit,
 }) => {
   const colorMapRef = useRef<{ [key: string]: string }>({});
+  const existingColors = useRef<string[]>([]);
 
   const getColor = (key: string) => {
     if (!colorMapRef.current[key]) {
-      colorMapRef.current[key] = getRandomColor();
+      const newColor = getRandomColor(existingColors.current, 100);
+      colorMapRef.current[key] = newColor;
+      existingColors.current.push(newColor);
     }
     return colorMapRef.current[key];
   };
@@ -127,18 +130,20 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
     }));
   }, [teachingScheduleData, preparationTimeData, privateStudyData]);
 
-  const renderLines = () => {
+  const renderAreas = () => {
     const elements = [];
 
     Object.keys(teachingSchedule).forEach((type) => {
       elements.push(
-        <Line
+        <Area
           key={type}
           type="monotone"
           dataKey={type}
           stroke={getColor(type)}
+          fill={getColor(type)}
           strokeWidth={2}
           dot={{ r: 4 }}
+          stackId="1"
         />,
       );
     });
@@ -150,26 +155,30 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
             ? `${coursework.shortTitle} (${dist.type})`
             : `${coursework.shortTitle} (deadline: ${coursework.deadlineWeek}, weight: ${coursework.weight}%)`;
         elements.push(
-          <Line
+          <Area
             key={label}
             type="monotone"
             dataKey={label}
             stroke={getColor(label)}
+            fill={getColor(label)}
             strokeWidth={2}
             dot={{ r: 4 }}
+            stackId="1"
           />,
         );
       }),
     );
 
     elements.push(
-      <Line
+      <Area
         key="privateStudy"
         type="monotone"
         dataKey="privateStudy"
         stroke={getColor('privateStudy')}
+        fill={getColor('privateStudy')}
         strokeWidth={2}
         dot={{ r: 4 }}
+        stackId="1"
       />,
     );
 
@@ -179,7 +188,7 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
   return (
     <Box>
       <ResponsiveContainer width="100%" height={500}>
-        <LineChart
+        <AreaChart
           data={combinedData}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >
@@ -209,8 +218,8 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
             strokeWidth={3}
             label="Avg Effort"
           />
-          {renderLines()}
-        </LineChart>
+          {renderAreas()}
+        </AreaChart>
       </ResponsiveContainer>
     </Box>
   );

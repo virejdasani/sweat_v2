@@ -31,7 +31,6 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
       sumContactHours(templateData[1], 15);
     }
 
-    console.log('Calculated contactTime array:', contactTime);
     return contactTime;
   };
 

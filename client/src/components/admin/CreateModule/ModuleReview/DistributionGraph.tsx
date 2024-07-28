@@ -17,7 +17,7 @@ import {
   Coursework,
 } from '../../../../types/admin/CreateModule/CourseworkSetup';
 import { TeachingScheduleSaveData } from '../../../../types/admin/CreateModule/TeachingSchedule';
-import { getRandomColor } from '../../../../utils/admin/CreateModule/WorkloadGraph';
+import { getRandomColor } from '../../../../utils/admin/CreateModule/ModuleReview';
 
 interface DistributionGraphProps {
   teachingSchedule: TeachingScheduleSaveData;

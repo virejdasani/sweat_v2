@@ -62,6 +62,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     const updatedCourseworkList = addExamCoursework(
       examPercentage,
       courseworkList,
+      semester,
     );
     if (updatedCourseworkList) {
       onCourseworkListChange(updatedCourseworkList);
@@ -197,9 +198,6 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                           </option>
                           <option key="easterBreak3" value="easterBreak3">
                             Easter Break Week 3
-                          </option>
-                          <option key={i + 2} value={i + 2}>
-                            {i + 2}
                           </option>
                         </React.Fragment>
                       );

@@ -86,16 +86,20 @@ export const CourseworkSetupFunctions = ({
 export const addExamCoursework = (
   examPercentage: number,
   courseworkList: Coursework[],
+  semester: string,
 ): Coursework[] | null => {
   let updatedCourseworkList = [...courseworkList];
   const examIndex = updatedCourseworkList.findIndex(
     (coursework) => coursework.type === 'exam',
   );
 
+  const examDeadlineWeek = semester === 'whole session' ? 30 : 15;
+
   if (examPercentage > 0) {
     if (examIndex >= 0) {
       // Update existing exam coursework
       updatedCourseworkList[examIndex].weight = examPercentage;
+      updatedCourseworkList[examIndex].deadlineWeek = examDeadlineWeek;
     } else {
       // Add new exam coursework
       const examCoursework: Coursework = {
@@ -103,7 +107,7 @@ export const addExamCoursework = (
         longTitle: 'Final Exam',
         weight: examPercentage,
         type: 'exam',
-        deadlineWeek: 15,
+        deadlineWeek: examDeadlineWeek,
         releasedWeekPrior: 1,
         feedbackTime: 1,
         deadlineDay: '',

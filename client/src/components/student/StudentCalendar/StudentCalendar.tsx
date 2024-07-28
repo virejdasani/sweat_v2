@@ -1075,7 +1075,15 @@ function StudentCalendar() {
                         <th></th>
                         {Array.from({ length: 15 }, (_, i) => i + 1).map(
                           (week) => (
-                            <th key={week}>
+                            <th
+                              key={week}
+                              {...(week === 7
+                                ? { className: 'readingWeekTableData' }
+                                : {})}
+                              {...(week > 12
+                                ? { className: 'postWeek12TableData' }
+                                : {})}
+                            >
                               Week {week}
                               {/* show the week commence date */}
                               <br />
@@ -1083,7 +1091,9 @@ function StudentCalendar() {
                                 semester1Event.start,
                                 week,
                                 'Sunday',
-                              ).toLocaleDateString()}
+                              )
+                                .toLocaleDateString()
+                                .slice(0, -5)}
                             </th>
                           ),
                         )}
@@ -1109,16 +1119,24 @@ function StudentCalendar() {
                                       !event.title.includes('Exam'),
                                   );
                                   return (
-                                    // show the first 2 words of the event title only (removes the week number, academic year and version number)
-                                    <td key={week}>
+                                    // if its week 7, have a td with className readingWeekTableData
+                                    <td
+                                      key={week}
+                                      {...(week === 7
+                                        ? { className: 'readingWeekTableData' }
+                                        : {})}
+                                      {...(week > 12
+                                        ? { className: 'postWeek12TableData' }
+                                        : {})}
+                                    >
                                       {event
                                         ? event.title
                                             .split(' ')
-                                            .slice(0, 2)
+                                            .slice(1, -4) // remove the modulecode, week number, academic year and version number
                                             .join(' ') +
                                           // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
                                           (event.title.includes('Coursework')
-                                            ? ` (${moduleSetup.courseworkPercentage}%)`
+                                            ? ``
                                             : event.title.includes('Exam')
                                               ? ``
                                               : '')
@@ -1144,7 +1162,15 @@ function StudentCalendar() {
                         <th></th>
                         {Array.from({ length: 15 }, (_, i) => i + 1).map(
                           (week) => (
-                            <th key={week}>
+                            <th
+                              key={week}
+                              {...(week === 7
+                                ? { className: 'readingWeekTableData' }
+                                : {})}
+                              {...(week > 12
+                                ? { className: 'postWeek12TableData' }
+                                : {})}
+                            >
                               Week {week}
                               {/* show the week commence date */}
                               <br />
@@ -1152,7 +1178,9 @@ function StudentCalendar() {
                                 semester2Event.start,
                                 week,
                                 'Sunday',
-                              ).toLocaleDateString()}
+                              )
+                                .toLocaleDateString()
+                                .slice(0, -5)}
                             </th>
                           ),
                         )}
@@ -1179,15 +1207,23 @@ function StudentCalendar() {
                                   );
                                   return (
                                     // show the first 2 words of the event title only (removes the week number, academic year and version number)
-                                    <td key={week}>
+                                    <td
+                                      key={week}
+                                      {...(week === 7
+                                        ? { className: 'readingWeekTableData' }
+                                        : {})}
+                                      {...(week > 12
+                                        ? { className: 'postWeek12TableData' }
+                                        : {})}
+                                    >
                                       {event
                                         ? event.title
                                             .split(' ')
-                                            .slice(0, 2)
+                                            .slice(1, -4) // remove the modulecode, week number, academic year and version number
                                             .join(' ') +
                                           // get coursework percentage from the module setup and show it in the table if it's a coursework and show exam percentage if it's an exam
                                           (event.title.includes('Coursework')
-                                            ? ` (${moduleSetup.courseworkPercentage}%)`
+                                            ? ``
                                             : event.title.includes('Exam')
                                               ? ` (${moduleSetup.examPercentage}%)`
                                               : '')

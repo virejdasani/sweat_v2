@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import './StaffHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// import Branding from '../../Branding/Branding';
+import logo from '../../Branding/logo.png';
+import uniLogo from '../../Branding/uniLogo.png';
 
 const StaffHome = () => {
   const staffPassword = import.meta.env.VITE_STAFF_PASSWORD;
@@ -33,9 +36,32 @@ const StaffHome = () => {
 
   return (
     <div className="home">
-      <h1 className="">SWEAT Staff Home</h1>
+      <img
+        src={logo}
+        alt="Logo"
+        className="logo"
+        style={{
+          width: '150px',
+          height: '150px',
+          position: 'absolute',
+          bottom: '0',
+          right: '0',
+        }}
+      />
+      <img
+        src={uniLogo}
+        alt="University Logo"
+        className="uniLogo"
+        style={{
+          width: '190px',
+          position: 'absolute',
+          bottom: '0',
+          left: '22px',
+        }}
+      />
+      <h1 className="">Staff Portal</h1>
       <button
-        className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        style={{ position: 'absolute', top: '0', left: '0' }}
         onClick={() => {
           window.history.back();
         }}
@@ -62,22 +88,51 @@ const StaffHome = () => {
         </div>
       ) : (
         <>
-          <div className="linkContainer">
-            <Link to="/coursework-calendar">
-              Coursework Calendar (for testing)
-            </Link>
+          <div>
+            {/* dropdown for selecting current academic year */}
+            <span>Academic Year: </span>
+            <select className="mb-4">
+              <option value="2023/24">2023/24</option>
+              <option value="2024/25">2024/25</option>
+              <option value="2025/26">2025/26</option>
+            </select>
           </div>
-          <div className="linkContainer">
-            <Link to="/admin/create-module">Create Module</Link>
+
+          <div>
+            <label>Calendar Version: </label>
+            {/* Dropdown for selecting calendar version */}
+            <select className="mb-4">
+              <option value="CV1">CV1</option>
+            </select>
           </div>
-          <div className="linkContainer">
-            <Link to="/admin/programme-design">Programme Design</Link>
-          </div>
-          <div className="linkContainer">
-            <Link to="/academic-event-calendar">Academic Event Calendar</Link>
-          </div>
-          <div className="linkContainer">
-            <Link to="/Graph">Graph</Link>
+          <div
+            className="makeResponsiveScrollable"
+            style={{
+              overflowY: 'scroll',
+              // display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <div className="linkContainer">
+              <Link to="/admin/set-key-dates">Set Key Dates</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/coursework-calendar">
+                Coursework Calendar (for testing)
+              </Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/admin/programme-design">Programme Design</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/academic-event-calendar">Academic Event Calendar</Link>
+            </div>
+            <div className="linkContainer">
+              <Link to="/Graph">Workload Profiles</Link>
+            </div>
           </div>
         </>
       )}

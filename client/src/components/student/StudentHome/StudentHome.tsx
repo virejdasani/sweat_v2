@@ -1,10 +1,36 @@
 import { Link } from 'react-router-dom';
 import './StudentHome.css';
+// import Branding from '../../Branding/Branding';
+import logo from '../../Branding/logo.png';
+import uniLogo from '../../Branding/uniLogo.png';
 
 const StudentHome = () => {
   return (
     <div className="home">
-      <h1>SWEAT Student Home</h1>
+      <img
+        src={logo}
+        alt="Logo"
+        className="logo"
+        style={{
+          width: '150px',
+          height: '150px',
+          position: 'absolute',
+          bottom: '0',
+          right: '0',
+        }}
+      />
+      <img
+        src={uniLogo}
+        alt="University Logo"
+        className="uniLogo"
+        style={{
+          width: '190px',
+          position: 'absolute',
+          bottom: '0',
+          left: '22px',
+        }}
+      />
+      <h1>Student Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
         onClick={() => {
@@ -15,7 +41,10 @@ const StudentHome = () => {
       </button>
       {/* student */}
       <div className="linkContainer">
-        <Link to="/Graph">Graph</Link>
+        <Link to="/Graph">Workload Profiles</Link>
+      </div>
+      <div className="linkContainer">
+        <Link to="/cwcalendar">Your CW Calendar</Link>
       </div>
     </div>
   );

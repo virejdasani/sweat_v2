@@ -9,10 +9,13 @@ import CourseworkCalendar from './components/CourseworkCalendar/CourseworkCalend
 import AcademicEventCalendar from './components/AcademicEventCalendar/AcademicEventCalendar';
 import AdminHome from './components/admin/AdminHome/AdminHome';
 import StaffHome from './components/staff/StaffHome/StaffHome';
-import StudentHome from './components/student/StudentHome/StudentHome';
+// import StudentHome from './components/student/StudentHome/StudentHome';
 import Home from './components/Home/Home';
 import EffortGraph from './components/Graph/EffortGraph';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import About from './components/About/About';
+import StudentCalendar from './components/student/StudentCalendar/StudentCalendar';
+// import WIP from './components/WIP/WIP';
 
 function App() {
   return (
@@ -21,7 +24,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminHome />} />
         <Route path="/staff" element={<StaffHome />} />
-        <Route path="/student" element={<StudentHome />} />
+        {/* <Route path="/student" element={<StudentHome />} /> */}
+        <Route path="/student" element={<StudentCalendar />} />
+        {/* <Route path="/student" element={<WIP />} /> */}
+
+        <Route path="/about" element={<About />} />
+        <Route path="/cwcalendar" element={<StudentCalendar />} />
 
         <Route path="/admin/set-key-dates" element={<DateSetter />} />
         <Route path="/coursework-calendar" element={<CourseworkCalendar />} />

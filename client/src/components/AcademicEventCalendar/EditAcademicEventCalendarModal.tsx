@@ -116,7 +116,7 @@ const EditAcademicEventCalendarModal: React.FC<ModalProps> = ({
             </div>
             <div className="modal-footer">
               <AddToCalendarButton
-                name={eventTitle + ' (Added from SWEAT)'}
+                name={eventTitle + ' (Added from CW Calendar)'}
                 options={['Apple', 'Google', 'Outlook.com']}
                 location="World Wide Web"
                 startDate={formatDate(selectedEventStartDate)}

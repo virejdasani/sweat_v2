@@ -119,7 +119,7 @@ function EffortGraph() {
         Home
       </button>
       <h1 className="text-center my-4 mt-5">
-        Total modelled effort (timetabled + private study)
+        Your Effort Graph (timetabled + private study)
       </h1>
 
       <ResponsiveContainer width="95%" height={500}>

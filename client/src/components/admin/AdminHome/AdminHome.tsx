@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import './AdminHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// import Branding from '../../Branding/Branding';
+import logo from '../../Branding/logo.png';
+import uniLogo from '../../Branding/uniLogo.png';
 
 const AdminHome = () => {
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
@@ -32,7 +35,31 @@ const AdminHome = () => {
 
   return (
     <div className="home">
-      <h1 className="">SWEAT Admin Home</h1>
+      {/* <Branding /> */}
+      <img
+        src={logo}
+        alt="Logo"
+        className="logo"
+        style={{
+          width: '150px',
+          height: '150px',
+          position: 'absolute',
+          bottom: '0',
+          right: '0',
+        }}
+      />
+      <img
+        src={uniLogo}
+        alt="University Logo"
+        className="uniLogo"
+        style={{
+          width: '190px',
+          position: 'absolute',
+          bottom: '0',
+          left: '22px',
+        }}
+      />
+      <h1 className="">Admin Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
         onClick={() => {
@@ -60,7 +87,17 @@ const AdminHome = () => {
           </form>
         </div>
       ) : (
-        <>
+        <div
+          className="makeResponsiveScrollable"
+          style={{
+            overflowY: 'scroll',
+            // display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
           <div className="linkContainer">
             <Link to="/admin/set-key-dates">
               Set Key Dates (Admin access only)
@@ -81,9 +118,9 @@ const AdminHome = () => {
             <Link to="/academic-event-calendar">Academic Event Calendar</Link>
           </div>
           <div className="linkContainer">
-            <Link to="/Graph">Graph</Link>
+            <Link to="/Graph">Workload Profiles</Link>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -34,6 +34,25 @@ export const expectedTotalTime = (weight: number, moduleCredit: number) => {
   return parseFloat((moduleCredit * 10 * (weight / 100)).toFixed(2));
 };
 
+const calculateContactTime = (
+  templateData: number[][][],
+  activityIndex: number,
+  startWeek: number,
+  endWeek: number,
+): number => {
+  let total = 0;
+
+  for (let week = startWeek; week < endWeek; week++) {
+    if (week <= 14) {
+      total += templateData[0][activityIndex][week];
+    } else {
+      total += templateData[1][activityIndex][week - 15];
+    }
+  }
+
+  return total;
+};
+
 export const updateCourseworkList = (
   courseworkList: Coursework[],
   templateData: number[][][],
@@ -68,63 +87,64 @@ export const updateCourseworkList = (
           ? parseInt(previousDeadlineWeek, 10)
           : previousDeadlineWeek;
 
-      const calculateContactTime = (activityData: number[]) =>
-        activityData
-          .slice(startWeek, numericDeadlineWeek)
-          .reduce((acc, val) => acc + val, 0);
-
       const contactTimeFields =
         coursework.type === 'exam'
           ? {}
           : {
               contactTimeLectures: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[0]),
+                (calculateContactTime(
+                  templateData,
                   0,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeTutorials: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[1]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  1,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeLabs: Math.round(
-                templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[2]),
-                  0,
+                calculateContactTime(
+                  templateData,
+                  2,
+                  startWeek,
+                  numericDeadlineWeek,
                 ), // formFactor not applied here
               ),
               contactTimeSeminars: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[3]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  3,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeFieldworkPlacement: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[4]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  4,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeOthers: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[5]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  5,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
@@ -388,7 +408,7 @@ export const handleInputBlurUtil = (
 export const initializeCourseworkList = (
   courseworkList: Coursework[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  templateData: any[],
+  templateData: number[][][],
   moduleCredit: number,
   formFactor: number,
   isEditing: boolean,
@@ -420,8 +440,7 @@ export const initializeCourseworkList = (
 
 export const recalculateCourseworkList = (
   courseworkList: Coursework[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  templateData: any[],
+  templateData: number[][][],
   moduleCredit: number,
   formFactor: number,
 ): Coursework[] => {

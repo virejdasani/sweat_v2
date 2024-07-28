@@ -9,13 +9,29 @@ const getDistributions = async (req, res) => {
     // Extract the semester from moduleSetup
     const semester = moduleSetup.semester;
 
+    // Check if courseworkList is empty
+    if (!courseworkList || courseworkList.length === 0) {
+      return res.status(200).json({
+        courseworkList: [],
+        privateStudyDistributions: [],
+      });
+    }
+
     // Calculate private study distributions and preparation time distributions
     const completeDistributions = courseworkList.map((coursework, index) => {
-      return calculateCompleteDistributions(
+      if (!coursework) {
+        console.error(`Coursework at index ${index} is undefined`);
+        return {
+          privateStudyDistributions: [],
+          preparationTimeDistributions: [],
+        };
+      }
+      const distribution = calculateCompleteDistributions(
         teachingSchedule,
         coursework,
         semester,
       );
+      return distribution;
     });
 
     // Check if completeDistributions is properly populated
@@ -27,8 +43,9 @@ const getDistributions = async (req, res) => {
     completeDistributions.forEach((dist, index) => {
       if (
         !dist ||
-        !dist.privateStudyDistributions ||
-        !dist.preparationTimeDistributions
+        !dist.preparationTimeDistributions ||
+        (courseworkList[index].type === 'exam' &&
+          !dist.privateStudyDistributions)
       ) {
         throw new Error(
           `completeDistributions[${index}] is missing required properties`,
@@ -38,7 +55,7 @@ const getDistributions = async (req, res) => {
 
     // Collect all private study distributions
     const privateStudyDistributions = completeDistributions.flatMap(
-      (dist) => dist.privateStudyDistributions,
+      (dist) => dist.privateStudyDistributions || [],
     );
 
     // Collect all preparation time distributions for each coursework

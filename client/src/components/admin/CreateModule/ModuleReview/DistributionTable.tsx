@@ -57,14 +57,16 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
                 <Td key={index}>{hours}</Td>
               ))}
             </Tr>
-            <Tr>
-              <Td>Private Study Time</Td>
-              {privateStudyDistributions[0].distribution.map(
-                (weekData, index) => (
-                  <Td key={index}>{weekData.hours}</Td>
-                ),
-              )}
-            </Tr>
+            {privateStudyDistributions[0] && (
+              <Tr>
+                <Td>Private Study Time</Td>
+                {privateStudyDistributions[0].distribution.map(
+                  (weekData, index) => (
+                    <Td key={index}>{weekData.hours}</Td>
+                  ),
+                )}
+              </Tr>
+            )}
           </Tbody>
         </Table>
       </Box>

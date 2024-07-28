@@ -6,6 +6,10 @@ const calculatePreparationDistributions = (
   studyStyle,
   semester,
 ) => {
+  if (!coursework) {
+    throw new Error('Coursework is undefined');
+  }
+
   const isWholeSession = semester.toLowerCase() === 'whole session';
   const totalWeeks = isWholeSession ? 30 : 15;
   const workloadData = Array(totalWeeks)
@@ -13,7 +17,10 @@ const calculatePreparationDistributions = (
     .map((_, i) => ({ week: i + 1, coursework: 0 }));
 
   const { preparationTime, deadlineWeek, releasedWeekPrior } = coursework;
-  const actualStartWeek = deadlineWeek - (releasedWeekPrior ?? 0);
+  let actualStartWeek = deadlineWeek - (releasedWeekPrior ?? 0);
+  if (actualStartWeek < 1) {
+    actualStartWeek = 1;
+  }
   let totalPreparationTime = preparationTime || 0;
 
   const distributeTime = (startWeek, endWeek, timePerWeek) => {
@@ -34,25 +41,31 @@ const calculatePreparationDistributions = (
       distributeTime(actualStartWeek, deadlineWeek, timePerWeek1);
       break;
     case 'steady':
-      const weeksForDistribution2 = deadlineWeek - releasedWeekPrior + 1;
-      const incrementValue = safeDivide(
-        2 * totalPreparationTime - 2 * releasedWeekPrior - 2,
-        releasedWeekPrior * releasedWeekPrior + releasedWeekPrior,
-      );
-      let cumulativeTime = 1;
-      workloadData[actualStartWeek - 1].coursework += 1; // First week always 1 hour
-      for (let week = actualStartWeek + 1; week <= deadlineWeek; week++) {
-        if (week > 0 && week <= totalWeeks) {
-          cumulativeTime += incrementValue;
-          workloadData[week - 1].coursework +=
-            roundToNearestHalf(cumulativeTime);
+      if (actualStartWeek > 0 && actualStartWeek <= totalWeeks) {
+        const weeksForDistribution2 = deadlineWeek - releasedWeekPrior + 1;
+        const incrementValue = safeDivide(
+          2 * totalPreparationTime - 2 * releasedWeekPrior - 2,
+          releasedWeekPrior * releasedWeekPrior + releasedWeekPrior,
+        );
+        let cumulativeTime = 1;
+        workloadData[actualStartWeek - 1].coursework += 1; // First week always 1 hour
+        for (let week = actualStartWeek + 1; week <= deadlineWeek; week++) {
+          if (week > 0 && week <= totalWeeks) {
+            cumulativeTime += incrementValue;
+            workloadData[week - 1].coursework +=
+              roundToNearestHalf(cumulativeTime);
+          }
         }
+      } else {
+        throw new Error(`Invalid actual start week: ${actualStartWeek}`);
       }
       break;
     case 'justInTime':
       if (deadlineWeek > 0 && deadlineWeek <= totalWeeks) {
         workloadData[deadlineWeek - 1].coursework +=
           roundToNearestHalf(totalPreparationTime);
+      } else {
+        throw new Error(`Invalid deadline week: ${deadlineWeek}`);
       }
       break;
     default:
@@ -208,45 +221,50 @@ const calculateCompleteDistributions = (
   coursework,
   semester,
 ) => {
-  if (coursework.type !== 'exam') {
-    return {
-      privateStudyDistributions: [],
-      preparationTimeDistributions: calculatePreparationTimeDistributions(
-        coursework,
-        semester,
-      ),
-    };
-  }
-
-  const privateStudyDistributions = calculatePrivateStudyDistributions(
-    teachingSchedule,
-    coursework,
-    semester,
-  );
-
-  const remainingTime = privateStudyDistributions.map(
-    (item) => item.remainingTime,
-  );
-
-  const studyStyles = ['earlyStarter', 'steady', 'justInTime'];
-  const preparationTimeDistributions = studyStyles
-    .map((style) => {
-      return remainingTime.map((time, index) => ({
-        type: `${style}_${privateStudyDistributions[index].type}`,
-        distribution: calculateRemainingPreparationDistributions(
-          time,
-          style,
+  try {
+    if (coursework.type !== 'exam') {
+      return {
+        privateStudyDistributions: [],
+        preparationTimeDistributions: calculatePreparationTimeDistributions(
+          coursework,
           semester,
-          privateStudyDistributions[index].type,
         ),
-      }));
-    })
-    .flat();
+      };
+    }
 
-  return {
-    privateStudyDistributions,
-    preparationTimeDistributions,
-  };
+    const privateStudyDistributions = calculatePrivateStudyDistributions(
+      teachingSchedule,
+      coursework,
+      semester,
+    );
+
+    const remainingTime = privateStudyDistributions.map(
+      (item) => item.remainingTime,
+    );
+
+    const studyStyles = ['earlyStarter', 'steady', 'justInTime'];
+    const preparationTimeDistributions = studyStyles
+      .map((style) => {
+        return remainingTime.map((time, index) => ({
+          type: `${style}_${privateStudyDistributions[index].type}`,
+          distribution: calculateRemainingPreparationDistributions(
+            time,
+            style,
+            semester,
+            privateStudyDistributions[index].type,
+          ),
+        }));
+      })
+      .flat();
+
+    return {
+      privateStudyDistributions,
+      preparationTimeDistributions,
+    };
+  } catch (error) {
+    console.error('Error in calculateCompleteDistributions:', error);
+    throw error;
+  }
 };
 
 module.exports = {

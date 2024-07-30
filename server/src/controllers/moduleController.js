@@ -2,6 +2,9 @@ const Module = require('../models/module');
 const Programme = require('../models/programme');
 const { handleError } = require('../utils/errorHandler');
 const { createOrUpdateModule } = require('../services/moduleService');
+const {
+  updateProgrammesForModule,
+} = require('../controllers/programmeController');
 const path = require('path');
 const fs = require('fs');
 
@@ -48,6 +51,13 @@ const createOrUpdateModuleController = async (req, res) => {
     });
 
     await createOrUpdateModule(moduleData, existingModule, res);
+
+    // Update programmes after module has been created or updated
+    await updateProgrammesForModule(moduleData, res);
+
+    res
+      .status(200)
+      .json({ message: 'Module created or updated successfully.' });
   } catch (error) {
     handleError(res, error);
   }

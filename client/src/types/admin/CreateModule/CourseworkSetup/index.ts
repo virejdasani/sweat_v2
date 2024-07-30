@@ -1,5 +1,3 @@
-import { ModuleSetupFormData } from '../ModuleSetup';
-
 export interface Distribution {
   week: number;
   hours: number;
@@ -42,7 +40,6 @@ export interface CourseworkSetupProps {
   examPercentage: number;
   formFactor: number;
   onFormFactorChange: (formFactor: number) => void;
-  formData: ModuleSetupFormData;
 }
 
 export interface CourseworkSetupFunctionsProps {

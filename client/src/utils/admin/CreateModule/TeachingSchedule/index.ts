@@ -34,7 +34,6 @@ export const transformTemplateDataToSaveData = (
     fieldworkPlacement: { hours: 0 },
     other: { hours: 0 },
   };
-
   const activityKeys: (keyof TeachingScheduleSaveData)[] = [
     'lectures',
     'tutorials',
@@ -44,19 +43,19 @@ export const transformTemplateDataToSaveData = (
     'other',
   ];
 
-  const totalWeeks = templateData.length * 15;
+  const isWholeSession = templateData.length === 2;
+  const totalWeeks = isWholeSession ? 33 : templateData[0][0].length;
 
   templateData.forEach((semesterData, semesterIndex) => {
+    const startWeek = semesterIndex === 0 ? 1 : 16;
+
     semesterData.forEach((row, rowIndex) => {
       const activityKey = activityKeys[rowIndex];
-
       if (activityKey) {
-        const distribution = row
-          .map((hours, week) => ({
-            week: week + 1 + semesterIndex * 15,
-            hours,
-          }))
-          .filter((item) => item.hours > 0);
+        const distribution = row.map((hours, weekIndex) => ({
+          week: startWeek + weekIndex,
+          hours,
+        }));
 
         const activity = teachingScheduleSaveData[activityKey];
         activity.hours += distribution.reduce(
@@ -64,12 +63,10 @@ export const transformTemplateDataToSaveData = (
           0,
         );
 
-        if (distribution.length > 0) {
-          if (!activity.distribution) {
-            activity.distribution = [];
-          }
-          activity.distribution.push(...distribution);
+        if (!activity.distribution) {
+          activity.distribution = [];
         }
+        activity.distribution.push(...distribution);
       }
     });
   });
@@ -78,87 +75,166 @@ export const transformTemplateDataToSaveData = (
   activityKeys.forEach((key) => {
     const activity = teachingScheduleSaveData[key];
     if (activity.distribution) {
-      for (let week = 1; week <= totalWeeks; week++) {
-        if (!activity.distribution.some((d) => d.week === week)) {
-          activity.distribution.push({ week, hours: 0 });
+      const fullDistribution = Array.from({ length: totalWeeks }, (_, i) => ({
+        week: i + 1,
+        hours: 0,
+      }));
+
+      activity.distribution.forEach((d) => {
+        const index = fullDistribution.findIndex((fd) => fd.week === d.week);
+        if (index !== -1) {
+          fullDistribution[index] = d;
         }
-      }
-      activity.distribution.sort((a, b) => a.week - b.week);
+      });
+
+      activity.distribution = fullDistribution;
     }
   });
+
   return teachingScheduleSaveData;
 };
+
 export const transformEditingDataToTemplateData = (
   scheduleData: TeachingScheduleSaveData,
-  isWholeSession: boolean,
+  templateType: 'first' | 'second' | 'whole session',
 ): number[][][] => {
   const splitDistribution = (
     distribution: Distribution[] = [],
+    firstSemesterWeeks: number,
+    secondSemesterWeeks: number,
   ): [Distribution[], Distribution[]] => {
-    const firstSemester = distribution.slice(0, 12);
-    const secondSemester = distribution.slice(12);
+    const firstSemester = distribution.filter(
+      (item) => item.week <= firstSemesterWeeks,
+    );
+    const secondSemester = distribution.filter(
+      (item) =>
+        item.week > firstSemesterWeeks &&
+        item.week <= firstSemesterWeeks + secondSemesterWeeks,
+    );
     return [firstSemester, secondSemester];
   };
 
-  if (isWholeSession) {
-    const [lecturesFirst, lecturesSecond] = splitDistribution(
-      scheduleData.lectures?.distribution,
-    );
-    const [tutorialsFirst, tutorialsSecond] = splitDistribution(
-      scheduleData.tutorials?.distribution,
-    );
-    const [labsFirst, labsSecond] = splitDistribution(
-      scheduleData.labs?.distribution,
-    );
-    const [seminarsFirst, seminarsSecond] = splitDistribution(
-      scheduleData.seminars?.distribution,
-    );
-    const [fieldworkFirst, fieldworkSecond] = splitDistribution(
-      scheduleData.fieldworkPlacement?.distribution,
-    );
-    const [otherFirst, otherSecond] = splitDistribution(
-      scheduleData.other?.distribution,
-    );
+  const createWeekArray = (
+    distribution: Distribution[] = [],
+    weeks: number,
+    startWeek: number = 1,
+  ): number[] => {
+    const weekArray = new Array(weeks).fill(0);
+    distribution.forEach((item) => {
+      const index = item.week - startWeek;
+      if (index >= 0 && index < weeks) {
+        weekArray[index] = item.hours;
+      }
+    });
+    return weekArray;
+  };
 
-    const firstSemesterData = [
-      createWeekArray(lecturesFirst),
-      createWeekArray(tutorialsFirst),
-      createWeekArray(labsFirst),
-      createWeekArray(seminarsFirst),
-      createWeekArray(fieldworkFirst),
-      createWeekArray(otherFirst),
-    ];
+  const firstSemesterWeeks = 15;
+  const secondSemesterWeeks = 18;
 
-    const secondSemesterData = [
-      createWeekArray(lecturesSecond),
-      createWeekArray(tutorialsSecond),
-      createWeekArray(labsSecond),
-      createWeekArray(seminarsSecond),
-      createWeekArray(fieldworkSecond),
-      createWeekArray(otherSecond),
-    ];
+  const [lecturesFirst, lecturesSecond] = splitDistribution(
+    scheduleData.lectures?.distribution,
+    firstSemesterWeeks,
+    secondSemesterWeeks,
+  );
+  const [tutorialsFirst, tutorialsSecond] = splitDistribution(
+    scheduleData.tutorials?.distribution,
+    firstSemesterWeeks,
+    secondSemesterWeeks,
+  );
+  const [labsFirst, labsSecond] = splitDistribution(
+    scheduleData.labs?.distribution,
+    firstSemesterWeeks,
+    secondSemesterWeeks,
+  );
+  const [seminarsFirst, seminarsSecond] = splitDistribution(
+    scheduleData.seminars?.distribution,
+    firstSemesterWeeks,
+    secondSemesterWeeks,
+  );
+  const [fieldworkFirst, fieldworkSecond] = splitDistribution(
+    scheduleData.fieldworkPlacement?.distribution,
+    firstSemesterWeeks,
+    secondSemesterWeeks,
+  );
+  const [otherFirst, otherSecond] = splitDistribution(
+    scheduleData.other?.distribution,
+    firstSemesterWeeks,
+    secondSemesterWeeks,
+  );
 
-    return [firstSemesterData, secondSemesterData];
-  } else {
-    const transformedData = [
-      createWeekArray(scheduleData.lectures?.distribution),
-      createWeekArray(scheduleData.tutorials?.distribution),
-      createWeekArray(scheduleData.labs?.distribution),
-      createWeekArray(scheduleData.seminars?.distribution),
-      createWeekArray(scheduleData.fieldworkPlacement?.distribution),
-      createWeekArray(scheduleData.other?.distribution),
-    ];
+  const createSemesterData = (
+    distributions: Distribution[][],
+    weeks: number,
+    startWeek: number = 1,
+  ) => [
+    createWeekArray(distributions[0], weeks, startWeek),
+    createWeekArray(distributions[1], weeks, startWeek),
+    createWeekArray(distributions[2], weeks, startWeek),
+    createWeekArray(distributions[3], weeks, startWeek),
+    createWeekArray(distributions[4], weeks, startWeek),
+    createWeekArray(distributions[5], weeks, startWeek),
+  ];
 
-    return [transformedData];
+  switch (templateType) {
+    case 'first':
+      return [
+        createSemesterData(
+          [
+            lecturesFirst,
+            tutorialsFirst,
+            labsFirst,
+            seminarsFirst,
+            fieldworkFirst,
+            otherFirst,
+          ],
+          firstSemesterWeeks,
+        ),
+      ];
+    case 'second':
+      return [
+        createSemesterData(
+          [
+            lecturesSecond,
+            tutorialsSecond,
+            labsSecond,
+            seminarsSecond,
+            fieldworkSecond,
+            otherSecond,
+          ],
+          secondSemesterWeeks,
+          firstSemesterWeeks + 1,
+        ),
+      ];
+    case 'whole session':
+      return [
+        createSemesterData(
+          [
+            lecturesFirst,
+            tutorialsFirst,
+            labsFirst,
+            seminarsFirst,
+            fieldworkFirst,
+            otherFirst,
+          ],
+          firstSemesterWeeks,
+        ),
+        createSemesterData(
+          [
+            lecturesSecond,
+            tutorialsSecond,
+            labsSecond,
+            seminarsSecond,
+            fieldworkSecond,
+            otherSecond,
+          ],
+          secondSemesterWeeks,
+          firstSemesterWeeks + 1,
+        ),
+      ];
+    default:
+      throw new Error('Invalid template type');
   }
-};
-
-const createWeekArray = (distribution: Distribution[] = []): number[] => {
-  const weeks = Array(15).fill(0);
-  distribution.forEach((dist) => {
-    weeks[dist.week - 1] = dist.hours; // Assuming week is 1-based index
-  });
-  return weeks;
 };
 
 export const handleInputChange = (

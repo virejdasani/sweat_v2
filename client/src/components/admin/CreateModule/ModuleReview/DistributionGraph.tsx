@@ -11,25 +11,16 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
+import { DistributionGraphProps } from '../../../../types/admin/CreateModule/ModuleReview';
 import {
-  StudyStyleDistribution,
-  Distribution,
-  Coursework,
-} from '../../../../types/admin/CreateModule/CourseworkSetup';
-import { TeachingScheduleSaveData } from '../../../../types/admin/CreateModule/TeachingSchedule';
-import { getRandomColor } from '../../../../utils/admin/CreateModule/ModuleReview';
-
-interface DistributionGraphProps {
-  teachingSchedule: TeachingScheduleSaveData;
-  privateStudyDistributions: StudyStyleDistribution[];
-  preparationTimeDistributions: Coursework[];
-  moduleCredit: number;
-}
-
-interface CombinedData {
-  week: number;
-  [key: string]: number;
-}
+  calculateWeeks,
+  transformTeachingScheduleData,
+  transformPreparationTimeData,
+  transformPrivateStudyData,
+  fillMissingWeeks,
+  filterKeys,
+  getColor,
+} from '../../../../utils/admin/CreateModule/ModuleReview';
 
 const DistributionGraph: React.FC<DistributionGraphProps> = ({
   teachingSchedule,
@@ -40,147 +31,59 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
   const colorMapRef = useRef<{ [key: string]: string }>({});
   const existingColors = useRef<string[]>([]);
 
-  const getColor = (key: string) => {
-    if (!colorMapRef.current[key]) {
-      const newColor = getRandomColor(existingColors.current, 100);
-      colorMapRef.current[key] = newColor;
-      existingColors.current.push(newColor);
-    }
-    return colorMapRef.current[key];
-  };
-
   const weeks = useMemo(
     () =>
-      Math.max(
-        ...Object.values(teachingSchedule).flatMap((activity) =>
-          (activity.distribution ?? []).map((dist: Distribution) => dist.week),
-        ),
-        ...preparationTimeDistributions.flatMap((coursework) =>
-          (coursework.preparationTimeDistributions ?? []).flatMap(
-            (dist: StudyStyleDistribution) =>
-              dist.distribution.map((weekData: Distribution) => weekData.week),
-          ),
-        ),
-        ...privateStudyDistributions.flatMap((dist: StudyStyleDistribution) =>
-          dist.distribution.map((weekData: Distribution) => weekData.week),
-        ),
+      calculateWeeks(
+        teachingSchedule,
+        preparationTimeDistributions,
+        privateStudyDistributions,
       ),
     [teachingSchedule, preparationTimeDistributions, privateStudyDistributions],
   );
 
   const averageWeeklyEffort = (moduleCredit * 10) / weeks;
 
-  // Transform teaching schedule data
-  const teachingScheduleData = useMemo(() => {
-    const data: CombinedData[] = Array(weeks)
-      .fill(0)
-      .map((_, i) => ({ week: i + 1 }));
-    Object.keys(teachingSchedule).forEach((type) => {
-      teachingSchedule[
-        type as keyof typeof teachingSchedule
-      ].distribution?.forEach((weekData) => {
-        data[weekData.week - 1][type] = weekData.hours;
-      });
-    });
-    return data;
-  }, [teachingSchedule, weeks]);
+  const teachingScheduleData = useMemo(
+    () => transformTeachingScheduleData(teachingSchedule, weeks),
+    [teachingSchedule, weeks],
+  );
+  const preparationTimeData = useMemo(
+    () => transformPreparationTimeData(preparationTimeDistributions, weeks),
+    [preparationTimeDistributions, weeks],
+  );
+  const privateStudyData = useMemo(
+    () => transformPrivateStudyData(privateStudyDistributions, weeks),
+    [privateStudyDistributions, weeks],
+  );
 
-  // Transform preparation time data
-  const preparationTimeData = useMemo(() => {
-    const data: CombinedData[] = Array(weeks)
-      .fill(0)
-      .map((_, i) => ({ week: i + 1 }));
-    preparationTimeDistributions.forEach((coursework) => {
-      (coursework.preparationTimeDistributions ?? []).forEach((dist) => {
-        dist.distribution.forEach((weekData) => {
-          if (weekData.hours > 0) {
-            const label =
-              coursework.type === 'exam'
-                ? `${coursework.shortTitle} (${dist.type})`
-                : `${coursework.shortTitle} (deadline: ${coursework.deadlineWeek}, weight: ${coursework.weight}%)`;
-            data[weekData.week - 1][label] = weekData.hours;
-          }
-        });
-      });
-    });
-    return data;
-  }, [preparationTimeDistributions, weeks]);
-
-  // Transform private study data
-  const privateStudyData = useMemo(() => {
-    const data: CombinedData[] = Array(weeks)
-      .fill(0)
-      .map((_, i) => ({ week: i + 1 }));
-    privateStudyDistributions.forEach((dist) => {
-      dist.distribution.forEach((weekData) => {
-        if (weekData.hours > 0) {
-          data[weekData.week - 1]['privateStudy'] = weekData.hours;
-        }
-      });
-    });
-    return data;
-  }, [privateStudyDistributions, weeks]);
-
-  // Combine all data
   const combinedData = useMemo(() => {
-    return teachingScheduleData.map((entry, index) => ({
+    const data = teachingScheduleData.map((entry, index) => ({
       ...entry,
       ...preparationTimeData[index],
       ...privateStudyData[index],
     }));
+    return fillMissingWeeks(data);
   }, [teachingScheduleData, preparationTimeData, privateStudyData]);
 
-  const renderAreas = () => {
-    const elements = [];
+  const filteredKeys = useMemo(() => filterKeys(combinedData), [combinedData]);
 
-    Object.keys(teachingSchedule).forEach((type) => {
+  const renderAreas = () => {
+    const elements: JSX.Element[] = [];
+
+    filteredKeys.forEach((type) => {
       elements.push(
         <Area
           key={type}
           type="monotone"
           dataKey={type}
-          stroke={getColor(type)}
-          fill={getColor(type)}
+          stroke={getColor(type, colorMapRef.current, existingColors.current)}
+          fill={getColor(type, colorMapRef.current, existingColors.current)}
           strokeWidth={2}
-          dot={{ r: 4 }}
+          dot={{ r: 2 }}
           stackId="1"
         />,
       );
     });
-
-    preparationTimeDistributions.flatMap((coursework) =>
-      (coursework.preparationTimeDistributions ?? []).forEach((dist) => {
-        const label =
-          coursework.type === 'exam'
-            ? `${coursework.shortTitle} (${dist.type})`
-            : `${coursework.shortTitle} (deadline: ${coursework.deadlineWeek}, weight: ${coursework.weight}%)`;
-        elements.push(
-          <Area
-            key={label}
-            type="monotone"
-            dataKey={label}
-            stroke={getColor(label)}
-            fill={getColor(label)}
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            stackId="1"
-          />,
-        );
-      }),
-    );
-
-    elements.push(
-      <Area
-        key="privateStudy"
-        type="monotone"
-        dataKey="privateStudy"
-        stroke={getColor('privateStudy')}
-        fill={getColor('privateStudy')}
-        strokeWidth={2}
-        dot={{ r: 4 }}
-        stackId="1"
-      />,
-    );
 
     return elements;
   };
@@ -190,19 +93,19 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
       <ResponsiveContainer width="100%" height={500}>
         <AreaChart
           data={combinedData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="week"
             label={{
               value: 'Weeks',
-              position: 'insideBottomRight',
-              offset: -5,
+              position: 'insideBottom',
+              dy: 20,
             }}
           />
           <YAxis
-            domain={[0, 40]}
+            domain={[0, 30]}
             label={{
               value: 'Effort Hours',
               angle: -90,
@@ -210,7 +113,7 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
             }}
           />
           <Tooltip />
-          <Legend />
+          <Legend verticalAlign="bottom" wrapperStyle={{ paddingTop: 30 }} />
           <ReferenceLine
             y={averageWeeklyEffort}
             stroke="red"

@@ -38,7 +38,7 @@ const daysOfWeek = [
   'Friday',
   'Saturday',
   'Sunday',
-  'As Timetabled',
+  'As Scheduled',
 ];
 
 const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
@@ -48,7 +48,6 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   examPercentage,
   formFactor,
   onFormFactorChange,
-  formData,
 }) => {
   const {
     handleAddCoursework,
@@ -69,15 +68,85 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     }
   }, [examPercentage]);
 
-  const numWeeks =
-    formData.semester === 'whole session' ||
-    formData.semester === 'Whole Session'
-      ? 30
-      : 15;
+  const renderWeekOptions = () => {
+    const options = [];
+    if (semester === 'second') {
+      for (let i = 1; i <= 18; i++) {
+        if (i === 9) {
+          options.push(
+            <React.Fragment key="easterBreak1">
+              <option key={9} value="9">
+                9 (Easter Break Week 1)
+              </option>
+              <option key={10} value="10">
+                10 (Easter Break Week 2)
+              </option>
+              <option key={11} value="11">
+                11 (Easter Break Week 3)
+              </option>
+            </React.Fragment>,
+          );
+          i += 2;
+        } else {
+          options.push(
+            <option key={i} value={i.toString()}>
+              {i}
+            </option>,
+          );
+        }
+      }
+    } else if (semester === 'whole session' || semester === 'Whole Session') {
+      for (let i = 1; i <= 33; i++) {
+        if (i === 24) {
+          options.push(
+            <React.Fragment key="easterBreak1">
+              <option key={24} value="24">
+                24 (Easter Break Week 1)
+              </option>
+              <option key={25} value="25">
+                25 (Easter Break Week 2)
+              </option>
+              <option key={26} value="26">
+                26 (Easter Break Week 3)
+              </option>
+            </React.Fragment>,
+          );
+          i += 2;
+        } else {
+          options.push(
+            <option key={i} value={i.toString()}>
+              {i}
+            </option>,
+          );
+        }
+      }
+    } else {
+      for (let i = 1; i <= 15; i++) {
+        options.push(
+          <option key={i} value={i.toString()}>
+            {i}
+          </option>,
+        );
+      }
+    }
+    return options;
+  };
 
   const handleTimeChange = (index: number, date: Date) => {
     const timeString = format(date, 'HH:mm');
     handleInputChange(index, 'deadlineTime', timeString);
+  };
+
+  const handleDeadlineWeekChange = (index: number, value: string) => {
+    let deadlineWeek = parseInt(value, 10);
+    if (value === 'easterBreak1') {
+      deadlineWeek = semester === 'second' ? 9 : 24;
+    } else if (value === 'easterBreak2') {
+      deadlineWeek = semester === 'second' ? 10 : 25;
+    } else if (value === 'easterBreak3') {
+      deadlineWeek = semester === 'second' ? 11 : 26;
+    }
+    handleInputChange(index, 'deadlineWeek', deadlineWeek);
   };
 
   return (
@@ -137,7 +206,6 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                   disabled={coursework.type === 'exam'}
                 />
               </Td>
-
               <Td style={courseworkSetupStyles.td}>
                 <Select
                   value={coursework.type || ''}
@@ -157,58 +225,16 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.deadlineWeek || ''}
+                  value={coursework.deadlineWeek.toString() || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'deadlineWeek', e.target.value)
+                    handleDeadlineWeekChange(index, e.target.value)
                   }
                   style={courseworkSetupStyles.select}
                   disabled={
                     coursework.type === 'exam' && semester !== 'whole session'
                   }
                 >
-                  {Array.from({ length: numWeeks }, (_, i) => {
-                    if (semester === 'second' && i + 1 === 8) {
-                      return (
-                        <React.Fragment key={i}>
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                          <option key="easterBreak1" value="easterBreak1">
-                            Easter Break Week 1
-                          </option>
-                          <option key="easterBreak2" value="easterBreak2">
-                            Easter Break Week 2
-                          </option>
-                          <option key="easterBreak3" value="easterBreak3">
-                            Easter Break Week 3
-                          </option>
-                        </React.Fragment>
-                      );
-                    } else if (semester === 'whole session' && i + 1 === 23) {
-                      return (
-                        <React.Fragment key={i}>
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                          <option key="easterBreak1" value="easterBreak1">
-                            Easter Break Week 1
-                          </option>
-                          <option key="easterBreak2" value="easterBreak2">
-                            Easter Break Week 2
-                          </option>
-                          <option key="easterBreak3" value="easterBreak3">
-                            Easter Break Week 3
-                          </option>
-                        </React.Fragment>
-                      );
-                    } else {
-                      return (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      );
-                    }
-                  })}
+                  {renderWeekOptions()}
                 </Select>
               </Td>
               <Td style={courseworkSetupStyles.td}>
@@ -226,7 +252,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 >
                   <option value="N/A">N/A</option>
                   {Array.from({ length: 15 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
+                    <option key={i + 1} value={(i + 1).toString()}>
                       {i + 1}
                     </option>
                   ))}

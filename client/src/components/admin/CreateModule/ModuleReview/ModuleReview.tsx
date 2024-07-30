@@ -124,6 +124,7 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
         <DistributionTable
           templateData={templateData}
           privateStudyDistributions={filteredPrivateStudyData}
+          preparationDistributions={filteredPreparationData}
         />
       </Box>
       <Box width="80%" mx="auto" mb={12} overflowX="auto">

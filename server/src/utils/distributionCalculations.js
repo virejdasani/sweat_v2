@@ -11,7 +11,11 @@ const calculatePreparationDistributions = (
   }
 
   const isWholeSession = semester.toLowerCase() === 'whole session';
-  const totalWeeks = isWholeSession ? 30 : 15;
+  const totalWeeks = isWholeSession
+    ? 33
+    : semester.toLowerCase() === 'second'
+      ? 18
+      : 15;
   const workloadData = Array(totalWeeks)
     .fill(0)
     .map((_, i) => ({ week: i + 1, coursework: 0 }));
@@ -124,7 +128,11 @@ const calculatePrivateStudyDistributions = (
   semester,
 ) => {
   const isWholeSession = semester.toLowerCase() === 'whole session';
-  const totalWeeks = isWholeSession ? 30 : 15;
+  const totalWeeks = isWholeSession
+    ? 33
+    : semester.toLowerCase() === 'second'
+      ? 18
+      : 15;
 
   if (coursework.type !== 'exam') {
     throw new Error(
@@ -167,8 +175,16 @@ const calculateRemainingPreparationDistributions = (
   type,
 ) => {
   const isWholeSession = semester.toLowerCase() === 'whole session';
-  const startWeek = isWholeSession ? 28 : 13;
-  const endWeek = isWholeSession ? 30 : 15;
+  const startWeek = isWholeSession
+    ? 31
+    : semester.toLowerCase() === 'second'
+      ? 16
+      : 13;
+  const endWeek = isWholeSession
+    ? 33
+    : semester.toLowerCase() === 'second'
+      ? 18
+      : 15;
   const totalWeeks = endWeek - startWeek + 1;
 
   const workloadData = Array(totalWeeks)
@@ -231,6 +247,14 @@ const calculateCompleteDistributions = (
         ),
       };
     }
+
+    // Update the deadlineWeek for exam coursework
+    coursework.deadlineWeek =
+      semester.toLowerCase() === 'whole session'
+        ? 33
+        : semester.toLowerCase() === 'second'
+          ? 18
+          : 15;
 
     const privateStudyDistributions = calculatePrivateStudyDistributions(
       teachingSchedule,

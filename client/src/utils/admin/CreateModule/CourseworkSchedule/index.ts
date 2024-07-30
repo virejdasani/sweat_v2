@@ -40,13 +40,33 @@ const calculateContactTime = (
   startWeek: number,
   endWeek: number,
 ): number => {
+  if (!Array.isArray(templateData) || templateData.length < 1) {
+    throw new Error('Invalid templateData structure');
+  }
+
+  if (activityIndex < 0 || activityIndex >= templateData[0].length) {
+    throw new Error('Invalid activityIndex');
+  }
+
+  if (startWeek < 0 || endWeek <= startWeek) {
+    throw new Error('Invalid week range');
+  }
+
+  const firstSemesterWeeks = templateData[0][0].length;
+  const secondSemesterWeeks =
+    templateData.length > 1 ? templateData[1][0].length : 0;
+
   let total = 0;
 
   for (let week = startWeek; week < endWeek; week++) {
-    if (week <= 14) {
+    if (week < firstSemesterWeeks) {
       total += templateData[0][activityIndex][week];
-    } else {
-      total += templateData[1][activityIndex][week - 15];
+    } else if (
+      week >= firstSemesterWeeks &&
+      week < firstSemesterWeeks + secondSemesterWeeks
+    ) {
+      const adjustedWeek = week - firstSemesterWeeks;
+      total += templateData[1][activityIndex][adjustedWeek];
     }
   }
 

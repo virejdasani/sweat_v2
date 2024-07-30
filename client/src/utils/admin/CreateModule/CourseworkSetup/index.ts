@@ -93,7 +93,8 @@ export const addExamCoursework = (
     (coursework) => coursework.type === 'exam',
   );
 
-  const examDeadlineWeek = semester === 'whole session' ? 30 : 15;
+  const examDeadlineWeek =
+    semester === 'whole session' ? 33 : semester === 'second' ? 18 : 15;
 
   if (examPercentage > 0) {
     if (examIndex >= 0) {

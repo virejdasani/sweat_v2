@@ -36,7 +36,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
       if (editingScheduleData) {
         const transformedData = transformEditingDataToTemplateData(
           editingScheduleData,
-          semester === 'whole session',
+          semester as 'first' | 'second' | 'whole session',
         );
         setTemplateData(transformedData);
       } else if (templateData.length === 0) {
@@ -44,26 +44,39 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
       }
     };
     fetchData();
-  }, [moduleCredit, semester, setTemplateData, editingScheduleData]);
+  }, [
+    moduleCredit,
+    semester,
+    setTemplateData,
+    editingScheduleData,
+    templateData.length,
+  ]);
 
-  const renderTableHeader = () => (
-    <Thead>
-      <Tr>
-        <Th sx={headerStyle}></Th>
-        {Array.from({ length: 15 }, (_, i) => (
-          <Th
-            key={i}
-            sx={{
-              ...headerStyle,
-              color: i >= 12 ? 'red' : 'inherit',
-            }}
-          >
-            Week {i + 1}
-          </Th>
-        ))}
-      </Tr>
-    </Thead>
-  );
+  const renderTableHeader = (isSecondSemester = false) => {
+    const numWeeks = isSecondSemester || semester === 'second' ? 18 : 15;
+    const lastThreeWeeksStart = numWeeks - 3;
+
+    return (
+      <Thead>
+        <Tr>
+          <Th sx={headerStyle}></Th>
+          {Array.from({ length: numWeeks }, (_, i) => (
+            <Th
+              key={i}
+              sx={{
+                ...headerStyle,
+                color: i >= lastThreeWeeksStart ? 'red' : 'inherit',
+              }}
+            >
+              {(isSecondSemester || semester === 'second') && i >= 8 && i <= 10
+                ? `Week ${i + 1} (Easter Break Week ${i - 8 + 1})`
+                : `Week ${i + 1}`}
+            </Th>
+          ))}
+        </Tr>
+      </Thead>
+    );
+  };
 
   const renderTableBody = (tableIndex: number) => (
     <Tbody>
@@ -104,9 +117,9 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
     </Tbody>
   );
 
-  const renderTable = (tableIndex: number) => (
+  const renderTable = (tableIndex: number, isSecondSemester = false) => (
     <Table {...tableStyle}>
-      {renderTableHeader()}
+      {renderTableHeader(isSecondSemester)}
       {renderTableBody(tableIndex)}
     </Table>
   );
@@ -124,7 +137,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
           <Heading size="md" mt={8} mb={4}>
             Second Semester
           </Heading>
-          {renderTable(1)}
+          {renderTable(1, true)}
         </>
       ) : (
         <>

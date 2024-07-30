@@ -44,10 +44,6 @@ const createOrUpdateModule = async (moduleData, existingModule, res) => {
       const newModule = new Module(moduleData);
       await newModule.save();
     }
-
-    res
-      .status(200)
-      .json({ message: 'Module created or updated successfully.' });
   } catch (error) {
     handleError(res, error);
   }

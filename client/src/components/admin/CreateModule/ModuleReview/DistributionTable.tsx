@@ -1,43 +1,24 @@
 import React from 'react';
 import { Box, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
-import { StudyStyleDistribution } from '../../../../types/admin/CreateModule/CourseworkSetup';
-
-interface DistributionTableProps {
-  templateData: number[][][];
-  privateStudyDistributions: StudyStyleDistribution[];
-}
+import { DistributionTableProps } from '../../../../types/admin/CreateModule/ModuleReview';
+import {
+  calculateContactTime,
+  getTableCell,
+} from '../../../../utils/admin/CreateModule/ModuleReview';
 
 const DistributionTable: React.FC<DistributionTableProps> = ({
   templateData,
   privateStudyDistributions,
+  preparationDistributions,
 }) => {
-  const calculateContactTime = (): number[] => {
-    const weeks = templateData.length === 2 ? 30 : 15;
-    const contactTime = Array(weeks).fill(0);
-
-    const sumContactHours = (semesterData: number[][], startWeek: number) => {
-      semesterData.forEach((contactTypeArray) => {
-        contactTypeArray.forEach((hours, weekIndex) => {
-          contactTime[startWeek + weekIndex] += hours;
-        });
-      });
-    };
-
-    if (templateData.length > 0) {
-      sumContactHours(templateData[0], 0);
-    }
-
-    if (templateData.length > 1) {
-      sumContactHours(templateData[1], 15);
-    }
-
-    return contactTime;
-  };
-
-  const contactTime = React.useMemo(calculateContactTime, [templateData]);
+  const contactTime = React.useMemo(
+    () => calculateContactTime(templateData),
+    [templateData],
+  );
 
   const renderTable = () => {
-    const weeks = templateData.length === 2 ? 30 : 15;
+    const isWholeSession = templateData.length === 2;
+    const totalWeeks = isWholeSession ? 33 : templateData[0][0].length;
 
     return (
       <Box overflowX="auto">
@@ -45,7 +26,7 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
           <Thead>
             <Tr>
               <Th>Week</Th>
-              {Array.from({ length: weeks }, (_, i) => (
+              {Array.from({ length: totalWeeks }, (_, i) => (
                 <Th key={i}>{i + 1}</Th>
               ))}
             </Tr>
@@ -54,7 +35,7 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
             <Tr>
               <Td>Contact Time</Td>
               {contactTime.map((hours, index) => (
-                <Td key={index}>{hours}</Td>
+                <Td key={index}>{getTableCell(hours)}</Td>
               ))}
             </Tr>
             {privateStudyDistributions[0] && (
@@ -62,11 +43,54 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
                 <Td>Private Study Time</Td>
                 {privateStudyDistributions[0].distribution.map(
                   (weekData, index) => (
-                    <Td key={index}>{weekData.hours}</Td>
+                    <Td key={index}>{getTableCell(weekData.hours)}</Td>
                   ),
                 )}
               </Tr>
             )}
+            {preparationDistributions
+              .filter((coursework) => coursework.type !== 'exam')
+              .map((coursework, i) => (
+                <React.Fragment key={i}>
+                  {coursework.preparationTimeDistributions?.map((dist, j) => (
+                    <Tr key={j}>
+                      <Td>
+                        {coursework.shortTitle} ({dist.type})
+                      </Td>
+                      {Array.from({ length: totalWeeks }, (_, index) => (
+                        <Td key={index}>
+                          {getTableCell(
+                            dist.distribution.find(
+                              (weekData) => weekData.week === index + 1,
+                            )?.hours || 0,
+                          )}
+                        </Td>
+                      ))}
+                    </Tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            {preparationDistributions
+              .filter((coursework) => coursework.type === 'exam')
+              .flatMap(
+                (coursework) =>
+                  coursework.preparationTimeDistributions?.map((dist, j) => (
+                    <Tr key={j}>
+                      <Td>
+                        {coursework.shortTitle} ({dist.type})
+                      </Td>
+                      {Array.from({ length: totalWeeks }, (_, index) => (
+                        <Td key={index}>
+                          {getTableCell(
+                            dist.distribution.find(
+                              (weekData) => weekData.week === index + 1,
+                            )?.hours || 0,
+                          )}
+                        </Td>
+                      ))}
+                    </Tr>
+                  )) || [],
+              )}
           </Tbody>
         </Table>
       </Box>

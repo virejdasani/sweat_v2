@@ -120,7 +120,6 @@ const CreateModule: React.FC = () => {
                 formFactor: value,
               }))
             }
-            formData={formData}
           />
         );
       case 3:

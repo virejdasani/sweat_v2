@@ -1,5 +1,10 @@
 const Programme = require('../models/programme');
 const { handleError } = require('../utils/errorHandler');
+const {
+  getCurrentProgrammesForModule,
+  addModuleToProgrammes,
+  removeModuleFromProgrammes,
+} = require('../utils/programmeHelpers');
 
 const getAllProgrammes = async (req, res) => {
   try {
@@ -133,6 +138,27 @@ const removeModuleFromProgramme = async (req, res) => {
   }
 };
 
+const updateProgrammesForModule = async (moduleData, res) => {
+  try {
+    const moduleCode = moduleData.moduleSetup.moduleCode;
+    const newProgrammes = moduleData.moduleSetup.programme || [];
+
+    const currentProgrammes = await getCurrentProgrammesForModule(moduleCode);
+
+    const programmesToAdd = newProgrammes.filter(
+      (programmeId) => !currentProgrammes.includes(programmeId),
+    );
+    const programmesToRemove = currentProgrammes.filter(
+      (programmeId) => !newProgrammes.includes(programmeId),
+    );
+
+    await addModuleToProgrammes(moduleCode, programmesToAdd);
+    await removeModuleFromProgrammes(moduleCode, programmesToRemove);
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
 module.exports = {
   getAllProgrammes,
   getAllProgrammeIds,
@@ -142,4 +168,5 @@ module.exports = {
   updateModuleIdsForAllProgrammes,
   deleteProgrammeById,
   removeModuleFromProgramme,
+  updateProgrammesForModule,
 };

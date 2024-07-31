@@ -1,9 +1,12 @@
+import { CalendarKeyDateEvent } from '../../../../components/shared/types';
+
 export interface TeachingScheduleProps {
   moduleCredit: number;
   semester: string;
   templateData: number[][][];
   setTemplateData: React.Dispatch<React.SetStateAction<number[][][]>>;
   editingScheduleData?: TeachingScheduleSaveData;
+  readingWeeks: number[];
 }
 
 export interface Distribution {
@@ -36,4 +39,9 @@ export interface TeachingScheduleSaveData {
     hours: number;
     distribution?: Distribution[];
   };
+}
+
+export interface CalendarData {
+  events: CalendarKeyDateEvent[];
+  readingWeeks: number[];
 }

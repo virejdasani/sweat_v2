@@ -249,3 +249,41 @@ export const handleInputChange = (
   updatedData[tableIndex][rowIndex][colIndex] = parseInt(value);
   setTemplateData(updatedData);
 };
+
+export const updateTemplateDataForReadingWeek = (
+  templateData: number[][][],
+  readingWeeks: number[] | { sem1: number[]; sem2: number[] },
+): number[][][] => {
+  const updatedTemplateData = templateData.map(
+    (semesterData, semesterIndex) => {
+      // Determine the weeks to use based on the semesterIndex and type of readingWeeks
+      let weeks: number[] = [];
+      if (Array.isArray(readingWeeks)) {
+        weeks = readingWeeks;
+      } else if (readingWeeks && typeof readingWeeks === 'object') {
+        weeks = semesterIndex === 0 ? readingWeeks.sem1 : readingWeeks.sem2;
+      } else {
+        console.error('Unexpected format for readingWeeks:', readingWeeks);
+      }
+
+      // Ensure weeks is always an array
+      if (!Array.isArray(weeks)) {
+        console.error('Weeks is not an array:', weeks);
+        weeks = [];
+      }
+
+      return semesterData.map((contactTimeData) => {
+        return contactTimeData.map((hours, weekIndex) => {
+          const adjustedWeekIndex =
+            semesterIndex === 1 ? weekIndex + 1 : weekIndex + 1;
+          if (weeks.includes(adjustedWeekIndex)) {
+            return 0;
+          }
+          return hours;
+        });
+      });
+    },
+  );
+
+  return updatedTemplateData;
+};

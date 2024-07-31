@@ -33,6 +33,7 @@ import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
+import { fetchCalendarData } from '../../../services/admin/CreateModule/TeachingSchedule';
 import ModuleReview from './ModuleReview/ModuleReview';
 
 const MAX_STEPS = 5;
@@ -60,6 +61,7 @@ const CreateModule: React.FC = () => {
   const [templateData, setTemplateData] = useState<number[][][]>(
     initialTemplateData || [],
   );
+  const [readingWeeks, setReadingWeeks] = useState<number[]>([]);
 
   useEffect(() => {
     if (module) {
@@ -82,6 +84,21 @@ const CreateModule: React.FC = () => {
     }
   }, [formData.moduleCredit, formData.semester, initialTemplateData]);
 
+  useEffect(() => {
+    if (
+      formData.semester &&
+      !formData.moduleCode.toLowerCase().startsWith('comp')
+    ) {
+      const fetchReadingWeeks = async () => {
+        const { readingWeeks } = await fetchCalendarData(
+          formData.semester as 'first' | 'second' | 'whole session',
+        );
+        setReadingWeeks(readingWeeks);
+      };
+      fetchReadingWeeks();
+    }
+  }, [formData.semester, formData.moduleCode]);
+
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
@@ -99,6 +116,7 @@ const CreateModule: React.FC = () => {
             templateData={templateData}
             setTemplateData={setTemplateData}
             editingScheduleData={module?.teachingSchedule}
+            readingWeeks={readingWeeks}
           />
         );
       case 2:
@@ -143,11 +161,11 @@ const CreateModule: React.FC = () => {
                 setCourseworkList,
               )
             }
-            formFactor={formData.formFactor} // Pass formFactor from formData
+            formFactor={formData.formFactor}
             isEditing={!!module}
           />
         );
-      case 4: // New case for module review
+      case 4:
         return (
           <ModuleReview
             templateData={templateData}

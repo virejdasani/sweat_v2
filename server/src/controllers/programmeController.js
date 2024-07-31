@@ -4,7 +4,7 @@ const {
   getCurrentProgrammesForModule,
   addModuleToProgrammes,
   removeModuleFromProgrammes,
-} = require('../utils/programmeHelpers');
+} = require('../services/programmeService');
 
 const getAllProgrammes = async (req, res) => {
   try {

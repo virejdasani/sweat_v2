@@ -1,4 +1,3 @@
-const Module = require('../models/module');
 const {
   calculatePreparationTimeDistributions,
   calculateCompleteDistributions,
@@ -27,6 +26,7 @@ const createOrUpdateModule = async (moduleData, existingModule, res) => {
             moduleData.teachingSchedule,
             coursework,
             moduleData.moduleSetup.semester,
+            moduleData.readingWeeks,
           );
 
         // Assign private study distributions to the module

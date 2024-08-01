@@ -3,24 +3,19 @@ import { Box, Select, Flex, Text, Tooltip, Icon } from '@chakra-ui/react';
 import { InfoOutlineIcon } from '@chakra-ui/icons';
 import DistributionTable from './DistributionTable';
 import DistributionGraph from './DistributionGraph';
-import { ModuleSetupFormData } from '../../../../types/admin/CreateModule/ModuleSetup';
 import {
   Coursework,
   StudyStyleDistribution,
 } from '../../../../types/admin/CreateModule/CourseworkSetup';
 import httpClient from '../../../../shared/api/httpClient';
 import { transformTemplateDataToSaveData } from '../../../../utils/admin/CreateModule/TeachingSchedule';
-
-interface ModuleReviewProps {
-  templateData: number[][][];
-  formData: ModuleSetupFormData;
-  courseworkList: Coursework[];
-}
+import { ModuleReviewProps } from '../../../../types/admin/CreateModule/ModuleReview';
 
 const ModuleReview: React.FC<ModuleReviewProps> = ({
   templateData,
   formData,
   courseworkList,
+  readingWeeks,
 }) => {
   const [studyStyle, setStudyStyle] = useState<string>('earlyStarter');
   const [ratio, setRatio] = useState<string>('0');
@@ -37,6 +32,7 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
           moduleSetup: formData,
           teachingSchedule: transformTemplateDataToSaveData(templateData),
           courseworkList,
+          readingWeeks,
         };
         const response = await httpClient.post(
           '/private-study-distributions',
@@ -52,7 +48,7 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
     };
 
     fetchData();
-  }, [templateData, formData, courseworkList]);
+  }, [templateData, formData, courseworkList, readingWeeks]);
 
   if (loading) {
     return <Box>Loading...</Box>;

@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import {
   Coursework,
   CourseworkSetupFunctionsProps,
@@ -123,4 +124,30 @@ export const addExamCoursework = (
     return updatedCourseworkList;
   }
   return null;
+};
+
+export const handleTimeChange = (
+  index: number,
+  date: Date,
+  handleInputChange: (index: number, field: string, value: string) => void,
+) => {
+  const timeString = format(date, 'HH:mm');
+  handleInputChange(index, 'deadlineTime', timeString);
+};
+
+export const handleDeadlineWeekChange = (
+  index: number,
+  value: string,
+  semester: string,
+  handleInputChange: (index: number, field: string, value: number) => void,
+) => {
+  let deadlineWeek = parseInt(value, 10);
+  if (value === 'easterBreak1') {
+    deadlineWeek = semester === 'second' ? 9 : 24;
+  } else if (value === 'easterBreak2') {
+    deadlineWeek = semester === 'second' ? 10 : 25;
+  } else if (value === 'easterBreak3') {
+    deadlineWeek = semester === 'second' ? 11 : 26;
+  }
+  handleInputChange(index, 'deadlineWeek', deadlineWeek);
 };

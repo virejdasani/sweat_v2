@@ -67,7 +67,6 @@ const getReadingWeek = async (req, res) => {
   const { semester } = req.params;
   try {
     const events = await Calendar.find({});
-    console.log('Retrieved calendar events:', events);
     const readingWeeks = extractReadingWeek(events, semester);
     res.json({ events, readingWeeks });
   } catch (error) {

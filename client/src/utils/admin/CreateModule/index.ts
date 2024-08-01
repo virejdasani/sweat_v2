@@ -39,6 +39,7 @@ export const handleSave = async (
   courseworkList: Coursework[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   navigate: any,
+  readingWeeks?: number[] | { sem1: number[]; sem2: number[] },
 ) => {
   const moduleDocument: ModuleDocument = {
     moduleSetup: formData,
@@ -47,7 +48,7 @@ export const handleSave = async (
   };
 
   try {
-    await createModule(moduleDocument);
+    await createModule(moduleDocument, readingWeeks);
     toast.success('Module document saved successfully');
     navigate('/admin');
   } catch (error) {

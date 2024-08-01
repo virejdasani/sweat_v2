@@ -45,15 +45,16 @@ const getModuleById = async (req, res) => {
 
 const createOrUpdateModuleController = async (req, res) => {
   try {
-    const moduleData = req.body;
+    const { moduleData, readingWeeks } = req.body;
+
     const existingModule = await Module.findOne({
       'moduleSetup.moduleCode': moduleData.moduleSetup.moduleCode,
     });
 
-    await createOrUpdateModule(moduleData, existingModule, res);
+    await createOrUpdateModule(moduleData, existingModule, readingWeeks);
 
     // Update programmes after module has been created or updated
-    await updateProgrammesForModule(moduleData, res);
+    await updateProgrammesForModule(moduleData);
 
     res
       .status(200)

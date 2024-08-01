@@ -19,27 +19,19 @@ import {
 import { QuestionOutlineIcon, DeleteIcon } from '@chakra-ui/icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { setHours, setMinutes, format } from 'date-fns';
+import { setHours, setMinutes } from 'date-fns';
 import {
   CourseworkSetupFunctions,
   addExamCoursework,
+  handleDeadlineWeekChange,
+  handleTimeChange,
 } from '../../../../utils/admin/CreateModule/CourseworkSetup';
 import {
   Coursework,
   CourseworkSetupProps,
+  daysOfWeek,
 } from '../../../../types/admin/CreateModule/CourseworkSetup';
 import { courseworkSetupStyles } from './CourseworkSetupStyles';
-
-const daysOfWeek = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-  'As Scheduled',
-];
 
 const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   courseworkList = [],
@@ -48,6 +40,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   examPercentage,
   formFactor,
   onFormFactorChange,
+  readingWeeks,
 }) => {
   const {
     handleAddCoursework,
@@ -66,10 +59,33 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     if (updatedCourseworkList) {
       onCourseworkListChange(updatedCourseworkList);
     }
-  }, [examPercentage]);
+  }, [examPercentage, semester, courseworkList, onCourseworkListChange]);
 
   const renderWeekOptions = () => {
     const options = [];
+
+    const isReadingWeek = (week: number) => {
+      if (Array.isArray(readingWeeks)) {
+        return readingWeeks.includes(week);
+      } else if (readingWeeks && semester === 'whole session') {
+        return (
+          (week <= 15 && readingWeeks.sem1.includes(week)) ||
+          (week > 15 && readingWeeks.sem2.includes(week - 15))
+        ); // Adjust for whole session
+      }
+      return false;
+    };
+
+    const getLabel = (week: number) => {
+      if (isReadingWeek(week)) {
+        return `${week} (Private Study Week)`;
+      }
+      if (week >= 24 && week <= 26) {
+        return `${week} (Easter Break Week ${week - 23})`;
+      }
+      return week.toString();
+    };
+
     if (semester === 'second') {
       for (let i = 1; i <= 18; i++) {
         if (i === 9) {
@@ -90,7 +106,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
         } else {
           options.push(
             <option key={i} value={i.toString()}>
-              {i}
+              {getLabel(i)}
             </option>,
           );
         }
@@ -115,7 +131,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
         } else {
           options.push(
             <option key={i} value={i.toString()}>
-              {i}
+              {getLabel(i)}
             </option>,
           );
         }
@@ -124,29 +140,12 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       for (let i = 1; i <= 15; i++) {
         options.push(
           <option key={i} value={i.toString()}>
-            {i}
+            {getLabel(i)}
           </option>,
         );
       }
     }
     return options;
-  };
-
-  const handleTimeChange = (index: number, date: Date) => {
-    const timeString = format(date, 'HH:mm');
-    handleInputChange(index, 'deadlineTime', timeString);
-  };
-
-  const handleDeadlineWeekChange = (index: number, value: string) => {
-    let deadlineWeek = parseInt(value, 10);
-    if (value === 'easterBreak1') {
-      deadlineWeek = semester === 'second' ? 9 : 24;
-    } else if (value === 'easterBreak2') {
-      deadlineWeek = semester === 'second' ? 10 : 25;
-    } else if (value === 'easterBreak3') {
-      deadlineWeek = semester === 'second' ? 11 : 26;
-    }
-    handleInputChange(index, 'deadlineWeek', deadlineWeek);
   };
 
   return (
@@ -227,7 +226,12 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 <Select
                   value={coursework.deadlineWeek.toString() || ''}
                   onChange={(e) =>
-                    handleDeadlineWeekChange(index, e.target.value)
+                    handleDeadlineWeekChange(
+                      index,
+                      e.target.value,
+                      semester,
+                      handleInputChange,
+                    )
                   }
                   style={courseworkSetupStyles.select}
                   disabled={
@@ -301,7 +305,9 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                             )
                           : new Date()
                       }
-                      onChange={(date: Date) => handleTimeChange(index, date)}
+                      onChange={(date: Date) =>
+                        handleTimeChange(index, date, handleInputChange)
+                      }
                       showTimeSelect
                       showTimeSelectOnly
                       timeIntervals={15} // Set time intervals to 15 minutes

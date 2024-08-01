@@ -100,6 +100,8 @@ const calculatePrivateStudyDistribution = (
   privateStudyTime,
   ratio,
   totalWeeks,
+  readingWeeks,
+  semester,
 ) => {
   const workloadData = Array(totalWeeks)
     .fill(0)
@@ -107,11 +109,39 @@ const calculatePrivateStudyDistribution = (
 
   let totalAllocatedTime = 0;
 
+  // Function to check if a week is a reading week
+  const isReadingWeek = (week) => {
+    if (Array.isArray(readingWeeks)) {
+      return readingWeeks.includes(week);
+    } else if (readingWeeks && typeof readingWeeks === 'object') {
+      const { sem1, sem2 } = readingWeeks;
+      if (semester.toLowerCase() === 'whole session') {
+        // Map week to the respective semester
+        if (week <= 15) {
+          return sem1 && sem1.includes(week);
+        } else {
+          return sem2 && sem2.includes(week - 15);
+        }
+      } else {
+        return (sem1 && sem1.includes(week)) || (sem2 && sem2.includes(week));
+      }
+    }
+    return false;
+  };
+
   Object.values(teachingSchedule).forEach((activity) => {
     if (activity.distribution && Array.isArray(activity.distribution)) {
-      activity.distribution.forEach((week) => {
-        const studyHours = roundToNearestHalf(week.hours * ratio);
-        workloadData[week.week - 1].hours += studyHours;
+      activity.distribution.forEach((week, index) => {
+        const weekNumber = week.week;
+        const prevWeekNumber =
+          index > 0 ? activity.distribution[index - 1].week : weekNumber;
+        const prevWeekHours =
+          index > 0 ? activity.distribution[index - 1].hours : week.hours;
+        const effectiveHours = isReadingWeek(weekNumber)
+          ? prevWeekHours
+          : week.hours;
+        const studyHours = roundToNearestHalf(effectiveHours * ratio);
+        workloadData[weekNumber - 1].hours += studyHours;
         totalAllocatedTime += studyHours;
       });
     }
@@ -126,6 +156,7 @@ const calculatePrivateStudyDistributions = (
   teachingSchedule,
   coursework,
   semester,
+  readingWeeks,
 ) => {
   const isWholeSession = semester.toLowerCase() === 'whole session';
   const totalWeeks = isWholeSession
@@ -149,6 +180,8 @@ const calculatePrivateStudyDistributions = (
         privateStudyTime,
         ratio,
         totalWeeks,
+        readingWeeks,
+        semester,
       );
 
     // Adjust for the case where 2x ratio exceeds privateStudyTime
@@ -236,6 +269,7 @@ const calculateCompleteDistributions = (
   teachingSchedule,
   coursework,
   semester,
+  readingWeeks,
 ) => {
   try {
     if (coursework.type !== 'exam') {
@@ -260,6 +294,7 @@ const calculateCompleteDistributions = (
       teachingSchedule,
       coursework,
       semester,
+      readingWeeks,
     );
 
     const remainingTime = privateStudyDistributions.map(

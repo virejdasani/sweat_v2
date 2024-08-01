@@ -4,8 +4,8 @@ const {
 
 const getDistributions = async (req, res) => {
   try {
-    const { moduleSetup, teachingSchedule, courseworkList } = req.body;
-
+    const { moduleSetup, teachingSchedule, courseworkList, readingWeeks } =
+      req.body;
     // Extract the semester from moduleSetup
     const semester = moduleSetup.semester;
 
@@ -30,6 +30,7 @@ const getDistributions = async (req, res) => {
         teachingSchedule,
         coursework,
         semester,
+        readingWeeks,
       );
       return distribution;
     });

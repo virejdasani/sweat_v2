@@ -6,9 +6,10 @@ import {
 import { TeachingScheduleSaveData } from '../TeachingSchedule';
 
 export interface ModuleReviewProps {
+  templateData: number[][][];
   formData: ModuleSetupFormData;
   courseworkList: Coursework[];
-  templateData: number[][][];
+  readingWeeks?: number[] | { sem1: number[]; sem2: number[] };
 }
 
 export interface CombinedData {

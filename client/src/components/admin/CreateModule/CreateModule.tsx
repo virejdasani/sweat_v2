@@ -138,6 +138,7 @@ const CreateModule: React.FC = () => {
                 formFactor: value,
               }))
             }
+            readingWeeks={readingWeeks}
           />
         );
       case 3:
@@ -171,6 +172,7 @@ const CreateModule: React.FC = () => {
             templateData={templateData}
             formData={formData}
             courseworkList={courseworkList}
+            readingWeeks={readingWeeks}
           />
         );
       default:
@@ -232,7 +234,13 @@ const CreateModule: React.FC = () => {
             onClick={
               activeStep === MAX_STEPS - 1
                 ? () =>
-                    handleSave(formData, templateData, courseworkList, navigate)
+                    handleSave(
+                      formData,
+                      templateData,
+                      courseworkList,
+                      navigate,
+                      readingWeeks,
+                    )
                 : handleNextStep
             }
             disabled={activeStep === MAX_STEPS}

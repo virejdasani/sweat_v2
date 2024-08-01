@@ -484,3 +484,92 @@ export const recalculateCourseworkList = (
     return { ...coursework, preparationTime, privateStudyTime };
   });
 };
+
+export const saveCourseworkListToSession = (courseworkList: Coursework[]) => {
+  sessionStorage.setItem(
+    'internalCourseworkList',
+    JSON.stringify(courseworkList),
+  );
+};
+
+export const getCourseworkListFromSession = (): Coursework[] | null => {
+  const savedCourseworkList = sessionStorage.getItem('internalCourseworkList');
+  return savedCourseworkList ? JSON.parse(savedCourseworkList) : null;
+};
+
+export const saveInitialCourseworkListToSession = (
+  initialCourseworkList: Coursework[],
+) => {
+  sessionStorage.setItem(
+    'initialCourseworkList',
+    JSON.stringify(initialCourseworkList),
+  );
+};
+
+export const getInitialCourseworkListFromSession = (): Coursework[] | null => {
+  const savedInitialList = sessionStorage.getItem('initialCourseworkList');
+  return savedInitialList ? JSON.parse(savedInitialList) : null;
+};
+
+export const handleRestoreDefaults = (
+  setInternalCourseworkList: React.Dispatch<React.SetStateAction<Coursework[]>>,
+  handleCourseworkListChange: (courseworkList: Coursework[]) => void,
+  setManualChanges: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >,
+) => {
+  const restoredList = getInitialCourseworkListFromSession() || []; // Deep copy
+  setInternalCourseworkList(restoredList);
+  handleCourseworkListChange(restoredList);
+  setManualChanges({});
+  sessionStorage.removeItem('internalCourseworkList');
+};
+
+export const handleInputChange = (
+  index: number,
+  field: keyof Omit<
+    Coursework,
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
+  >,
+  value: number | undefined,
+  internalCourseworkList: Coursework[],
+  setInternalCourseworkList: React.Dispatch<React.SetStateAction<Coursework[]>>,
+  manualChanges: Record<string, boolean>,
+  setManualChanges: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >,
+  handleScheduleChange: (
+    index: number,
+    field: string,
+    value: number | undefined,
+  ) => void,
+) => {
+  const updatedCourseworkList = [...internalCourseworkList];
+  updatedCourseworkList[index][field] = value;
+  setInternalCourseworkList(updatedCourseworkList);
+
+  const manualChangesCopy = { ...manualChanges };
+  manualChangesCopy[`${index}-${field}`] = true;
+  setManualChanges(manualChangesCopy);
+
+  handleScheduleChange(index, field as string, value);
+
+  saveCourseworkListToSession(updatedCourseworkList);
+};
+
+export const handleInputBlur = (
+  index: number,
+  field: keyof Omit<
+    Coursework,
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
+  >,
+  internalCourseworkList: Coursework[],
+  handleScheduleChange: (
+    index: number,
+    field: string,
+    value: number | undefined,
+  ) => void,
+) => {
+  const value = Number(internalCourseworkList[index][field]);
+  handleScheduleChange(index, field as string, value);
+};

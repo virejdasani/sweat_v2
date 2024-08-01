@@ -40,9 +40,21 @@ export interface CourseworkSetupProps {
   examPercentage: number;
   formFactor: number;
   onFormFactorChange: (formFactor: number) => void;
+  readingWeeks?: number[] | { sem1: number[]; sem2: number[] };
 }
 
 export interface CourseworkSetupFunctionsProps {
   courseworkList: Coursework[];
   onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
 }
+
+export const daysOfWeek = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+  'As Scheduled',
+];

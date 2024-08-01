@@ -27,6 +27,7 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
   privateStudyDistributions,
   preparationTimeDistributions,
   moduleCredit,
+  semester,
 }) => {
   const colorMapRef = useRef<{ [key: string]: string }>({});
   const existingColors = useRef<string[]>([]);
@@ -41,7 +42,8 @@ const DistributionGraph: React.FC<DistributionGraphProps> = ({
     [teachingSchedule, preparationTimeDistributions, privateStudyDistributions],
   );
 
-  const averageWeeklyEffort = (moduleCredit * 10) / weeks;
+  const totalWeeks = semester.toLowerCase() === 'whole session' ? 30 : 15;
+  const averageWeeklyEffort = (moduleCredit * 10) / totalWeeks;
 
   const teachingScheduleData = useMemo(
     () => transformTeachingScheduleData(teachingSchedule, weeks),

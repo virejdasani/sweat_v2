@@ -129,6 +129,7 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
           privateStudyDistributions={filteredPrivateStudyData}
           preparationTimeDistributions={filteredPreparationData}
           moduleCredit={formData.moduleCredit}
+          semester={formData.semester}
         />
       </Box>
     </Box>

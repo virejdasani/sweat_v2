@@ -51,7 +51,7 @@ const createOrUpdateModuleController = async (req, res) => {
       'moduleSetup.moduleCode': moduleData.moduleSetup.moduleCode,
     });
 
-    await createOrUpdateModule(moduleData, existingModule, readingWeeks);
+    await createOrUpdateModule(moduleData, existingModule, readingWeeks, res);
 
     // Update programmes after module has been created or updated
     await updateProgrammesForModule(moduleData);

@@ -22,6 +22,7 @@ export interface DistributionGraphProps {
   privateStudyDistributions: StudyStyleDistribution[];
   preparationTimeDistributions: Coursework[];
   moduleCredit: number;
+  semester: string;
 }
 
 export interface DistributionTableProps {

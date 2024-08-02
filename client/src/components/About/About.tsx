@@ -44,7 +44,7 @@ const About = () => {
             <h2>Meet the team</h2>
             <ul>
               <li>
-                {' '}<a href="http://https%3A%2F%2Fwww.liverpool.ac.uk%2Felectrical-engineering-and-electronics%2Fstaff%2Fwaleed-al-nuaimy%2F&usg=AOvVaw0ujNrvc3PSg_Csqzrw4etY&opi=89978449">Waleed Al-Nuaimy</a>{' '}– Department of Electrical Engineering and
+                <a href="http://https%3A%2F%2Fwww.liverpool.ac.uk%2Felectrical-engineering-and-electronics%2Fstaff%2Fwaleed-al-nuaimy%2F&usg=AOvVaw0ujNrvc3PSg_Csqzrw4etY&opi=89978449">Waleed Al-Nuaimy</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>

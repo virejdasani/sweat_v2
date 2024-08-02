@@ -48,7 +48,7 @@ const About = () => {
                 Electronics
               </li>
               <li>
-                <a href="https://www.liverpool.ac.uk/electrical-engineering-and-electronics/staff/judith-lewa/">Lee Devlin</a> – Department of Electrical Engineering and
+                <a href="https://www.linkedin.com/in/lee-devlin-08495351/">Lee Devlin</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li><a href="https://www.liverpool.ac.uk/computer-science/staff/stuart-thomason/">Stuart Thomason</a> – Department of Computer Science</li>
@@ -79,6 +79,10 @@ const About = () => {
               <li>
                 <a href="www.linkedin.com/in/shahmeer-khan-swe">Shahmeer Khan</a> - Computer Science student in 2024, worked alongside Virej Dasani to 
                 improve frontend design of the portal and general refinements of the portal.
+              </li>
+              <li>
+                <a href="https://www.liverpool.ac.uk/cooper-group/people/bertie,naivalurua/">Bertie Naivalurua</a> - CSEE student in 2024, assisting Shahmeer Khan
+                and Virej Dasani in developing Coursework Calendar. 
               </li>
             </ul>
             <p>

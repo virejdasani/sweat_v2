@@ -15,4 +15,5 @@ export interface CourseworkScheduleProps {
   handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
   formFactor: number;
   isEditing: boolean;
+  courseworkPercentage: number;
 }

@@ -164,6 +164,7 @@ const CreateModule: React.FC = () => {
             }
             formFactor={formData.formFactor}
             isEditing={!!module}
+            courseworkPercentage={formData.courseworkPercentage}
           />
         );
       case 4:

@@ -255,11 +255,16 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                   disabled={coursework.type === 'exam'}
                 >
                   <option value="N/A">N/A</option>
-                  {Array.from({ length: 15 }, (_, i) => (
-                    <option key={i + 1} value={(i + 1).toString()}>
-                      {i + 1}
-                    </option>
-                  ))}
+                  {Array.from(
+                    {
+                      length: semester === 'whole session' ? 30 : 15,
+                    },
+                    (_, i) => (
+                      <option key={i + 1} value={(i + 1).toString()}>
+                        {i + 1}
+                      </option>
+                    ),
+                  )}
                 </Select>
               </Td>
               <Td style={courseworkSetupStyles.td}>

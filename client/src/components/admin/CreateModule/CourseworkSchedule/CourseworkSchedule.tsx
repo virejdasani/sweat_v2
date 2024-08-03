@@ -38,6 +38,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   handleCourseworkListChange,
   formFactor = 0,
   isEditing = false,
+  courseworkPercentage,
 }) => {
   const [internalCourseworkList, setInternalCourseworkList] =
     useState<Coursework[]>(courseworkList);
@@ -55,11 +56,13 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
       handleCourseworkListChange(savedCourseworkList);
       isInitialized.current = true;
     } else if (!isInitialized.current) {
+      const adjustedFormFactor =
+        courseworkPercentage === 100 ? 100 : formFactor;
       const initialList = initializeCourseworkList(
         courseworkList,
         templateData,
         moduleCredit,
-        formFactor,
+        adjustedFormFactor,
         isEditing,
       );
       setInternalCourseworkList(initialList);
@@ -77,6 +80,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
     formFactor,
     isEditing,
     handleCourseworkListChange,
+    courseworkPercentage, // Add courseworkPercentage to dependencies
   ]);
 
   useEffect(() => {

@@ -21,7 +21,8 @@ const calculatePreparationDistributions = (
     .map((_, i) => ({ week: i + 1, coursework: 0 }));
 
   const { preparationTime, deadlineWeek, releasedWeekPrior } = coursework;
-  let actualStartWeek = deadlineWeek - (releasedWeekPrior ?? 0);
+  let actualStartWeek =
+    deadlineWeek - (releasedWeekPrior === 'N/A' ? 2 : releasedWeekPrior ?? 0);
   if (actualStartWeek < 1) {
     actualStartWeek = 1;
   }
@@ -46,10 +47,17 @@ const calculatePreparationDistributions = (
       break;
     case 'steady':
       if (actualStartWeek > 0 && actualStartWeek <= totalWeeks) {
-        const weeksForDistribution2 = deadlineWeek - releasedWeekPrior + 1;
+        const weeksForDistribution2 =
+          deadlineWeek -
+          (releasedWeekPrior === 'N/A' ? 2 : releasedWeekPrior) +
+          1;
         const incrementValue = safeDivide(
-          2 * totalPreparationTime - 2 * releasedWeekPrior - 2,
-          releasedWeekPrior * releasedWeekPrior + releasedWeekPrior,
+          2 * totalPreparationTime -
+            2 * (releasedWeekPrior === 'N/A' ? 2 : releasedWeekPrior) -
+            2,
+          (releasedWeekPrior === 'N/A' ? 2 : releasedWeekPrior) *
+            (releasedWeekPrior === 'N/A' ? 2 : releasedWeekPrior) +
+            (releasedWeekPrior === 'N/A' ? 2 : releasedWeekPrior),
         );
         let cumulativeTime = 1;
         workloadData[actualStartWeek - 1].coursework += 1; // First week always 1 hour

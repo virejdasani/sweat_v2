@@ -1,3 +1,11 @@
+.postWeek12TableData {
+  background-color: #adadad !important;
+}
+
+.readingWeekTableData {
+  background-color: #f5ff6f !important;
+}
+
 .calendar {}
 
 .calendarHeader {

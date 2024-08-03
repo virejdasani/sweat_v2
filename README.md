@@ -1,6 +1,7 @@
 ## Deployed frontend: https://sweatdeployed.netlify.app/
+## Deployed backend: https://sweat-v2.onrender.com
 
-## Deployed backend: https://sweat-backend.onrender.com/
+[DEPRECATED] Deployed backend: https://sweat-backend.onrender.com/
 
 ---
 

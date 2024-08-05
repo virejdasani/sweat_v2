@@ -44,17 +44,17 @@ const About = () => {
             <h2>Meet the team</h2>
             <ul>
               <li>
-                Waleed Al-Nuaimy – Department of Electrical Engineering and
+                <a href="http://https%3A%2F%2Fwww.liverpool.ac.uk%2Felectrical-engineering-and-electronics%2Fstaff%2Fwaleed-al-nuaimy%2F&usg=AOvVaw0ujNrvc3PSg_Csqzrw4etY&opi=89978449">Waleed Al-Nuaimy</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>
-                Lee Devlin – Department of Electrical Engineering and
+                <a href="https://www.linkedin.com/in/lee-devlin-08495351/">Lee Devlin</a> – Department of Electrical Engineering and
                 Electronics
               </li>
-              <li>Stuart Thomason – Department of Computer Science</li>
-              <li>Jeffrey Ray – Department of Computer Science</li>
+              <li><a href="https://www.liverpool.ac.uk/computer-science/staff/stuart-thomason/">Stuart Thomason</a> – Department of Computer Science</li>
+              <li><a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwj8sfytiZeHAxXfVUEAHVbOATYQFnoECBcQAQ&url=https%3A%2F%2Fwww.liverpool.ac.uk%2Fcomputer-science%2Fstaff%2F&usg=AOvVaw0LS-RmdL3uC8F5jx4ylv-Z&opi=89978449">Jeffrey Ray</a> – Department of Computer Science</li>
               <li>
-                Judith Birtall – Student Experience Team Leader in the School of
+                <a href="https://www.liverpool.ac.uk/electrical-engineering-and-electronics/staff/judith-lewa/">Judith Birtall</a> – Student Experience Team Leader in the School of
                 Electrical Engineering, Electronics and Computer Science
               </li>
               <li>
@@ -62,12 +62,12 @@ const About = () => {
                 functioning prototype as part of is BEng final year project.
               </li>
               <li>
-                Abubaker Iqbal – EEE graduate in 2024, developed the second
+                <a href="https://www.linkedin.com/in/abu-baker-iqbal-9112001">Abubaker Iqbal</a> – EEE graduate in 2024, developed the second
                 functioning prototype as part of is BEng final year project, and
                 as part of a summer project with Virej (below).
               </li>
               <li>
-                Virej Dasani – Computer Science student in 2024, worked with
+                <a href="https://www.linkedin.com/in/virej-dasani-b64470209">Virej Dasani</a> – Computer Science student in 2024, worked with
                 Abubaker to make the web portal suitable for public deployment
                 in 2024-25.
               </li>
@@ -75,6 +75,14 @@ const About = () => {
                 Rahul Manikandan – EEE MSc student in 2024, worked with the team
                 on some key enhancements and refinements of the portal
                 appearance and functionality.
+              </li>
+              <li>
+                <a href="www.linkedin.com/in/shahmeer-khan-swe">Shahmeer Khan</a> - Computer Science student in 2024, worked alongside Virej Dasani to 
+                improve frontend design of the portal and general refinements of the portal.
+              </li>
+              <li>
+                <a href="https://www.liverpool.ac.uk/cooper-group/people/bertie,naivalurua/">Bertie Naivalurua</a> - CSEE student in 2024, assisting Shahmeer Khan
+                and Virej Dasani in developing Coursework Calendar. 
               </li>
             </ul>
             <p>

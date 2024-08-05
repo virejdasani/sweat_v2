@@ -22,6 +22,12 @@ export const inputStyle: InputProps = {
   textAlign: 'center',
 };
 
+export const greyedOutInputStyle: InputProps = {
+  backgroundColor: '#d3d3d3', // Lighter grey for better visibility
+  width: '100%',
+  height: '100%',
+};
+
 export const buttonStyle: ButtonProps = {
   mt: 4,
   size: 'sm',

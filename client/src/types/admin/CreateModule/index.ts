@@ -1,4 +1,4 @@
-import { Coursework } from './CourseworkSetup';
+import { Coursework, StudyStyleDistribution } from './CourseworkSetup';
 import { ModuleSetupFormData } from './ModuleSetup';
 import { TeachingScheduleSaveData } from './TeachingSchedule';
 
@@ -6,7 +6,6 @@ export interface Step {
   title: string;
   description: string;
 }
-
 export const steps: Step[] = [
   { title: 'Module Setup', description: 'Set up module' },
   {
@@ -18,11 +17,12 @@ export const steps: Step[] = [
     title: 'Coursework Schedule',
     description: 'Modify coursework properties',
   },
-  { title: 'Review', description: 'Review module details' },
+  { title: 'Module Review', description: 'Review module details' },
 ];
 
 export interface ModuleDocument {
   moduleSetup: ModuleSetupFormData;
   teachingSchedule: TeachingScheduleSaveData;
   courseworkList: Coursework[];
+  privateStudyDistributions?: StudyStyleDistribution[];
 }

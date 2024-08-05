@@ -34,6 +34,45 @@ export const expectedTotalTime = (weight: number, moduleCredit: number) => {
   return parseFloat((moduleCredit * 10 * (weight / 100)).toFixed(2));
 };
 
+const calculateContactTime = (
+  templateData: number[][][],
+  activityIndex: number,
+  startWeek: number,
+  endWeek: number,
+): number => {
+  if (!Array.isArray(templateData) || templateData.length < 1) {
+    throw new Error('Invalid templateData structure');
+  }
+
+  if (activityIndex < 0 || activityIndex >= templateData[0].length) {
+    throw new Error('Invalid activityIndex');
+  }
+
+  if (startWeek < 0 || endWeek <= startWeek) {
+    throw new Error('Invalid week range');
+  }
+
+  const firstSemesterWeeks = templateData[0][0].length;
+  const secondSemesterWeeks =
+    templateData.length > 1 ? templateData[1][0].length : 0;
+
+  let total = 0;
+
+  for (let week = startWeek; week < endWeek; week++) {
+    if (week < firstSemesterWeeks) {
+      total += templateData[0][activityIndex][week];
+    } else if (
+      week >= firstSemesterWeeks &&
+      week < firstSemesterWeeks + secondSemesterWeeks
+    ) {
+      const adjustedWeek = week - firstSemesterWeeks;
+      total += templateData[1][activityIndex][adjustedWeek];
+    }
+  }
+
+  return total;
+};
+
 export const updateCourseworkList = (
   courseworkList: Coursework[],
   templateData: number[][][],
@@ -68,65 +107,64 @@ export const updateCourseworkList = (
           ? parseInt(previousDeadlineWeek, 10)
           : previousDeadlineWeek;
 
-      const calculateContactTime = (activityData: number[]) =>
-        activityData
-          .slice(startWeek, numericDeadlineWeek)
-          .reduce((acc, val) => acc + val, 0);
-
       const contactTimeFields =
         coursework.type === 'exam'
           ? {}
           : {
               contactTimeLectures: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[0]),
+                (calculateContactTime(
+                  templateData,
                   0,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeTutorials: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[1]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  1,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeLabs: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[2]),
-                  0,
-                ) *
-                  formFactor) /
-                  100,
+                calculateContactTime(
+                  templateData,
+                  2,
+                  startWeek,
+                  numericDeadlineWeek,
+                ), // formFactor not applied here
               ),
               contactTimeSeminars: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[3]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  3,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeFieldworkPlacement: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[4]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  4,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
               ),
               contactTimeOthers: Math.round(
-                (templateData.reduce(
-                  (total, semesterData) =>
-                    total + calculateContactTime(semesterData[5]),
-                  0,
+                (calculateContactTime(
+                  templateData,
+                  5,
+                  startWeek,
+                  numericDeadlineWeek,
                 ) *
                   formFactor) /
                   100,
@@ -156,6 +194,7 @@ export const updateCourseworkList = (
 
   return updatedCourseworkList;
 };
+
 export const updateExamContactTime = (
   courseworkList: Coursework[],
   templateData: number[][][],
@@ -347,14 +386,14 @@ export const handleInputChangeUtil = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
   >,
   value: number | undefined,
   handleScheduleChange: (
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
     >,
     value: number | undefined,
   ) => void,
@@ -371,17 +410,166 @@ export const handleInputBlurUtil = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
   >,
   handleScheduleChange: (
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
     >,
     value: number | undefined,
   ) => void,
 ) => {
   const value = Number(internalCourseworkList[index][field]);
   handleScheduleChange(index, field, value);
+};
+
+export const initializeCourseworkList = (
+  courseworkList: Coursework[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  templateData: number[][][],
+  moduleCredit: number,
+  formFactor: number,
+  isEditing: boolean,
+): Coursework[] => {
+  if (isEditing) {
+    return courseworkList;
+  }
+
+  let updatedCourseworkList = updateCourseworkList(
+    courseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  updatedCourseworkList = updateExamContactTime(
+    updatedCourseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  return updatedCourseworkList.map((coursework) => {
+    const { preparationTime, privateStudyTime } =
+      getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
+    return { ...coursework, preparationTime, privateStudyTime };
+  });
+};
+
+export const recalculateCourseworkList = (
+  courseworkList: Coursework[],
+  templateData: number[][][],
+  moduleCredit: number,
+  formFactor: number,
+): Coursework[] => {
+  let updatedCourseworkList = updateCourseworkList(
+    courseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  updatedCourseworkList = updateExamContactTime(
+    updatedCourseworkList,
+    templateData,
+    moduleCredit,
+    formFactor,
+  );
+
+  return updatedCourseworkList.map((coursework) => {
+    const { preparationTime, privateStudyTime } =
+      getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
+    return { ...coursework, preparationTime, privateStudyTime };
+  });
+};
+
+export const saveCourseworkListToSession = (courseworkList: Coursework[]) => {
+  sessionStorage.setItem(
+    'internalCourseworkList',
+    JSON.stringify(courseworkList),
+  );
+};
+
+export const getCourseworkListFromSession = (): Coursework[] | null => {
+  const savedCourseworkList = sessionStorage.getItem('internalCourseworkList');
+  return savedCourseworkList ? JSON.parse(savedCourseworkList) : null;
+};
+
+export const saveInitialCourseworkListToSession = (
+  initialCourseworkList: Coursework[],
+) => {
+  sessionStorage.setItem(
+    'initialCourseworkList',
+    JSON.stringify(initialCourseworkList),
+  );
+};
+
+export const getInitialCourseworkListFromSession = (): Coursework[] | null => {
+  const savedInitialList = sessionStorage.getItem('initialCourseworkList');
+  return savedInitialList ? JSON.parse(savedInitialList) : null;
+};
+
+export const handleRestoreDefaults = (
+  setInternalCourseworkList: React.Dispatch<React.SetStateAction<Coursework[]>>,
+  handleCourseworkListChange: (courseworkList: Coursework[]) => void,
+  setManualChanges: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >,
+) => {
+  const restoredList = getInitialCourseworkListFromSession() || []; // Deep copy
+  setInternalCourseworkList(restoredList);
+  handleCourseworkListChange(restoredList);
+  setManualChanges({});
+  sessionStorage.removeItem('internalCourseworkList');
+};
+
+export const handleInputChange = (
+  index: number,
+  field: keyof Omit<
+    Coursework,
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
+  >,
+  value: number | undefined,
+  internalCourseworkList: Coursework[],
+  setInternalCourseworkList: React.Dispatch<React.SetStateAction<Coursework[]>>,
+  manualChanges: Record<string, boolean>,
+  setManualChanges: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >,
+  handleScheduleChange: (
+    index: number,
+    field: string,
+    value: number | undefined,
+  ) => void,
+) => {
+  const updatedCourseworkList = [...internalCourseworkList];
+  updatedCourseworkList[index][field] = value;
+  setInternalCourseworkList(updatedCourseworkList);
+
+  const manualChangesCopy = { ...manualChanges };
+  manualChangesCopy[`${index}-${field}`] = true;
+  setManualChanges(manualChangesCopy);
+
+  handleScheduleChange(index, field as string, value);
+
+  saveCourseworkListToSession(updatedCourseworkList);
+};
+
+export const handleInputBlur = (
+  index: number,
+  field: keyof Omit<
+    Coursework,
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
+  >,
+  internalCourseworkList: Coursework[],
+  handleScheduleChange: (
+    index: number,
+    field: string,
+    value: number | undefined,
+  ) => void,
+) => {
+  const value = Number(internalCourseworkList[index][field]);
+  handleScheduleChange(index, field as string, value);
 };

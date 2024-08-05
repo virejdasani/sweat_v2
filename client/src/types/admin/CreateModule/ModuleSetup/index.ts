@@ -8,6 +8,9 @@ export interface ModuleSetupFormData {
   programme: string[];
   semester: string;
   type: string;
+  teachingStaff: string[];
+  formFactor: number;
+  archived?: boolean;
 }
 
 export interface ModuleSetupProps {

@@ -37,6 +37,9 @@ export const handleSave = async (
   formData: ModuleSetupFormData,
   templateData: number[][][],
   courseworkList: Coursework[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  navigate: any,
+  readingWeeks?: number[] | { sem1: number[]; sem2: number[] },
 ) => {
   const moduleDocument: ModuleDocument = {
     moduleSetup: formData,
@@ -45,9 +48,9 @@ export const handleSave = async (
   };
 
   try {
-    await createModule(moduleDocument);
-    console.log('Module document saved successfully');
+    await createModule(moduleDocument, readingWeeks);
     toast.success('Module document saved successfully');
+    navigate('/admin');
   } catch (error) {
     console.error('Error saving module document:', error);
     toast.error('Error saving module document');
@@ -65,7 +68,7 @@ export const handleScheduleChange = (
   index: number,
   field: keyof Omit<
     Coursework,
-    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+    'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
   >,
   value: number | undefined,
   courseworkList: Coursework[],

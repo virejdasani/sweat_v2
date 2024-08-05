@@ -14,13 +14,21 @@ import {
   GridItem,
   Checkbox,
   CheckboxGroup,
+  Button,
+  IconButton,
 } from '@chakra-ui/react';
+import { DeleteIcon } from '@chakra-ui/icons';
 import { moduleSetupStyles } from './ModuleSetupStyles';
 import { ModuleSetupProps } from '../../../../types/admin/CreateModule/ModuleSetup';
-import { handleInputChange } from '../../../../utils/admin/CreateModule/ModuleSetup';
+import {
+  handleInputChange,
+  handleTeachingStaffChange,
+  addTeachingStaff,
+  removeTeachingStaff,
+} from '../../../../utils/admin/CreateModule/ModuleSetup';
 
 const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
-  const programmes = ['CSEE', 'AVS', 'MCR', 'EEE'];
+  const programmes = ['CSEE', 'AVS', 'MCR', 'EEE', 'EEEP', 'EEMS', 'EETW'];
 
   return (
     <Box sx={moduleSetupStyles.container}>
@@ -201,6 +209,51 @@ const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
               <option value="core">Core</option>
               <option value="optional">Optional</option>
             </Select>
+          </FormControl>
+        </GridItem>
+
+        <GridItem colSpan={3}>
+          <FormControl
+            id="teachingStaff"
+            sx={moduleSetupStyles.formControl}
+            isRequired
+          >
+            <FormLabel sx={moduleSetupStyles.formLabel}>
+              Teaching Staff
+            </FormLabel>
+            {formData.teachingStaff.map((staff, index) => (
+              <Box key={index} display="flex" alignItems="center" mb={2}>
+                <Input
+                  type="text"
+                  value={staff}
+                  onChange={(e) =>
+                    handleTeachingStaffChange(
+                      index,
+                      e.target.value,
+                      formData,
+                      setFormData,
+                    )
+                  }
+                  placeholder={`Teaching Staff ${index + 1}`}
+                  width="300px"
+                />
+                <IconButton
+                  ml={2}
+                  icon={<DeleteIcon />}
+                  onClick={() =>
+                    removeTeachingStaff(index, formData, setFormData)
+                  }
+                  aria-label={`Remove Teaching Staff ${index + 1}`}
+                  disabled={formData.teachingStaff.length <= 1}
+                />
+              </Box>
+            ))}
+            <Button
+              onClick={() => addTeachingStaff(formData, setFormData)}
+              disabled={formData.teachingStaff.length >= 2}
+            >
+              Add Teaching Staff
+            </Button>
           </FormControl>
         </GridItem>
       </Grid>

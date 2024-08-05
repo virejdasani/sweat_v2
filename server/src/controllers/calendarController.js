@@ -1,4 +1,5 @@
 const Calendar = require('../models/calendar');
+const { extractReadingWeek } = require('../services/calendarService');
 
 const saveEvents = async (req, res) => {
   try {
@@ -61,6 +62,19 @@ const deleteAllEvents = async (req, res) => {
   }
 };
 
+// Controller function to get calendar events and extract reading week
+const getReadingWeek = async (req, res) => {
+  const { semester } = req.params;
+  try {
+    const events = await Calendar.find({});
+    const readingWeeks = extractReadingWeek(events, semester);
+    res.json({ events, readingWeeks });
+  } catch (error) {
+    console.error('Error fetching calendar events:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   saveEvents,
   getEvents,
@@ -68,4 +82,5 @@ module.exports = {
   deleteEvent,
   updateEvent,
   deleteAllEvents,
+  getReadingWeek,
 };

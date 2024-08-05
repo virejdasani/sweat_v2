@@ -7,7 +7,7 @@ export interface CourseworkScheduleProps {
     index: number,
     field: keyof Omit<
       Coursework,
-      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekEarlier'
+      'title' | 'weight' | 'type' | 'deadlineWeek' | 'releasedWeekPrior'
     >,
     value: number | undefined,
   ) => void;
@@ -15,4 +15,5 @@ export interface CourseworkScheduleProps {
   handleCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
   formFactor: number;
   isEditing: boolean;
+  courseworkPercentage: number;
 }

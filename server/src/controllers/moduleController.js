@@ -1,7 +1,10 @@
 const Module = require('../models/module');
 const Programme = require('../models/programme');
 const { handleError } = require('../utils/errorHandler');
-const { createOrUpdateModule } = require('../utils/helpers');
+const { createOrUpdateModule } = require('../services/moduleService');
+const {
+  updateProgrammesForModule,
+} = require('../controllers/programmeController');
 const path = require('path');
 const fs = require('fs');
 
@@ -42,12 +45,20 @@ const getModuleById = async (req, res) => {
 
 const createOrUpdateModuleController = async (req, res) => {
   try {
-    const moduleData = req.body;
+    const { moduleData, readingWeeks } = req.body;
+
     const existingModule = await Module.findOne({
       'moduleSetup.moduleCode': moduleData.moduleSetup.moduleCode,
     });
 
-    await createOrUpdateModule(moduleData, existingModule, res);
+    await createOrUpdateModule(moduleData, existingModule, readingWeeks, res);
+
+    // Update programmes after module has been created or updated
+    await updateProgrammesForModule(moduleData);
+
+    res
+      .status(200)
+      .json({ message: 'Module created or updated successfully.' });
   } catch (error) {
     handleError(res, error);
   }

@@ -1,83 +1,137 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Box, Select, Flex, Text, Tooltip, Icon } from '@chakra-ui/react';
+import { InfoOutlineIcon } from '@chakra-ui/icons';
+import DistributionTable from './DistributionTable';
+import DistributionGraph from './DistributionGraph';
 import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Heading,
-} from '@chakra-ui/react';
+  Coursework,
+  StudyStyleDistribution,
+} from '../../../../types/admin/CreateModule/CourseworkSetup';
+import httpClient from '../../../../shared/api/httpClient';
+import { transformTemplateDataToSaveData } from '../../../../utils/admin/CreateModule/TeachingSchedule';
 import { ModuleReviewProps } from '../../../../types/admin/CreateModule/ModuleReview';
-import {
-  calculateContactTime,
-  calculateFormativeAssessmentTime,
-  calculatePrivateStudyTime,
-  calculatePreparationTime,
-  calculateKeyboardTime,
-  calculateFeedbackTime,
-  calculateTotalTime,
-  calculateOverallTime,
-} from '../../../../utils/admin/CreateModule/ModuleReview';
 
 const ModuleReview: React.FC<ModuleReviewProps> = ({
+  templateData,
   formData,
-  courseworkList = [],
-  templateData = [],
+  courseworkList,
+  readingWeeks,
 }) => {
-  const overallTime = calculateOverallTime(templateData, courseworkList);
-  const totalTime = calculateTotalTime(formData);
+  const [studyStyle, setStudyStyle] = useState<string>('earlyStarter');
+  const [ratio, setRatio] = useState<string>('0');
+  const [courseworkData, setCourseworkData] = useState<Coursework[]>([]);
+  const [privateStudyData, setPrivateStudyData] = useState<
+    StudyStyleDistribution[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const moduleDocument = {
+          moduleSetup: formData,
+          teachingSchedule: transformTemplateDataToSaveData(templateData),
+          courseworkList,
+          readingWeeks,
+        };
+        const response = await httpClient.post(
+          '/private-study-distributions',
+          moduleDocument,
+        );
+        setCourseworkData(response.data.courseworkList);
+        setPrivateStudyData(response.data.privateStudyDistributions);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching distributions:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [templateData, formData, courseworkList, readingWeeks]);
+
+  if (loading) {
+    return <Box>Loading...</Box>;
+  }
+
+  const filteredPrivateStudyData = privateStudyData.filter(
+    (dist) => dist.type === `ratio${ratio}`,
+  );
+
+  const filteredPreparationData = courseworkData.map((coursework) => ({
+    ...coursework,
+    preparationTimeDistributions: (
+      coursework.preparationTimeDistributions || []
+    ).filter((dist) => {
+      if (coursework.type !== 'exam') {
+        return dist.type === studyStyle;
+      } else {
+        return dist.type === `${studyStyle}_ratio${ratio}`;
+      }
+    }),
+  }));
 
   return (
     <Box>
-      <Heading as="h2" size="lg" mb={4}>
-        Module Review
-      </Heading>
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Category</Th>
-            <Th>Time (hours)</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>Contact Time</Td>
-            <Td>{calculateContactTime(templateData)}</Td>
-          </Tr>
-          <Tr>
-            <Td>Formative Assessment Time</Td>
-            <Td>{calculateFormativeAssessmentTime(courseworkList)}</Td>
-          </Tr>
-          <Tr>
-            <Td>Private Study Time</Td>
-            <Td>{calculatePrivateStudyTime(courseworkList)}</Td>
-          </Tr>
-          <Tr>
-            <Td>Preparation Time</Td>
-            <Td>{calculatePreparationTime(courseworkList)}</Td>
-          </Tr>
-          <Tr>
-            <Td>Keyboard Time</Td>
-            <Td>{calculateKeyboardTime(courseworkList)}</Td>
-          </Tr>
-          <Tr>
-            <Td>Feedback Time</Td>
-            <Td>{calculateFeedbackTime(courseworkList)}</Td>
-          </Tr>
-          <Tr>
-            <Td>Total Time</Td>
-            <Td
-              style={{
-                color: overallTime === totalTime ? 'green' : 'red',
-              }}
+      <Flex justifyContent="center" mb={8} mt={4}>
+        <Box mr={8}>
+          <Text mb={1}>
+            Select student study style
+            <Tooltip
+              label="3 different study styles for students with different studying habits"
+              fontSize="md"
             >
-              {overallTime} / {totalTime}
-            </Td>
-          </Tr>
-        </Tbody>
-      </Table>
+              <Icon as={InfoOutlineIcon} ml={2} />
+            </Tooltip>
+          </Text>
+          <Select
+            width="200px"
+            onChange={(e) => setStudyStyle(e.target.value)}
+            value={studyStyle}
+          >
+            <option value="earlyStarter">Early Starter</option>
+            <option value="steady">Steady</option>
+            <option value="justInTime">Just In Time</option>
+          </Select>
+        </Box>
+        <Box>
+          <Text mb={1}>
+            Select student study hour ratio
+            <Tooltip
+              label={`For every 1 hour spent in class, the student will study ${ratio} hour(s) at home`}
+              fontSize="md"
+            >
+              <Icon as={InfoOutlineIcon} ml={2} />
+            </Tooltip>
+          </Text>
+          <Select
+            width="200px"
+            onChange={(e) => setRatio(e.target.value)}
+            value={ratio}
+          >
+            <option value="0">0</option>
+            <option value="0_5">0.5</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </Select>
+        </Box>
+      </Flex>
+      <Box width="80%" mb={12} mx="auto" overflowX="auto">
+        <DistributionTable
+          templateData={templateData}
+          privateStudyDistributions={filteredPrivateStudyData}
+          preparationDistributions={filteredPreparationData}
+        />
+      </Box>
+      <Box width="80%" mx="auto" mb={12} overflowX="auto">
+        <DistributionGraph
+          teachingSchedule={transformTemplateDataToSaveData(templateData)}
+          privateStudyDistributions={filteredPrivateStudyData}
+          preparationTimeDistributions={filteredPreparationData}
+          moduleCredit={formData.moduleCredit}
+          semester={formData.semester}
+        />
+      </Box>
     </Box>
   );
 };

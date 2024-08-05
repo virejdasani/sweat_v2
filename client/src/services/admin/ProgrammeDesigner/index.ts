@@ -5,11 +5,12 @@ import { ModuleDocument } from '../../../types/admin/CreateModule';
 
 export const createModule = async (
   moduleData: ModuleDocument,
+  readingWeeks?: number[] | { sem1: number[]; sem2: number[] },
 ): Promise<ModuleDocument> => {
   try {
     const response: AxiosResponse<ModuleDocument> = await httpClient.post(
       '/modules/create-module',
-      moduleData,
+      { moduleData, readingWeeks },
     );
     return response.data;
   } catch (error) {

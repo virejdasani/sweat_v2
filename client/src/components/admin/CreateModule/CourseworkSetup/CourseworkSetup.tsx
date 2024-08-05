@@ -14,27 +14,24 @@ import {
   Icon,
   Flex,
   Box,
+  IconButton,
 } from '@chakra-ui/react';
-import { QuestionOutlineIcon } from '@chakra-ui/icons';
+import { QuestionOutlineIcon, DeleteIcon } from '@chakra-ui/icons';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { setHours, setMinutes } from 'date-fns';
 import {
   CourseworkSetupFunctions,
   addExamCoursework,
+  handleDeadlineWeekChange,
+  handleTimeChange,
 } from '../../../../utils/admin/CreateModule/CourseworkSetup';
 import {
   Coursework,
   CourseworkSetupProps,
+  daysOfWeek,
 } from '../../../../types/admin/CreateModule/CourseworkSetup';
 import { courseworkSetupStyles } from './CourseworkSetupStyles';
-
-const daysOfWeek = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
 
 const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   courseworkList = [],
@@ -43,7 +40,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   examPercentage,
   formFactor,
   onFormFactorChange,
-  formData,
+  readingWeeks,
 }) => {
   const {
     handleAddCoursework,
@@ -54,25 +51,114 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   } = CourseworkSetupFunctions({ courseworkList, onCourseworkListChange });
 
   useEffect(() => {
-    addExamCoursework(examPercentage, courseworkList, onCourseworkListChange);
-  }, [examPercentage, courseworkList, onCourseworkListChange]);
+    const updatedCourseworkList = addExamCoursework(
+      examPercentage,
+      courseworkList,
+      semester,
+    );
+    if (updatedCourseworkList) {
+      onCourseworkListChange(updatedCourseworkList);
+    }
+  }, [examPercentage, semester, courseworkList, onCourseworkListChange]);
 
-  const numWeeks =
-    formData.semester === 'whole session' ||
-    formData.semester === 'Whole Session'
-      ? 30
-      : 15;
+  const renderWeekOptions = () => {
+    const options = [];
+
+    const isReadingWeek = (week: number) => {
+      if (Array.isArray(readingWeeks)) {
+        return readingWeeks.includes(week);
+      } else if (readingWeeks && semester === 'whole session') {
+        return (
+          (week <= 15 && readingWeeks.sem1.includes(week)) ||
+          (week > 15 && readingWeeks.sem2.includes(week - 15))
+        ); // Adjust for whole session
+      }
+      return false;
+    };
+
+    const getLabel = (week: number) => {
+      if (isReadingWeek(week)) {
+        return `${week} (Private Study Week)`;
+      }
+      if (week >= 24 && week <= 26) {
+        return `${week} (Easter Break Week ${week - 23})`;
+      }
+      return week.toString();
+    };
+
+    if (semester === 'second') {
+      for (let i = 1; i <= 18; i++) {
+        if (i === 9) {
+          options.push(
+            <React.Fragment key="easterBreak1">
+              <option key={9} value="9">
+                9 (Easter Break Week 1)
+              </option>
+              <option key={10} value="10">
+                10 (Easter Break Week 2)
+              </option>
+              <option key={11} value="11">
+                11 (Easter Break Week 3)
+              </option>
+            </React.Fragment>,
+          );
+          i += 2;
+        } else {
+          options.push(
+            <option key={i} value={i.toString()}>
+              {getLabel(i)}
+            </option>,
+          );
+        }
+      }
+    } else if (semester === 'whole session' || semester === 'Whole Session') {
+      for (let i = 1; i <= 33; i++) {
+        if (i === 24) {
+          options.push(
+            <React.Fragment key="easterBreak1">
+              <option key={24} value="24">
+                24 (Easter Break Week 1)
+              </option>
+              <option key={25} value="25">
+                25 (Easter Break Week 2)
+              </option>
+              <option key={26} value="26">
+                26 (Easter Break Week 3)
+              </option>
+            </React.Fragment>,
+          );
+          i += 2;
+        } else {
+          options.push(
+            <option key={i} value={i.toString()}>
+              {getLabel(i)}
+            </option>,
+          );
+        }
+      }
+    } else {
+      for (let i = 1; i <= 15; i++) {
+        options.push(
+          <option key={i} value={i.toString()}>
+            {getLabel(i)}
+          </option>,
+        );
+      }
+    }
+    return options;
+  };
 
   return (
     <div>
       <Table style={courseworkSetupStyles.table}>
         <Thead>
           <Tr>
-            <Th style={courseworkSetupStyles.th}>Coursework Title</Th>
+            <Th style={courseworkSetupStyles.th}>Short Title</Th>
+            <Th style={courseworkSetupStyles.th}>Long Title</Th>
             <Th style={courseworkSetupStyles.th}>Weight</Th>
             <Th style={courseworkSetupStyles.th}>Type</Th>
             <Th style={courseworkSetupStyles.th}>Deadline Week</Th>
-            <Th style={courseworkSetupStyles.th}>Released Week Earlier</Th>
+            <Th style={courseworkSetupStyles.th}>Released Weeks Prior</Th>
             <Th style={courseworkSetupStyles.th}>Actions</Th>
             <Th style={courseworkSetupStyles.th}>Day of Week</Th>
             <Th style={courseworkSetupStyles.th}>Time</Th>
@@ -84,9 +170,20 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               <Td style={courseworkSetupStyles.td}>
                 <Input
                   type="text"
-                  value={coursework.title}
+                  value={coursework.shortTitle || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'title', e.target.value)
+                    handleInputChange(index, 'shortTitle', e.target.value)
+                  }
+                  style={courseworkSetupStyles.input}
+                  disabled={coursework.type === 'exam'}
+                />
+              </Td>
+              <Td style={courseworkSetupStyles.td}>
+                <Input
+                  type="text"
+                  value={coursework.longTitle || ''}
+                  onChange={(e) =>
+                    handleInputChange(index, 'longTitle', e.target.value)
                   }
                   style={courseworkSetupStyles.input}
                   disabled={coursework.type === 'exam'}
@@ -95,9 +192,14 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               <Td style={courseworkSetupStyles.td}>
                 <Input
                   type="number"
-                  value={coursework.weight}
+                  step="0.01"
+                  value={coursework.weight || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'weight', e.target.value)
+                    handleInputChange(
+                      index,
+                      'weight',
+                      parseFloat(e.target.value),
+                    )
                   }
                   style={courseworkSetupStyles.input}
                   disabled={coursework.type === 'exam'}
@@ -105,7 +207,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.type}
+                  value={coursework.type || ''}
                   onChange={(e) =>
                     handleInputChange(index, 'type', e.target.value)
                   }
@@ -122,91 +224,57 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.deadlineWeek}
+                  value={coursework.deadlineWeek.toString() || ''}
                   onChange={(e) =>
-                    handleInputChange(index, 'deadlineWeek', e.target.value)
+                    handleDeadlineWeekChange(
+                      index,
+                      e.target.value,
+                      semester,
+                      handleInputChange,
+                    )
                   }
                   style={courseworkSetupStyles.select}
                   disabled={
                     coursework.type === 'exam' && semester !== 'whole session'
                   }
                 >
-                  {Array.from({ length: numWeeks }, (_, i) => {
-                    if (semester === 'second' && i + 1 === 8) {
-                      return (
-                        <React.Fragment key={i}>
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                          <option key="easterBreak1" value="easterBreak1">
-                            Easter Break Week 1
-                          </option>
-                          <option key="easterBreak2" value="easterBreak2">
-                            Easter Break Week 2
-                          </option>
-                          <option key="easterBreak3" value="easterBreak3">
-                            Easter Break Week 3
-                          </option>
-                        </React.Fragment>
-                      );
-                    } else if (semester === 'whole session' && i + 1 === 23) {
-                      return (
-                        <React.Fragment key={i}>
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                          <option key="easterBreak1" value="easterBreak1">
-                            Easter Break Week 1
-                          </option>
-                          <option key="easterBreak2" value="easterBreak2">
-                            Easter Break Week 2
-                          </option>
-                          <option key="easterBreak3" value="easterBreak3">
-                            Easter Break Week 3
-                          </option>
-                          <option key={i + 2} value={i + 2}>
-                            {i + 2}
-                          </option>
-                        </React.Fragment>
-                      );
-                    } else {
-                      return (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      );
-                    }
-                  })}
+                  {renderWeekOptions()}
                 </Select>
               </Td>
               <Td style={courseworkSetupStyles.td}>
                 <Select
-                  value={coursework.releasedWeekEarlier}
+                  value={coursework.releasedWeekPrior || ''}
                   onChange={(e) =>
                     handleInputChange(
                       index,
-                      'releasedWeekEarlier',
+                      'releasedWeekPrior',
                       e.target.value,
                     )
                   }
                   style={courseworkSetupStyles.select}
                   disabled={coursework.type === 'exam'}
                 >
-                  {Array.from({ length: 15 }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
+                  <option value="N/A">N/A</option>
+                  {Array.from(
+                    {
+                      length: semester === 'whole session' ? 30 : 15,
+                    },
+                    (_, i) => (
+                      <option key={i + 1} value={(i + 1).toString()}>
+                        {i + 1}
+                      </option>
+                    ),
+                  )}
                 </Select>
               </Td>
               <Td style={courseworkSetupStyles.td}>
-                <Button
+                <IconButton
                   onClick={() => handleDeleteCoursework(index)}
                   style={courseworkSetupStyles.button}
-                  disabled={coursework.type === 'exam'}
-                >
-                  Delete
-                </Button>
+                  aria-label="Delete Coursework"
+                  icon={<DeleteIcon />}
+                  isDisabled={coursework.type === 'exam'}
+                />
               </Td>
               {coursework.type !== 'exam' && (
                 <>
@@ -230,13 +298,30 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                     </Select>
                   </Td>
                   <Td style={courseworkSetupStyles.td}>
-                    <Input
-                      type="time"
-                      value={coursework.deadlineTime}
-                      onChange={(e) =>
-                        handleInputChange(index, 'deadlineTime', e.target.value)
+                    <DatePicker
+                      selected={
+                        coursework.deadlineTime
+                          ? setHours(
+                              setMinutes(
+                                new Date(),
+                                parseInt(coursework.deadlineTime.split(':')[1]),
+                              ),
+                              parseInt(coursework.deadlineTime.split(':')[0]),
+                            )
+                          : new Date()
                       }
-                      style={courseworkSetupStyles.input}
+                      onChange={(date: Date) =>
+                        handleTimeChange(index, date, handleInputChange)
+                      }
+                      showTimeSelect
+                      showTimeSelectOnly
+                      timeIntervals={15} // Set time intervals to 15 minutes
+                      timeCaption="Time"
+                      dateFormat="HH:mm" // Set dateFormat to 24-hour format
+                      timeFormat="HH:mm" // Ensure timeFormat is set to 24-hour format
+                      className="chakra-input css-1c6d0i3"
+                      popperPlacement="bottom-end"
+                      customInput={<Input style={{ width: '80px' }} />}
                     />
                   </Td>
                 </>
@@ -256,7 +341,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
                 : 'inherit',
         }}
       >
-        Total Weight: {totalWeight}
+        Total Weight: {totalWeight}%
         {totalWeight > 100 && (
           <Text as="span" style={{ color: 'red' }}>
             {' '}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -32,13 +32,15 @@ import { ModuleSetupFormData } from '../../../types/admin/CreateModule/ModuleSet
 import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
 import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
-import ModuleReview from './ModuleReview/ModuleReview';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
+import { fetchCalendarData } from '../../../services/admin/CreateModule/TeachingSchedule';
+import ModuleReview from './ModuleReview/ModuleReview';
 
 const MAX_STEPS = 5;
 
 const CreateModule: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { module, templateData: initialTemplateData } = location.state || {};
 
   const [formData, setFormData] = useState<ModuleSetupFormData>({
@@ -51,13 +53,15 @@ const CreateModule: React.FC = () => {
     programme: [],
     semester: '',
     type: '',
+    teachingStaff: [],
+    formFactor: 0,
   });
 
   const [courseworkList, setCourseworkList] = useState<Coursework[]>([]);
   const [templateData, setTemplateData] = useState<number[][][]>(
     initialTemplateData || [],
   );
-  const [formFactor, setFormFactor] = useState(0);
+  const [readingWeeks, setReadingWeeks] = useState<number[]>([]);
 
   useEffect(() => {
     if (module) {
@@ -80,6 +84,21 @@ const CreateModule: React.FC = () => {
     }
   }, [formData.moduleCredit, formData.semester, initialTemplateData]);
 
+  useEffect(() => {
+    if (
+      formData.semester &&
+      !formData.moduleCode.toLowerCase().startsWith('comp')
+    ) {
+      const fetchReadingWeeks = async () => {
+        const { readingWeeks } = await fetchCalendarData(
+          formData.semester as 'first' | 'second' | 'whole session',
+        );
+        setReadingWeeks(readingWeeks);
+      };
+      fetchReadingWeeks();
+    }
+  }, [formData.semester, formData.moduleCode]);
+
   const { activeStep, setActiveStep } = useSteps({
     index: 0,
     count: steps.length,
@@ -97,6 +116,7 @@ const CreateModule: React.FC = () => {
             templateData={templateData}
             setTemplateData={setTemplateData}
             editingScheduleData={module?.teachingSchedule}
+            readingWeeks={readingWeeks}
           />
         );
       case 2:
@@ -111,9 +131,14 @@ const CreateModule: React.FC = () => {
             }
             semester={formData.semester}
             examPercentage={100 - formData.courseworkPercentage}
-            formFactor={formFactor}
-            onFormFactorChange={setFormFactor}
-            formData={formData}
+            formFactor={formData.formFactor}
+            onFormFactorChange={(value) =>
+              setFormData((prevData) => ({
+                ...prevData,
+                formFactor: value,
+              }))
+            }
+            readingWeeks={readingWeeks}
           />
         );
       case 3:
@@ -137,16 +162,18 @@ const CreateModule: React.FC = () => {
                 setCourseworkList,
               )
             }
-            formFactor={formFactor}
+            formFactor={formData.formFactor}
             isEditing={!!module}
+            courseworkPercentage={formData.courseworkPercentage}
           />
         );
       case 4:
         return (
           <ModuleReview
+            templateData={templateData}
             formData={formData}
             courseworkList={courseworkList}
-            templateData={templateData}
+            readingWeeks={readingWeeks}
           />
         );
       default:
@@ -158,6 +185,10 @@ const CreateModule: React.FC = () => {
     if (activeStep < MAX_STEPS - 1) {
       handleNext(activeStep, nextStep, setActiveStep, steps.length);
     }
+  };
+
+  const handleDiscardAndExit = () => {
+    navigate('/admin');
   };
 
   return (
@@ -172,7 +203,7 @@ const CreateModule: React.FC = () => {
           Home
         </button>
         <Heading as="h1" mb={8}>
-          Create Module
+          Edit Module Details
         </Heading>
         <Stepper index={activeStep} sx={createModuleStyles.stepper}>
           {steps.map((step, index) => (
@@ -203,13 +234,21 @@ const CreateModule: React.FC = () => {
           <Button
             onClick={
               activeStep === MAX_STEPS - 1
-                ? () => handleSave(formData, templateData, courseworkList)
+                ? () =>
+                    handleSave(
+                      formData,
+                      templateData,
+                      courseworkList,
+                      navigate,
+                      readingWeeks,
+                    )
                 : handleNextStep
             }
             disabled={activeStep === MAX_STEPS}
           >
-            {activeStep === MAX_STEPS - 1 ? 'Submit' : 'Next'}
+            {activeStep === MAX_STEPS - 1 ? 'Save to database' : 'Next'}
           </Button>
+          <Button onClick={handleDiscardAndExit}>Discard and Exit</Button>
         </Box>
       </Box>
     </>

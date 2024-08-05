@@ -1,12 +1,21 @@
-import { ModuleSetupFormData } from '../ModuleSetup';
+export interface Distribution {
+  week: number;
+  hours: number;
+}
+
+export interface StudyStyleDistribution {
+  type: string;
+  distribution: Distribution[];
+}
 
 export interface Coursework {
-  title: string;
+  shortTitle: string;
+  longTitle: string;
   weight: number;
   type: string;
   deadlineWeek: number;
   deadlineDate?: Date;
-  releasedWeekEarlier: number;
+  releasedWeekPrior?: number;
   deadlineDay?: string;
   deadlineTime?: string;
   contactTimeLectures?: number;
@@ -20,7 +29,8 @@ export interface Coursework {
   preparationTime?: number;
   keyboardTime?: number;
   feedbackTime?: number;
-  [key: string]: number | string | Date | undefined;
+  preparationTimeDistributions?: StudyStyleDistribution[];
+  [key: string]: number | string | Date | StudyStyleDistribution[] | undefined;
 }
 
 export interface CourseworkSetupProps {
@@ -30,10 +40,21 @@ export interface CourseworkSetupProps {
   examPercentage: number;
   formFactor: number;
   onFormFactorChange: (formFactor: number) => void;
-  formData: ModuleSetupFormData;
+  readingWeeks?: number[] | { sem1: number[]; sem2: number[] };
 }
 
 export interface CourseworkSetupFunctionsProps {
   courseworkList: Coursework[];
   onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void;
 }
+
+export const daysOfWeek = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+  'As Scheduled',
+];

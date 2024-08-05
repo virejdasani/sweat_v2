@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import {
   Coursework,
   CourseworkSetupFunctionsProps,
@@ -9,14 +10,15 @@ export const CourseworkSetupFunctions = ({
 }: CourseworkSetupFunctionsProps) => {
   const handleAddCoursework = () => {
     const newCoursework: Coursework = {
-      title: '',
+      shortTitle: '',
+      longTitle: '',
       weight: 0,
       type: 'assignment',
       deadlineWeek: 1,
-      releasedWeekEarlier: 1,
+      releasedWeekPrior: 2,
       feedbackTime: 1,
       deadlineDay: 'Monday', // Set default value
-      deadlineTime: '09:00', // Set default value
+      deadlineTime: '23:59', // Set default value
     };
     onCourseworkListChange([...courseworkList, newCoursework]);
   };
@@ -36,15 +38,19 @@ export const CourseworkSetupFunctions = ({
     let updatedValue = value === null ? undefined : value;
 
     if (field === 'deadlineTime' && typeof value === 'string') {
+      // Ensure 24-hour format
       const isValidTime = /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
       if (!isValidTime) {
-        alert('Please enter a valid time in HH:mm format');
+        alert('Please enter a valid time in 24-hour HH:mm format');
         return;
       }
+      // optionally format it to ensure consistency
+      const [hours, minutes] = value.split(':');
+      updatedValue = `${hours.padStart(2, '0')}:${minutes}`;
     }
 
     if (field === 'weight' && typeof value === 'string') {
-      updatedValue = parseInt(value, 10);
+      updatedValue = parseFloat(value);
     }
 
     updatedList[index] = {
@@ -56,7 +62,7 @@ export const CourseworkSetupFunctions = ({
   };
 
   const totalWeight = courseworkList.reduce(
-    (total, coursework) => total + coursework.weight,
+    (total, coursework) => total + (coursework.weight || 0),
     0,
   );
 
@@ -66,7 +72,7 @@ export const CourseworkSetupFunctions = ({
       (coursework) =>
         coursework.weight >= 1 &&
         coursework.weight <= 100 &&
-        coursework.releasedWeekEarlier <= coursework.deadlineWeek,
+        (coursework.releasedWeekPrior ?? 2) <= coursework.deadlineWeek,
     );
 
   return {
@@ -81,22 +87,67 @@ export const CourseworkSetupFunctions = ({
 export const addExamCoursework = (
   examPercentage: number,
   courseworkList: Coursework[],
-  onCourseworkListChange: (updatedCourseworkList: Coursework[]) => void,
-) => {
-  if (
-    examPercentage > 0 &&
-    !courseworkList.some((coursework) => coursework.type === 'exam')
-  ) {
-    const examCoursework: Coursework = {
-      title: 'Exam',
-      weight: examPercentage,
-      type: 'exam',
-      deadlineWeek: 15,
-      releasedWeekEarlier: 1,
-      feedbackTime: 1,
-      deadlineDay: '',
-      deadlineTime: '',
-    };
-    onCourseworkListChange([...courseworkList, examCoursework]);
+  semester: string,
+): Coursework[] | null => {
+  let updatedCourseworkList = [...courseworkList];
+  const examIndex = updatedCourseworkList.findIndex(
+    (coursework) => coursework.type === 'exam',
+  );
+
+  const examDeadlineWeek =
+    semester === 'whole session' ? 33 : semester === 'second' ? 18 : 15;
+
+  if (examPercentage > 0) {
+    if (examIndex >= 0) {
+      // Update existing exam coursework
+      updatedCourseworkList[examIndex].weight = examPercentage;
+      updatedCourseworkList[examIndex].deadlineWeek = examDeadlineWeek;
+    } else {
+      // Add new exam coursework
+      const examCoursework: Coursework = {
+        shortTitle: 'Exam',
+        longTitle: 'Final Exam',
+        weight: examPercentage,
+        type: 'exam',
+        deadlineWeek: examDeadlineWeek,
+        releasedWeekPrior: 1,
+        feedbackTime: 1,
+        deadlineDay: '',
+        deadlineTime: '',
+      };
+      updatedCourseworkList = [...updatedCourseworkList, examCoursework];
+    }
+    return updatedCourseworkList;
+  } else if (examIndex >= 0) {
+    // Remove exam coursework if examPercentage is 0
+    updatedCourseworkList.splice(examIndex, 1);
+    return updatedCourseworkList;
   }
+  return null;
+};
+
+export const handleTimeChange = (
+  index: number,
+  date: Date,
+  handleInputChange: (index: number, field: string, value: string) => void,
+) => {
+  const timeString = format(date, 'HH:mm');
+  handleInputChange(index, 'deadlineTime', timeString);
+};
+
+export const handleDeadlineWeekChange = (
+  index: number,
+  value: string,
+  semester: string,
+  handleInputChange: (index: number, field: string, value: number) => void,
+) => {
+  let deadlineWeek = parseInt(value, 10);
+  if (value === 'easterBreak1') {
+    deadlineWeek = semester === 'second' ? 9 : 24;
+  } else if (value === 'easterBreak2') {
+    deadlineWeek = semester === 'second' ? 10 : 25;
+  } else if (value === 'easterBreak3') {
+    deadlineWeek = semester === 'second' ? 11 : 26;
+  }
+  handleInputChange(index, 'deadlineWeek', deadlineWeek);
 };

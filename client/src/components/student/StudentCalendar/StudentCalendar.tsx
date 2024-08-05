@@ -317,11 +317,14 @@ function StudentCalendar() {
   );
 
   // Function to handle course selection
-  //@ts-expect-error // this is to avoid typescript errors
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCourse = e.target.value;
     setCourse(selectedCourse);
   };
+
+  console.log(handleCourseChange);
+
+  // to avoid typescript errors
 
   // const getSemesterWeekNumber = (
   //   date: Date,

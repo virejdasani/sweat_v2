@@ -203,7 +203,8 @@ const CreateModule: React.FC = () => {
           Home
         </button>
         <Heading as="h1" mb={8}>
-          Edit Module Details
+          {formData.moduleCode ? `${formData.moduleCode} - ` : ''}Edit Module
+          Details
         </Heading>
         <Stepper index={activeStep} sx={createModuleStyles.stepper}>
           {steps.map((step, index) => (

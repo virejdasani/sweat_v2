@@ -35,6 +35,7 @@ import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
 import { fetchCalendarData } from '../../../services/admin/CreateModule/TeachingSchedule';
 import ModuleReview from './ModuleReview/ModuleReview';
+import { getDefaultFormFactor } from '../../../services/admin/Settings';
 
 const MAX_STEPS = 5;
 
@@ -62,13 +63,29 @@ const CreateModule: React.FC = () => {
     initialTemplateData || [],
   );
   const [readingWeeks, setReadingWeeks] = useState<number[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (module) {
-      setFormData(module.moduleSetup);
-      setCourseworkList(module.courseworkList || []);
-      setTemplateData(module.teachingSchedule || []);
-    }
+    const fetchInitialData = async () => {
+      if (!module) {
+        try {
+          const defaultFormFactor = await getDefaultFormFactor();
+          setFormData((prevData) => ({
+            ...prevData,
+            formFactor: defaultFormFactor ?? 0,
+          }));
+        } catch (error) {
+          console.error('Error fetching default form factor', error);
+        }
+      } else {
+        setFormData(module.moduleSetup);
+        setCourseworkList(module.courseworkList || []);
+        setTemplateData(module.teachingSchedule || []);
+      }
+      setLoading(false);
+    };
+
+    fetchInitialData();
   }, [module]);
 
   useEffect(() => {
@@ -105,6 +122,10 @@ const CreateModule: React.FC = () => {
   });
 
   const renderStepComponent = () => {
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+
     switch (activeStep) {
       case 0:
         return <ModuleSetup formData={formData} setFormData={setFormData} />;

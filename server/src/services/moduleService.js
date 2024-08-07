@@ -3,6 +3,7 @@ const {
   calculateCompleteDistributions,
 } = require('../utils/distributionCalculations');
 const { handleError } = require('../utils/errorHandler');
+const Module = require('../models/module');
 
 const createOrUpdateModule = async (moduleData, existingModule, res) => {
   try {

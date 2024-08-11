@@ -15,6 +15,7 @@ import EffortGraph from './components/Graph/EffortGraph';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import About from './components/About/About';
 import StudentCalendar from './components/student/StudentCalendar/StudentCalendar';
+import AdminSettings from './components/admin/Settings/adminSettings';
 // import WIP from './components/WIP/WIP';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
           element={<ProgrammeDesignPage />}
         />
         <Route path="/Graph" element={<EffortGraph />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
       </Routes>
       <ToastContainer />
     </Router>

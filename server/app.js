@@ -20,6 +20,7 @@ const moduleController = require('./src/controllers/moduleController');
 const programmeController = require('./src/controllers/programmeController');
 const calendarController = require('./src/controllers/calendarController');
 const distributionController = require('./src/controllers/distributionController');
+const settingsController = require('./src/controllers/settingsController'); 
 
 // Module routes
 app.get('/modules/module-template', moduleController.getModuleTemplate);
@@ -66,6 +67,16 @@ app.get('/calendar/readingWeek/:semester', calendarController.getReadingWeek);
 app.post(
   '/private-study-distributions',
   distributionController.getDistributions,
+);
+
+// Admin settings routes
+app.get(
+  '/admin-settings/defaultFormFactor',
+  settingsController.getDefaultFormFactor,
+);
+app.post(
+  '/admin-settings/defaultFormFactor',
+  settingsController.setDefaultFormFactor,
 );
 
 // MongoDB connection

@@ -40,7 +40,7 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
             </Tr>
             {privateStudyDistributions[0] && (
               <Tr>
-                <Td>Private Study Time</Td>
+                <Td>Private Study</Td>
                 {privateStudyDistributions[0].distribution.map(
                   (weekData, index) => (
                     <Td key={index}>{getTableCell(weekData.hours)}</Td>
@@ -54,9 +54,7 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
                 <React.Fragment key={i}>
                   {coursework.preparationTimeDistributions?.map((dist, j) => (
                     <Tr key={j}>
-                      <Td>
-                        {coursework.shortTitle} ({dist.type})
-                      </Td>
+                      <Td>{coursework.shortTitle}</Td>
                       {Array.from({ length: totalWeeks }, (_, index) => (
                         <Td key={index}>
                           {getTableCell(
@@ -76,9 +74,7 @@ const DistributionTable: React.FC<DistributionTableProps> = ({
                 (coursework) =>
                   coursework.preparationTimeDistributions?.map((dist, j) => (
                     <Tr key={j}>
-                      <Td>
-                        {coursework.shortTitle} ({dist.type})
-                      </Td>
+                      <Td>{coursework.shortTitle}</Td>
                       {Array.from({ length: totalWeeks }, (_, index) => (
                         <Td key={index}>
                           {getTableCell(

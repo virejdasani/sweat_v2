@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './AdminHome.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import Branding from '../../Branding/Branding';
 import logo from '../../Branding/logo.png';
 import uniLogo from '../../Branding/uniLogo.png';
+import './AdminHome.css';
 
 const AdminHome = () => {
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
@@ -23,7 +22,7 @@ const AdminHome = () => {
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const password = document.querySelector('input')?.value;
+    const password = document.querySelector<HTMLInputElement>('input')?.value;
     if (password === adminPassword) {
       setIsLoggedIn(true);
       localStorage.setItem('isAdmin', 'true');
@@ -35,7 +34,6 @@ const AdminHome = () => {
 
   return (
     <div className="home">
-      {/* <Branding /> */}
       <img
         src={logo}
         alt="Logo"
@@ -70,7 +68,7 @@ const AdminHome = () => {
       </button>
       {!isLoggedIn ? (
         <div className="linkContainer">
-          <form action="submit">
+          <form>
             <input
               type="password"
               id="password"
@@ -91,7 +89,7 @@ const AdminHome = () => {
           className="makeResponsiveScrollable"
           style={{
             overflowY: 'scroll',
-            // display: 'flex',
+            display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
@@ -119,6 +117,9 @@ const AdminHome = () => {
           </div>
           <div className="linkContainer">
             <Link to="/Graph">Workload Profiles</Link>
+          </div>
+          <div className="linkContainer">
+            <Link to="/admin/settings">Settings</Link>
           </div>
         </div>
       )}

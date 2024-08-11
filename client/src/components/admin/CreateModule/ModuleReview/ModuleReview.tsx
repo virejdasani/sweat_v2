@@ -17,8 +17,8 @@ const ModuleReview: React.FC<ModuleReviewProps> = ({
   courseworkList,
   readingWeeks,
 }) => {
-  const [studyStyle, setStudyStyle] = useState<string>('earlyStarter');
-  const [ratio, setRatio] = useState<string>('0');
+  const [studyStyle, setStudyStyle] = useState<string>('steady');
+  const [ratio, setRatio] = useState<string>('0_5');
   const [courseworkData, setCourseworkData] = useState<Coursework[]>([]);
   const [privateStudyData, setPrivateStudyData] = useState<
     StudyStyleDistribution[]

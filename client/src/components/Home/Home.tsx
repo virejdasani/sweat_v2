@@ -13,16 +13,19 @@ const Home = () => {
         <Link
           to="/about"
           style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            margin: '10px',
+            position: 'fixed',
+            top: '10px',
+            right: '10px',
+            display: 'inline-block',
+            padding: '10px 20px',
+            backgroundColor: '#0a0a94',
+            color: 'white',
             textDecoration: 'none',
-            backgroundColor: '#333',
-            padding: '5px',
-            fontSize: '1.2em',
-            paddingLeft: '10px',
-            paddingRight: '10px',
+            borderRadius: '15px',
+            fontSize: '1.2rem',
+            textAlign: 'center',
+            transition: 'background-color 0.3s ease',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
           }}
         >
           About

@@ -21,10 +21,11 @@ const Branding = () => {
         alt="University Logo"
         className="uniLogo"
         style={{
-          width: '190px',
+          width: '394px',
+          height: '130px',
           position: 'absolute',
-          bottom: '0',
-          left: '22px',
+          top: '20px',
+          left: '20px',
         }}
       />
     </div>

@@ -24,8 +24,8 @@ const Branding = () => {
           width: '150px',
           height: '150px',
           position: 'absolute',
-          bottom: '0',
-          left: '22px',
+          top: '20px',
+          left: '20px',
         }}
       />
     </div>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import './home.css';
 import Branding from '../Branding/Branding';
+import Footer from './Footer';
+
 
 const Home = () => {
   return (
@@ -14,7 +16,7 @@ const Home = () => {
           to="/about"
           style={{
             position: 'fixed',
-            top: '10px',
+            top: '0px',
             right: '10px',
             display: 'inline-block',
             padding: '10px 20px',
@@ -154,6 +156,7 @@ const Home = () => {
           </Link>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

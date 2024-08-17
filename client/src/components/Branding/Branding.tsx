@@ -12,7 +12,7 @@ const Branding = () => {
           width: '150px',
           height: '150px',
           position: 'absolute',
-          top: '20px',
+          top: '0px',
           left: 'calc(50% - 65px)',
         }}
       />
@@ -21,11 +21,11 @@ const Branding = () => {
         alt="University Logo"
         className="uniLogo"
         style={{
-          width: '150px',
-          height: '150px',
+          width: '325px',
+          height: '165px',
           position: 'absolute',
-          top: '20px',
-          left: '20px',
+          top: '-25px',
+          left: '-3px',
         }}
       />
     </div>

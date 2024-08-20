@@ -1,9 +1,13 @@
 import logo from './logo.png';
-import uniLogo from './uniLogo.png';
+import uniLogo from './UOL-Logo.png';
 
 const Branding = () => {
   return (
-    <div>
+    <div
+      style={{
+        marginTop: '-150px',
+      }}
+    >
       <img
         src={logo}
         alt="Logo"
@@ -21,11 +25,11 @@ const Branding = () => {
         alt="University Logo"
         className="uniLogo"
         style={{
-          width: '325px',
-          height: '165px',
+          width: '300px',
+          height: '80px',
           position: 'absolute',
-          top: '-25px',
-          left: '-3px',
+          top: '25px',
+          left: '10px',
         }}
       />
     </div>

@@ -48,7 +48,7 @@ const About = () => {
                 Electronics
               </li>
               <li>
-                <a href="https://uk.linkedin.com/in/lee-devlin-08495351?original_referer=https%3A%2F%2Fwww.google.com%2F"></a>Lee Devlin – Department of Electrical Engineering and
+                <a href="https://uk.linkedin.com/in/lee-devlin-08495351?original_referer=https%3A%2F%2Fwww.google.com%2F">Lee Devlin</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>
@@ -76,7 +76,7 @@ const About = () => {
                 in 2024-25.
               </li>
               <li>
-                Rahul Manikandan – EEE MSc student in 2024, worked with the team
+                <a href="https://www.linkedin.com/in/rahul-manikandan-4160351b8?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app">Rahul Manikandan</a> – EEE MSc student in 2024, worked with the team
                 on some key enhancements and refinements of the portal
                 appearance and functionality.
               </li>

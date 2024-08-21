@@ -79,97 +79,110 @@ export const updateCourseworkList = (
   moduleCredit: number,
   formFactor: number,
 ): Coursework[] => {
+  // Helper function to ensure numeric deadlineWeek
+  const getNumericDeadlineWeek = (deadlineWeek: number | string): number =>
+    typeof deadlineWeek === 'string'
+      ? parseInt(deadlineWeek, 10)
+      : deadlineWeek;
+
   const sortedCourseworkList = courseworkList.sort((a, b) => {
-    const getNumericDeadlineWeek = (deadlineWeek: number | string) =>
-      typeof deadlineWeek === 'string'
-        ? parseInt(deadlineWeek, 10)
-        : deadlineWeek;
     return (
       getNumericDeadlineWeek(a.deadlineWeek) -
       getNumericDeadlineWeek(b.deadlineWeek)
     );
   });
 
+  let previousDeadlineWeek: number | undefined;
+  let sharedContactTime = {
+    contactTimeLectures: 0,
+    contactTimeTutorials: 0,
+    contactTimeLabs: 0,
+    contactTimeSeminars: 0,
+    contactTimeFieldworkPlacement: 0,
+    contactTimeOthers: 0,
+  };
+
   const updatedCourseworkList = sortedCourseworkList.map(
     (coursework, index) => {
-      const numericDeadlineWeek =
-        typeof coursework.deadlineWeek === 'string'
-          ? parseInt(coursework.deadlineWeek, 10)
-          : coursework.deadlineWeek;
+      const numericDeadlineWeek = getNumericDeadlineWeek(
+        coursework.deadlineWeek,
+      );
 
-      const previousCoursework = sortedCourseworkList[index - 1];
-      const previousDeadlineWeek = previousCoursework
-        ? previousCoursework.deadlineWeek
-        : 0;
+      // Only recalculate if the deadline week is different from the previous one
+      if (
+        previousDeadlineWeek === undefined ||
+        numericDeadlineWeek !== previousDeadlineWeek
+      ) {
+        const startWeek =
+          index > 0
+            ? getNumericDeadlineWeek(
+                sortedCourseworkList[index - 1].deadlineWeek,
+              )
+            : 0;
 
-      const startWeek =
-        typeof previousDeadlineWeek === 'string'
-          ? parseInt(previousDeadlineWeek, 10)
-          : previousDeadlineWeek;
+        sharedContactTime = {
+          contactTimeLectures: Math.round(
+            (calculateContactTime(
+              templateData,
+              0,
+              startWeek,
+              numericDeadlineWeek,
+            ) *
+              formFactor) /
+              100,
+          ),
+          contactTimeTutorials: Math.round(
+            (calculateContactTime(
+              templateData,
+              1,
+              startWeek,
+              numericDeadlineWeek,
+            ) *
+              formFactor) /
+              100,
+          ),
+          contactTimeLabs: Math.round(
+            calculateContactTime(
+              templateData,
+              2,
+              startWeek,
+              numericDeadlineWeek,
+            ), // formFactor not applied here
+          ),
+          contactTimeSeminars: Math.round(
+            (calculateContactTime(
+              templateData,
+              3,
+              startWeek,
+              numericDeadlineWeek,
+            ) *
+              formFactor) /
+              100,
+          ),
+          contactTimeFieldworkPlacement: Math.round(
+            (calculateContactTime(
+              templateData,
+              4,
+              startWeek,
+              numericDeadlineWeek,
+            ) *
+              formFactor) /
+              100,
+          ),
+          contactTimeOthers: Math.round(
+            (calculateContactTime(
+              templateData,
+              5,
+              startWeek,
+              numericDeadlineWeek,
+            ) *
+              formFactor) /
+              100,
+          ),
+        };
 
-      const contactTimeFields =
-        coursework.type === 'exam'
-          ? {}
-          : {
-              contactTimeLectures: Math.round(
-                (calculateContactTime(
-                  templateData,
-                  0,
-                  startWeek,
-                  numericDeadlineWeek,
-                ) *
-                  formFactor) /
-                  100,
-              ),
-              contactTimeTutorials: Math.round(
-                (calculateContactTime(
-                  templateData,
-                  1,
-                  startWeek,
-                  numericDeadlineWeek,
-                ) *
-                  formFactor) /
-                  100,
-              ),
-              contactTimeLabs: Math.round(
-                calculateContactTime(
-                  templateData,
-                  2,
-                  startWeek,
-                  numericDeadlineWeek,
-                ), // formFactor not applied here
-              ),
-              contactTimeSeminars: Math.round(
-                (calculateContactTime(
-                  templateData,
-                  3,
-                  startWeek,
-                  numericDeadlineWeek,
-                ) *
-                  formFactor) /
-                  100,
-              ),
-              contactTimeFieldworkPlacement: Math.round(
-                (calculateContactTime(
-                  templateData,
-                  4,
-                  startWeek,
-                  numericDeadlineWeek,
-                ) *
-                  formFactor) /
-                  100,
-              ),
-              contactTimeOthers: Math.round(
-                (calculateContactTime(
-                  templateData,
-                  5,
-                  startWeek,
-                  numericDeadlineWeek,
-                ) *
-                  formFactor) /
-                  100,
-              ),
-            };
+        previousDeadlineWeek = numericDeadlineWeek;
+      }
 
       const {
         feedbackTime,
@@ -187,7 +200,7 @@ export const updateCourseworkList = (
         keyboardTime,
         preparationTime,
         privateStudyTime,
-        ...contactTimeFields,
+        ...sharedContactTime,
       };
     },
   );

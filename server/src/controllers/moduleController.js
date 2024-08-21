@@ -150,7 +150,13 @@ const updateProgrammeArrayInModules = async (req, res) => {
 const getModuleTemplate = (req, res) => {
   const { moduleCredit, semester } = req.query;
 
-  const templateFileName = `module-template-${moduleCredit}-${semester}.json`;
+  // Map the semester value to the corresponding file name format
+  const normalizedSemester =
+    semester.toLowerCase() === 'whole session'
+      ? 'wholeSession'
+      : semester.replace(/\s+/g, '');
+
+  const templateFileName = `module-template-${moduleCredit}-${normalizedSemester}.json`;
   const templateFilePath = path.join(templatesDir, templateFileName);
 
   console.log(`Looking for template file at: ${templateFilePath}`); // Log the path for debugging

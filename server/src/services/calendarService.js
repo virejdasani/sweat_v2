@@ -2,9 +2,6 @@ const extractReadingWeek = (events, semester) => {
   const getReadingWeeks = (semesterKeyword) => {
     const filteredEvents = events.filter((event) => {
       const isMatch = event.title.includes(`${semesterKeyword} Reading Week`);
-      console.log(
-        `Checking event title "${event.title}" for match with "${semesterKeyword} Reading Week": ${isMatch}`,
-      );
       return isMatch;
     });
 

@@ -36,16 +36,22 @@ const StudentView: React.FC = () => {
 
   const handleSetVersion = () => {
     if (currentVersion) {
-      const versionPattern = /^[A-Za-z0-9]+/; // Pattern to match the current version prefix
-
       const prefixedModules = modules.map((module) => ({
         ...module,
         courseworkList: module.courseworkList.map((coursework) => {
           const { longTitle = '' } = coursework; // Ensure longTitle is a string
-          const updatedTitle = longTitle.replace(versionPattern, '').trim();
+
+          // Create a dynamic pattern to match the current version prefix at the start of the title
+          const versionPattern = new RegExp(`^${availableVersions.join('|')}`);
+
+          // Replace the matched version string with the new version or prepend if no match
+          const updatedTitle = longTitle
+            .replace(versionPattern, currentVersion)
+            .trim();
+
           return {
             ...coursework,
-            longTitle: `${currentVersion} ${updatedTitle}`,
+            longTitle: updatedTitle,
           };
         }),
       }));

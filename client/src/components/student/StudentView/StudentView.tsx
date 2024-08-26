@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, Flex } from '@chakra-ui/react';
+import { Box, Text, Flex, Input, Button, Select } from '@chakra-ui/react';
 import Filters from './Filters/Filters';
 import CourseworkCalendar from './CourseworkCalendar/CourseworkCalendar';
 import { fetchFilteredModules } from '../../../utils/student/StudentView';
@@ -14,6 +14,9 @@ const StudentView: React.FC = () => {
   const [modules, setModules] = useState<ModuleDocument[]>([]); // State to store modules
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
+  const [currentVersion, setCurrentVersion] = useState<string>(''); // State to store current version
+  const [availableVersions, setAvailableVersions] = useState<string[]>([]); // State to store available versions
+  const [selectedVersion, setSelectedVersion] = useState<string>(''); // State to store selected version for viewing
 
   // Fetch filtered modules from the backend
   useEffect(() => {
@@ -30,6 +33,43 @@ const StudentView: React.FC = () => {
 
     fetchModules();
   }, [year, programme, semester, error]);
+
+  const handleSetVersion = () => {
+    if (currentVersion) {
+      const versionPattern = /^[A-Za-z0-9]+/; // Pattern to match the current version prefix
+
+      const prefixedModules = modules.map((module) => ({
+        ...module,
+        courseworkList: module.courseworkList.map((coursework) => {
+          const { longTitle = '' } = coursework; // Ensure longTitle is a string
+          const updatedTitle = longTitle.replace(versionPattern, '').trim();
+          return {
+            ...coursework,
+            longTitle: `${currentVersion} ${updatedTitle}`,
+          };
+        }),
+      }));
+
+      setModules(prefixedModules);
+      setAvailableVersions((prev) => [...prev, currentVersion]);
+      setCurrentVersion('');
+
+      // here we need to send the local coursework names to the backend
+      // TODO here
+    }
+  };
+
+  const handleVersionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedVersion(e.target.value);
+  };
+
+  const filteredModules = selectedVersion
+    ? modules.filter((module) =>
+        module.courseworkList.some((coursework) =>
+          coursework.longTitle.startsWith(selectedVersion),
+        ),
+      )
+    : modules;
 
   // Define readingWeeks based on the selected semester
   const readingWeeks = (() => {
@@ -62,6 +102,31 @@ const StudentView: React.FC = () => {
           setSemester={setSemester}
         />
 
+        <Box mb={6} mt={6}>
+          <Input
+            placeholder="Enter Calendar Version (e.g., CV1)"
+            value={currentVersion}
+            onChange={(e) => setCurrentVersion(e.target.value)}
+            mr={2}
+          />
+          <Button onClick={handleSetVersion} colorScheme="teal">
+            Set New Calendar Version
+          </Button>
+        </Box>
+
+        <Box mb={6}>
+          <Select
+            placeholder="View All Calendar Versions"
+            onChange={handleVersionChange}
+          >
+            {availableVersions.map((version) => (
+              <option key={version} value={version}>
+                {version}
+              </option>
+            ))}
+          </Select>
+        </Box>
+
         {loading ? (
           <Text>Loading modules...</Text>
         ) : error ? (
@@ -70,7 +135,7 @@ const StudentView: React.FC = () => {
           <CourseworkCalendar
             semester={semester}
             programme={programme}
-            modules={modules} // Now filtered by the backend
+            modules={filteredModules} // Now filtered by the selected version
             readingWeeks={readingWeeks}
           />
         )}

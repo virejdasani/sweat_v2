@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, Flex } from '@chakra-ui/react';
 import Filters from './Filters/Filters';
 import CourseworkCalendar from './CourseworkCalendar/CourseworkCalendar';
+import StudentWorkloadGraph from './WorkloadGraphs/StackedModuleGraphs/StudentWorkloadGraph';
 import { fetchFilteredModules } from '../../../utils/student/StudentView';
 import { ModuleDocument } from '../../../types/admin/CreateModule';
 
@@ -15,21 +16,35 @@ const StudentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
 
+  const [selectedModules, setSelectedModules] = useState<string[]>([]); // State for selected modules
+
+  // Function to add a module to the selectedModules array
+  const addModule = (moduleCode: string) => {
+    setSelectedModules([...selectedModules, moduleCode]);
+  };
+
   // Fetch filtered modules from the backend
   useEffect(() => {
     const fetchModules = async () => {
       setLoading(true);
       setError(null);
-      const data = await fetchFilteredModules(year, programme, semester);
-      if (data.length === 0 && error) {
+
+      try {
+        const data = await fetchFilteredModules(year, programme, semester);
+        if (data.length === 0) {
+          setError('No modules found');
+        } else {
+          setModules(data);
+        }
+      } catch (err) {
         setError('Failed to load modules');
+      } finally {
+        setLoading(false);
       }
-      setModules(data);
-      setLoading(false);
     };
 
     fetchModules();
-  }, [year, programme, semester, error]);
+  }, [year, programme, semester]);
 
   // Define readingWeeks based on the selected semester
   const readingWeeks = (() => {
@@ -67,12 +82,19 @@ const StudentView: React.FC = () => {
         ) : error ? (
           <Text color="red.500">{error}</Text>
         ) : (
-          <CourseworkCalendar
-            semester={semester}
-            programme={programme}
-            modules={modules} // Now filtered by the backend
-            readingWeeks={readingWeeks}
-          />
+          <>
+            <CourseworkCalendar
+              semester={semester}
+              programme={programme}
+              modules={modules} // Now filtered by the backend
+              readingWeeks={readingWeeks}
+            />
+            <StudentWorkloadGraph
+              modules={modules}
+              displayedModules={selectedModules}
+              addModule={addModule}
+            />
+          </>
         )}
 
         <div

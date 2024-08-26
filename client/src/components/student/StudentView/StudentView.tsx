@@ -70,12 +70,22 @@ const StudentView: React.FC = () => {
   };
 
   const filteredModules = selectedVersion
-    ? modules.filter((module) =>
-        module.courseworkList.some((coursework) =>
-          coursework.longTitle.startsWith(selectedVersion),
+    ? modules
+        .map((module) => ({
+          ...module,
+          courseworkList: module.courseworkList.filter(
+            (coursework) =>
+              coursework.longTitle.startsWith(selectedVersion) &&
+              !/exam/i.test(coursework.longTitle), // Filter out courseworks with "exam" in their title
+          ),
+        }))
+        .filter((module) => module.courseworkList.length > 0) // Only include modules that have remaining courseworks
+    : modules.map((module) => ({
+        ...module,
+        courseworkList: module.courseworkList.filter(
+          (coursework) => !/exam/i.test(coursework.longTitle), // Filter out courseworks with "exam" in their title
         ),
-      )
-    : modules;
+      }));
 
   // Define readingWeeks based on the selected semester
   const readingWeeks = (() => {
@@ -141,7 +151,7 @@ const StudentView: React.FC = () => {
           <CourseworkCalendar
             semester={semester}
             programme={programme}
-            modules={filteredModules} // Now filtered by the selected version
+            modules={filteredModules} // Now filtered by the selected version and excluding exams
             readingWeeks={readingWeeks}
           />
         )}

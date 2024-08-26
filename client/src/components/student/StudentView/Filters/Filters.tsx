@@ -3,15 +3,12 @@ import { Dropdown } from 'primereact/dropdown';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-
-interface FiltersProps {
-  year: number;
-  setYear: (value: number) => void;
-  programme: string;
-  setProgramme: (value: string) => void;
-  semester: 'first' | 'second' | 'whole session';
-  setSemester: (value: 'first' | 'second' | 'whole session') => void;
-}
+import {
+  yearOptions,
+  programmeOptions,
+  semesterOptions,
+} from '../../../../utils/student/StudentView/Filters';
+import { FiltersProps } from '../../../../types/student/StudentView';
 
 const Filters: React.FC<FiltersProps> = ({
   year,
@@ -21,27 +18,6 @@ const Filters: React.FC<FiltersProps> = ({
   semester,
   setSemester,
 }) => {
-  const yearOptions = [
-    { label: '1', value: 1 },
-    { label: '2', value: 2 },
-    { label: '3', value: 3 },
-    { label: '4', value: 4 },
-  ];
-
-  const programmeOptions = [
-    { label: 'CSEE', value: 'CSEE' },
-    { label: 'AVS', value: 'AVS' },
-    { label: 'MCR', value: 'MCR' },
-    { label: 'EEE', value: 'EEE' },
-    { label: 'EEEP', value: 'EEEP' },
-  ];
-
-  const semesterOptions = [
-    { label: 'First', value: 'first' },
-    { label: 'Second', value: 'second' },
-    { label: 'Whole Session', value: 'wholeSession' },
-  ];
-
   return (
     <div
       style={{

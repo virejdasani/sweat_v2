@@ -2,43 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, Flex } from '@chakra-ui/react';
 import Filters from './Filters/Filters';
 import CourseworkCalendar from './CourseworkCalendar/CourseworkCalendar';
-import httpClient from '../../../shared/api/httpClient';
-import { ApiError } from '../../../shared/api/types';
+import { fetchFilteredModules } from '../../../utils/student/StudentView';
 import { ModuleDocument } from '../../../types/admin/CreateModule';
-
-const fetchFilteredModules = async (
-  studyYear: number,
-  programme: string,
-  semester: string,
-): Promise<ModuleDocument[]> => {
-  try {
-    const response = await httpClient.get<ModuleDocument[]>(
-      '/modules/filtered',
-      {
-        params: {
-          studyYear,
-          programme,
-          semester: semester === 'whole session' ? 'wholeSession' : semester, // Normalize for backend
-        },
-      },
-    );
-    return response.data;
-  } catch (error: unknown) {
-    const apiError = error as ApiError;
-    if (apiError.status && apiError.message) {
-      console.error('Error fetching filtered modules:', apiError.message);
-    } else {
-      console.error('Unknown error fetching filtered modules:', error);
-    }
-    return [];
-  }
-};
 
 const StudentView: React.FC = () => {
   const [year, setYear] = useState<number>(1);
   const [programme, setProgramme] = useState<string>('');
   const [semester, setSemester] = useState<
-    'first' | 'second' | 'whole session'
+    'first' | 'second' | 'whole session' | 'wholeSession'
   >('first');
   const [modules, setModules] = useState<ModuleDocument[]>([]); // State to store modules
   const [loading, setLoading] = useState<boolean>(true); // Loading state
@@ -66,7 +37,7 @@ const StudentView: React.FC = () => {
       return [7]; // Week 7 is a reading week for the first semester
     } else if (semester === 'second') {
       return []; // No reading weeks for the second semester
-    } else if (semester === 'whole session') {
+    } else if (semester === 'wholeSession') {
       return {
         sem1: [7], // Week 7 is a reading week for the first semester
         sem2: [], // No reading weeks in the second semester
@@ -78,7 +49,7 @@ const StudentView: React.FC = () => {
   return (
     <Box p={4} bg="gray.100" minHeight="100vh">
       <Flex justifyContent="center" alignItems="center" direction="column">
-        <Text fontSize="3xl" fontWeight="bold" mb={6} color="teal.600">
+        <Text fontSize="xxx-large" fontWeight="bold" mb={6} color="teal.600">
           Student View
         </Text>
 
@@ -104,11 +75,28 @@ const StudentView: React.FC = () => {
           />
         )}
 
-        <Box mt={8} textAlign="center">
-          <Text fontSize="sm" color="gray.600">
-            © 2024 Your University Name. All rights reserved.
-          </Text>
-        </Box>
+        <div
+          className="effortInfo"
+          style={{
+            marginLeft: '50px',
+            marginRight: '50px',
+            marginTop: '20px',
+            marginBottom: '20px',
+            fontSize: 'small',
+            border: '1px solid black',
+            padding: '20px',
+          }}
+        >
+          <h4>Effort Information</h4>
+          <p>
+            In the UK, each credit corresponds to 10 hours of notional learning.
+            Therefore, a 15 credit module requires a total of 150 hours of
+            student effort, including contact time and private study. <></>
+            <a href="https://www.qaa.ac.uk/docs/qaa/quality-code/what-is-credit-guide-for-students.pdf?sfvrsn=4460d981_14">
+              Source
+            </a>
+          </p>
+        </div>
       </Flex>
     </Box>
   );

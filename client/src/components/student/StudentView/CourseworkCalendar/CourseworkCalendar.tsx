@@ -11,8 +11,6 @@ import {
   IconButton,
   Text,
   VStack,
-  TableProps,
-  ResponsiveValue,
 } from '@chakra-ui/react';
 import { SmallCloseIcon } from '@chakra-ui/icons';
 import { ModuleDocument } from '../../../../types/admin/CreateModule';
@@ -20,32 +18,12 @@ import { Dropdown } from 'primereact/dropdown';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-
-// Styles
-export const tableStyle: TableProps = {
-  size: 'sm',
-  variant: 'simple',
-  colorScheme: 'gray',
-};
-
-export const headerStyle = {
-  fontSize: 'xs',
-  textAlign: 'center' as ResponsiveValue<'left' | 'center' | 'right'>,
-  fontWeight: 'semibold',
-};
-
-const cellStyle = {
-  border: '1px solid',
-  borderColor: 'gray.300',
-  px: 2,
-};
-
-interface CourseworkCalendarProps {
-  semester: 'first' | 'second' | 'whole session';
-  programme: string;
-  modules: ModuleDocument[];
-  readingWeeks?: number[] | { sem1: number[]; sem2: number[] };
-}
+import {
+  cellStyle,
+  headerStyle,
+  tableStyle,
+} from './CourseworkCalendar.styles';
+import { CourseworkCalendarProps } from '../../../../types/student/StudentView';
 
 const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   semester,
@@ -81,8 +59,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
     }
   };
 
-  const renderTableHeader = (isSecondSemester = false) => {
-    const numWeeks = isSecondSemester || semester === 'second' ? 18 : 15;
+  const renderTableHeader = (startWeek: number, endWeek: number) => {
+    const numWeeks = endWeek - startWeek + 1;
 
     return (
       <Thead bg="gray.50">
@@ -91,21 +69,35 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             Module Code
           </Th>
           {Array.from({ length: numWeeks }, (_, i) => {
-            const weekNumber = i + 1;
-            const isReadingWeek = Array.isArray(readingWeeks)
-              ? readingWeeks.includes(weekNumber)
-              : semester === 'whole session'
-                ? isSecondSemester
-                  ? (
-                      readingWeeks as { sem1: number[]; sem2: number[] }
-                    ).sem2.includes(weekNumber)
-                  : (
-                      readingWeeks as { sem1: number[]; sem2: number[] }
-                    ).sem1.includes(weekNumber)
-                : false;
-            const weekLabel = isReadingWeek
-              ? `Week ${weekNumber} (Private Study Week)`
-              : `Week ${weekNumber}`;
+            const weekNumber = startWeek + i;
+
+            // Handling reading weeks based on the type of semester
+            let isReadingWeek = false;
+            if (Array.isArray(readingWeeks)) {
+              isReadingWeek = readingWeeks.includes(weekNumber);
+            } else if (
+              typeof readingWeeks === 'object' &&
+              readingWeeks.sem1 &&
+              readingWeeks.sem2
+            ) {
+              if (startWeek <= 15) {
+                isReadingWeek = readingWeeks.sem1.includes(weekNumber);
+              } else {
+                isReadingWeek = readingWeeks.sem2.includes(weekNumber);
+              }
+            }
+
+            // Checking if the current week is within the Easter Break period
+            const isEasterBreak =
+              (startWeek <= 9 && weekNumber >= 9 && weekNumber <= 11) ||
+              (startWeek > 15 && weekNumber >= 24 && weekNumber <= 26);
+
+            const weekLabel = isEasterBreak
+              ? `Week ${weekNumber} (Easter Break)`
+              : isReadingWeek
+                ? `Week ${weekNumber} (Private Study Week)`
+                : `Week ${weekNumber}`;
+
             return (
               <Th key={i} {...cellStyle} {...headerStyle}>
                 {weekLabel}
@@ -117,9 +109,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
     );
   };
 
-  const renderTableBody = () => {
-    const numWeeks =
-      semester === 'second' || semester === 'whole session' ? 18 : 15;
+  const renderTableBody = (startWeek: number, endWeek: number) => {
+    const numWeeks = endWeek - startWeek + 1;
 
     return (
       <Tbody>
@@ -138,7 +129,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               />
             </Td>
             {Array.from({ length: numWeeks }, (_, i) => {
-              const weekNumber = i + 1;
+              const weekNumber = startWeek + i;
               const courseworkForWeek = module.courseworkList.filter(
                 (coursework) => coursework.deadlineWeek === weekNumber,
               );
@@ -163,8 +154,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                           textOverflow="ellipsis"
                           overflow="hidden"
                         >
-                          {coursework.shortTitle} - {coursework.longTitle} (
-                          {coursework.type})
+                          {coursework.longTitle} ({coursework.weight}%){' '}
+                          {coursework.deadlineDay}
                         </Text>
                       ))}
                     </VStack>
@@ -176,6 +167,62 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
         ))}
       </Tbody>
     );
+  };
+
+  const renderTables = () => {
+    if (semester === 'wholeSession') {
+      return (
+        <>
+          <Heading size="md" mb={4}>
+            First Semester - {programme}
+          </Heading>
+          <Box width="100%" margin="0 auto">
+            <Table {...tableStyle} mb={8}>
+              {renderTableHeader(1, 15)}
+              {renderTableBody(1, 15)}
+            </Table>
+          </Box>
+
+          <Heading size="md" mb={4}>
+            Second Semester - {programme}
+          </Heading>
+          <Box width="100%" margin="0 auto">
+            <Table {...tableStyle}>
+              {renderTableHeader(1, 18)}
+              {renderTableBody(16, 33)}
+            </Table>
+          </Box>
+        </>
+      );
+    } else if (semester === 'first') {
+      return (
+        <>
+          <Heading size="md" mb={4}>
+            First Semester - {programme}
+          </Heading>
+          <Box width="100%" margin="0 auto">
+            <Table {...tableStyle}>
+              {renderTableHeader(1, 15)}
+              {renderTableBody(1, 15)}
+            </Table>
+          </Box>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Heading size="md" mb={4}>
+            Second Semester - {programme}
+          </Heading>
+          <Box width="100%" margin="0 auto">
+            <Table {...tableStyle}>
+              {renderTableHeader(1, 18)}
+              {renderTableBody(1, 18)}
+            </Table>
+          </Box>
+        </>
+      );
+    }
   };
 
   return (
@@ -202,42 +249,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
         />
       </Box>
 
-      {semester === 'whole session' ? (
-        <>
-          <Heading size="md" mb={4}>
-            First Semester - {programme}
-          </Heading>
-          <Box width="80%" margin="0 auto">
-            <Table {...tableStyle} mb={8}>
-              {renderTableHeader(false)}
-              {renderTableBody()}
-            </Table>
-          </Box>
-
-          <Heading size="md" mb={4}>
-            Second Semester - {programme}
-          </Heading>
-          <Box width="100%" margin="0 auto">
-            <Table {...tableStyle}>
-              {renderTableHeader(true)}
-              {renderTableBody()}
-            </Table>
-          </Box>
-        </>
-      ) : (
-        <>
-          <Heading size="md" mb={4}>
-            {semester.charAt(0).toUpperCase() + semester.slice(1)} Semester -{' '}
-            {programme}
-          </Heading>
-          <Box width="100%" margin="0 auto">
-            <Table {...tableStyle}>
-              {renderTableHeader(semester === 'second')}
-              {renderTableBody()}
-            </Table>
-          </Box>
-        </>
-      )}
+      {renderTables()}
     </Box>
   );
 };

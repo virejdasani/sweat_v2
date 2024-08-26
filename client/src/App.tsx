@@ -16,6 +16,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import About from './components/About/About';
 import StudentCalendar from './components/student/StudentCalendar/StudentCalendar';
 import AdminSettings from './components/admin/Settings/adminSettings';
+import StudentView from './components/student/StudentView/StudentView';
 // import WIP from './components/WIP/WIP';
 
 function App() {
@@ -26,7 +27,8 @@ function App() {
         <Route path="/admin" element={<AdminHome />} />
         <Route path="/staff" element={<StaffHome />} />
         {/* <Route path="/student" element={<StudentHome />} /> */}
-        <Route path="/student" element={<StudentCalendar />} />
+        {/* <Route path="/student" element={<StudentCalendar />} /> */}
+        <Route path="/student" element={<StudentView />} />
         {/* <Route path="/student" element={<WIP />} /> */}
 
         <Route path="/about" element={<About />} />

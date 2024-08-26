@@ -1,0 +1,12 @@
+/* Custom styles for the dropdown panel */
+.custom-dropdown-panel .p-dropdown-item {
+  padding-left: 0.5rem !important; /* Adjust this value to reduce left padding */
+  padding-right: 0.5rem !important; /* Optional: Adjust right padding for consistency */
+  margin: 0 !important; /* Ensure no extra margins */
+}
+
+/* Ensure the entire panel is adjusted */
+.custom-dropdown-panel .p-dropdown-items-wrapper {
+  padding-left: 0 !important; /* Remove any internal padding */
+  padding-right: 0 !important; /* Remove any internal padding */
+}

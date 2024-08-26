@@ -170,6 +170,36 @@ const getModuleTemplate = (req, res) => {
   }
 };
 
+const getFilteredModules = async (req, res) => {
+  try {
+    const { studyYear, programme, semester } = req.query;
+
+    // Normalize the semester value
+    const normalizedSemester =
+      semester === 'wholeSession' ? 'whole session' : semester;
+
+    // Construct the filter object
+    const filter = {};
+    if (studyYear) {
+      filter['moduleSetup.studyYear'] = Number(studyYear);
+    }
+    if (programme) {
+      filter['moduleSetup.programme'] = { $in: [programme] };
+    }
+    if (normalizedSemester) {
+      filter['moduleSetup.semester'] = normalizedSemester;
+    }
+
+    // Fetch the modules based on the constructed filter
+    const modules = await Module.find(filter);
+
+    // Respond with the filtered modules
+    res.json(modules);
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
 module.exports = {
   getAllModules,
   getAllModuleIds,
@@ -178,4 +208,5 @@ module.exports = {
   deleteModuleById,
   updateProgrammeArrayInModules,
   getModuleTemplate,
+  getFilteredModules, // Export the new controller
 };

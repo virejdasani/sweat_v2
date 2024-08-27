@@ -9,7 +9,6 @@ import {
   Td,
   Input,
   Text,
-  Button,
   Tooltip,
   Icon,
   Flex,
@@ -23,9 +22,9 @@ import {
   expectedTotalTime,
   initializeCourseworkList,
   recalculateCourseworkList,
-  getCourseworkListFromSession,
-  saveInitialCourseworkListToSession,
-  handleRestoreDefaults,
+  // getCourseworkListFromSession,
+  // saveInitialCourseworkListToSession,
+  // handleRestoreDefaults,
   handleInputChange,
   handleInputBlur,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
@@ -50,12 +49,14 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   const initialCourseworkListRef = useRef<Coursework[]>([]);
 
   useEffect(() => {
-    const savedCourseworkList = getCourseworkListFromSession();
-    if (savedCourseworkList) {
-      setInternalCourseworkList(savedCourseworkList);
-      handleCourseworkListChange(savedCourseworkList);
-      isInitialized.current = true;
-    } else if (!isInitialized.current) {
+    // const savedCourseworkList = getCourseworkListFromSession();
+    // if (savedCourseworkList) {
+    //   setInternalCourseworkList(savedCourseworkList);
+    //   handleCourseworkListChange(savedCourseworkList);
+    //   isInitialized.current = true;
+    // } else if (!isInitialized.current) {
+    if (!isInitialized.current) {
+      // Added to prevent breaking due to commenting out above
       const adjustedFormFactor =
         courseworkPercentage === 100 ? 100 : formFactor;
       const initialList = initializeCourseworkList(
@@ -69,7 +70,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
       initialCourseworkListRef.current = JSON.parse(
         JSON.stringify(initialList),
       ); // Deep copy
-      saveInitialCourseworkListToSession(initialCourseworkListRef.current);
+      // saveInitialCourseworkListToSession(initialCourseworkListRef.current);
       handleCourseworkListChange(initialList);
       isInitialized.current = true;
     }
@@ -128,7 +129,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
 
   return (
     <Box>
-      <Button
+      {/* <Button
         onClick={() =>
           handleRestoreDefaults(
             setInternalCourseworkList,
@@ -140,7 +141,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
         colorScheme="blue"
       >
         Restore Defaults
-      </Button>
+      </Button> */}
       <Table style={courseworkScheduleStyles.table}>
         <Thead>
           <Tr>

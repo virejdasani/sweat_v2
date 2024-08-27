@@ -18,15 +18,6 @@ const StudentView: React.FC = () => {
   const [currentVersion, setCurrentVersion] = useState<string>(''); // State to store current version
   const [availableVersions, setAvailableVersions] = useState<string[]>([]); // State to store available versions
   const [selectedVersion, setSelectedVersion] = useState<string>(''); // State to store selected version for viewing
-  const [selectedModules, setSelectedModules] = useState<string[]>([]); // State for selected modules in the workload graph
-
-  // Function to add a module to the selectedModules array
-  const addModule = (moduleCode: string) => {
-    setSelectedModules((prevSelectedModules) => [
-      ...prevSelectedModules,
-      moduleCode,
-    ]);
-  };
 
   // Fetch filtered modules from the backend
   useEffect(() => {
@@ -166,17 +157,19 @@ const StudentView: React.FC = () => {
           <Text color="red.500">{error}</Text>
         ) : (
           <>
+            <Text fontSize="xx-large" fontWeight="bold" mb={6} color="teal.600">
+              Coursework Calendar
+            </Text>
             <CourseworkCalendar
               semester={semester}
               programme={programme}
               modules={filteredModules} // Now filtered by the selected version and excluding exams
               readingWeeks={readingWeeks}
             />
-            <StudentWorkloadGraph
-              modules={filteredModules}
-              displayedModules={selectedModules}
-              addModule={addModule}
-            />
+            <Text fontSize="xx-large" fontWeight="bold" mb={6} color="teal.600">
+              Workload Graph
+            </Text>
+            <StudentWorkloadGraph modules={filteredModules} />
           </>
         )}
 
@@ -186,7 +179,7 @@ const StudentView: React.FC = () => {
             marginLeft: '50px',
             marginRight: '50px',
             marginTop: '20px',
-            marginBottom: '20px',
+            marginBottom: '2rem',
             fontSize: 'small',
             border: '1px solid black',
             padding: '20px',

@@ -18,6 +18,15 @@ const StudentView: React.FC = () => {
   const [currentVersion, setCurrentVersion] = useState<string>(''); // State to store current version
   const [availableVersions, setAvailableVersions] = useState<string[]>([]); // State to store available versions
   const [selectedVersion, setSelectedVersion] = useState<string>(''); // State to store selected version for viewing
+  const [selectedModules, setSelectedModules] = useState<string[]>([]); // State for selected modules in the workload graph
+
+  // Function to add a module to the selectedModules array
+  const addModule = (moduleCode: string) => {
+    setSelectedModules((prevSelectedModules) => [
+      ...prevSelectedModules,
+      moduleCode,
+    ]);
+  };
 
   // Fetch filtered modules from the backend
   useEffect(() => {
@@ -156,12 +165,19 @@ const StudentView: React.FC = () => {
         ) : error ? (
           <Text color="red.500">{error}</Text>
         ) : (
-          <CourseworkCalendar
-            semester={semester}
-            programme={programme}
-            modules={filteredModules} // Now filtered by the selected version and excluding exams
-            readingWeeks={readingWeeks}
-          />
+          <>
+            <CourseworkCalendar
+              semester={semester}
+              programme={programme}
+              modules={filteredModules} // Now filtered by the selected version and excluding exams
+              readingWeeks={readingWeeks}
+            />
+            <StudentWorkloadGraph
+              modules={filteredModules}
+              displayedModules={selectedModules}
+              addModule={addModule}
+            />
+          </>
         )}
 
         <div

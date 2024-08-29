@@ -87,8 +87,9 @@ const aggregateModuleData = async (req, res) => {
       ratio,
     );
 
+    // Check if the result is empty or null and return an empty array
     if (!result || result.length === 0) {
-      return [res.status(404).json({ message: 'No data found' })];
+      return res.json([]); // Return an empty array instead of a 404 error
     }
 
     res.json(result);

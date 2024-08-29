@@ -1,4 +1,3 @@
-const Module = require('../models/module');
 const Programme = require('../models/programme');
 const { handleError } = require('../utils/errorHandler');
 const { createOrUpdateModule } = require('../services/moduleService');

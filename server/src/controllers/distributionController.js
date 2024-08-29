@@ -1,5 +1,6 @@
 const {
   calculateCompleteDistributions,
+  calculateAggregatedData,
 } = require('../utils/distributionCalculations');
 
 const getDistributions = async (req, res) => {
@@ -77,6 +78,27 @@ const getDistributions = async (req, res) => {
   }
 };
 
+const aggregateModuleData = async (req, res) => {
+  try {
+    const { moduleCodes, studyStyle, ratio } = req.body;
+    const result = await calculateAggregatedData(
+      moduleCodes,
+      studyStyle,
+      ratio,
+    );
+
+    if (!result || result.length === 0) {
+      return [res.status(404).json({ message: 'No data found' })];
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error aggregating module data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   getDistributions,
+  aggregateModuleData,
 };

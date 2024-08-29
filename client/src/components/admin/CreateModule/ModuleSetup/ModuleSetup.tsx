@@ -28,7 +28,7 @@ import {
 } from '../../../../utils/admin/CreateModule/ModuleSetup';
 
 const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
-  const programmes = ['CSEE', 'AVS', 'MCR', 'EEE', 'EEEP', 'EEMS', 'EETW'];
+  const programmes = ['CSEE', 'AVS', 'MRS', 'EEE', 'EEEP', 'EEMS', 'EETW'];
 
   return (
     <Box sx={moduleSetupStyles.container}>

@@ -76,6 +76,7 @@ const moduleSchema = new mongoose.Schema({
   },
 });
 
-const Module = mongoose.model('Module', moduleSchema);
+// Avoid redefinition by checking if the model already exists
+const Module = mongoose.models.Module || mongoose.model('Module', moduleSchema);
 
 module.exports = Module;

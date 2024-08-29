@@ -11,24 +11,23 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { ModuleDocument } from '../../../../../types/admin/CreateModule';
 import { Dropdown } from 'primereact/dropdown';
 import { Tooltip as PrimeTooltip } from 'primereact/tooltip';
-
-interface OptionType {
-  label: string;
-  value: string;
-}
-
-interface StudentWorkloadGraphProps {
-  modules: ModuleDocument[];
-}
+import {
+  OptionType,
+  StudentWorkloadGraphProps,
+  AggregatedData,
+} from '../../../../../types/student/StudentView';
+import {
+  fetchAggregatedData,
+  studyStyleOptions,
+  ratioOptions,
+} from '../../../../../utils/student/StudentView/WorkloadGraphs';
 
 const CustomOption = (props: OptionProps<OptionType>) => {
   const { data, innerRef, innerProps, isSelected } = props;
 
   if (data.value === '*') {
-    // Custom rendering for "Select All"
     return (
       <div
         ref={innerRef}
@@ -38,7 +37,7 @@ const CustomOption = (props: OptionProps<OptionType>) => {
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={() => {}} // Prevent the default behavior to avoid an additional click event
+          onChange={() => {}}
           style={{ marginRight: '8px' }}
         />
         <span>{data.label}</span>
@@ -46,7 +45,6 @@ const CustomOption = (props: OptionProps<OptionType>) => {
     );
   }
 
-  // Default rendering for other options
   return <components.Option {...props} />;
 };
 
@@ -57,8 +55,10 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
     MultiValue<OptionType>
   >([]);
   const [closeMenuOnSelect, setCloseMenuOnSelect] = useState<boolean>(true);
-  const [studyStyle, setStudyStyle] = useState<string>('earlyStarter');
+  const [studyStyle, setStudyStyle] = useState<string>('steady');
   const [ratio, setRatio] = useState<string>('1');
+  const [data, setData] = useState<AggregatedData[]>([]);
+  const [lineColors, setLineColors] = useState<{ [key: string]: string }>({});
 
   const moduleOptions: OptionType[] = modules.map((module) => ({
     label: module.moduleSetup.moduleCode,
@@ -69,17 +69,15 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
 
   const handleModuleChange = (selected: MultiValue<OptionType>) => {
     if (selected?.some((option) => option.value === selectAllOption.value)) {
-      // Select all modules
       setSelectedModules(moduleOptions);
-      setCloseMenuOnSelect(true); // Close the menu when "Select All" is chosen
+      setCloseMenuOnSelect(true);
     } else {
       setSelectedModules(selected);
-      setCloseMenuOnSelect(false); // Keep the menu open for individual selections
+      setCloseMenuOnSelect(false);
     }
   };
 
   useEffect(() => {
-    // Filter out selected modules that are no longer in the module options
     setSelectedModules((prevSelectedModules) =>
       prevSelectedModules.filter((module) =>
         modules.some((m) => m.moduleSetup.moduleCode === module.value),
@@ -87,30 +85,27 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
     );
   }, [modules]);
 
-  // Example data for the graph (this would typically be dynamic based on selectedModules)
-  const data = [
-    { week: 'Week 1', Module1: 10 },
-    { week: 'Week 2', Module1: 20 },
-    { week: 'Week 3', Module1: 30 },
-    { week: 'Week 4', Module1: 40 },
-    { week: 'Week 5', Module1: 50 },
-  ];
-
-  const studyStyleOptions = [
-    { label: 'Early Starter', value: 'earlyStarter' },
-    { label: 'Steady', value: 'steady' },
-    { label: 'Just In Time', value: 'justInTime' },
-  ];
-
-  const ratioOptions = [
-    { label: '0', value: '0' },
-    { label: '0.5', value: '0_5' },
-    { label: '1', value: '1' },
-    { label: '2', value: '2' },
-  ];
+  useEffect(() => {
+    fetchAggregatedData(
+      Array.from(selectedModules),
+      studyStyle,
+      ratio,
+      setData,
+      lineColors,
+      setLineColors,
+    );
+  }, [selectedModules, studyStyle, ratio]);
 
   return (
     <Box width="80%" height="80vh" p={4} bg="white">
+      <button
+        className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        onClick={() => {
+          window.history.back();
+        }}
+      >
+        Home
+      </button>
       {/* Filters */}
       <Flex justifyContent="center" mb={4}>
         <Box mr={8}>
@@ -159,9 +154,10 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
                 dataKey="week"
                 label={{
                   value: 'Weeks',
-                  position: 'insideBottomRight',
-                  offset: 0,
+                  position: 'insideBottom',
+                  dy: 20,
                 }}
+                tickFormatter={(value) => value.replace('Week ', '')}
               />
               <YAxis
                 label={{
@@ -171,12 +167,26 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
                 }}
               />
               <Tooltip />
-              <Legend />
+              <Legend
+                verticalAlign="bottom"
+                wrapperStyle={{ paddingTop: 30 }}
+              />
+              {selectedModules.map((module) => (
+                <Line
+                  key={module.value}
+                  type="monotone"
+                  dataKey={module.value}
+                  stroke={lineColors[module.value]}
+                  activeDot={{ r: 8 }}
+                />
+              ))}
+              {/* Add the total effort line */}
               <Line
                 type="monotone"
-                dataKey="Module1"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
+                dataKey="totalEffort"
+                stroke="#000000"
+                strokeWidth={3}
+                dot={false}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -188,12 +198,12 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
             isMulti
             value={selectedModules}
             onChange={handleModuleChange}
-            options={[selectAllOption, ...moduleOptions]} // Include the "Select All" option
+            options={[selectAllOption, ...moduleOptions]}
             classNamePrefix="react-select"
             placeholder="Select Modules"
-            closeMenuOnSelect={closeMenuOnSelect} // Dynamically set this based on selection
-            isSearchable // Enables the search functionality
-            components={{ Option: CustomOption }} // Use the custom option component
+            closeMenuOnSelect={closeMenuOnSelect}
+            isSearchable
+            components={{ Option: CustomOption }}
             styles={{
               multiValue: (base) => ({
                 ...base,

@@ -8,7 +8,7 @@ export const yearOptions = [
 export const programmeOptions = [
   { label: 'CSEE', value: 'CSEE' },
   { label: 'AVS', value: 'AVS' },
-  { label: 'MCR', value: 'MCR' },
+  { label: 'MRS', value: 'MRS' },
   { label: 'EEE', value: 'EEE' },
   { label: 'EEEP', value: 'EEEP' },
   { label: 'EEMS', value: 'EETW' },

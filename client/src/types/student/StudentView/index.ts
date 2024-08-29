@@ -17,3 +17,17 @@ export interface CourseworkCalendarProps {
   modules: ModuleDocument[];
   readingWeeks?: number[] | { sem1: number[]; sem2: number[] };
 }
+
+export interface OptionType {
+  label: string;
+  value: string;
+}
+
+export interface AggregatedData {
+  week: string;
+  [moduleCode: string]: number | string; // Allows dynamic module codes
+}
+
+export interface StudentWorkloadGraphProps {
+  modules: ModuleDocument[];
+}

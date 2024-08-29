@@ -1,4 +1,5 @@
 const { roundToNearestHalf, safeDivide } = require('./helpers');
+const Module = require('../models/Module');
 
 // Calculate preparation time distributions for coursework that is not of type exam
 const calculatePreparationDistributions = (
@@ -334,8 +335,105 @@ const calculateCompleteDistributions = (
   }
 };
 
+const calculateAggregatedData = async (moduleCodes, studyStyle, ratio) => {
+  try {
+    const modules = await Module.find({
+      'moduleSetup.moduleCode': { $in: moduleCodes },
+    });
+
+    const aggregatedData = {};
+
+    modules.forEach((module) => {
+      const moduleCode = module.moduleSetup.moduleCode;
+
+      // Initialize the module's data in the aggregatedData object
+      if (!aggregatedData[moduleCode]) {
+        aggregatedData[moduleCode] = {};
+      }
+
+      // Step 1: Aggregate Teaching Schedule Distributions
+      Object.values(module.teachingSchedule).forEach((schedule) => {
+        if (schedule && schedule.distribution) {
+          schedule.distribution.forEach(({ week, hours }) => {
+            if (!aggregatedData[moduleCode][week]) {
+              aggregatedData[moduleCode][week] = 0;
+            }
+            aggregatedData[moduleCode][week] += hours;
+          });
+        }
+      });
+
+      // Step 2: Aggregate Coursework Preparation Time Distributions
+      module.courseworkList.forEach((coursework) => {
+        let relevantDistribution;
+
+        if (coursework.type === 'exam') {
+          const combinedType = `${studyStyle}_ratio${ratio}`;
+          relevantDistribution = coursework.preparationTimeDistributions.find(
+            (dist) => dist.type === combinedType,
+          );
+        } else {
+          relevantDistribution = coursework.preparationTimeDistributions.find(
+            (dist) => dist.type === studyStyle,
+          );
+        }
+
+        if (relevantDistribution) {
+          relevantDistribution.distribution.forEach(({ week, hours }) => {
+            if (!aggregatedData[moduleCode][week]) {
+              aggregatedData[moduleCode][week] = 0;
+            }
+            aggregatedData[moduleCode][week] += hours;
+          });
+        }
+      });
+
+      // Step 3: Aggregate Private Study Distributions
+      const privateStudyDistribution = module.privateStudyDistributions.find(
+        (dist) => dist.type === ratio,
+      );
+
+      if (privateStudyDistribution) {
+        privateStudyDistribution.distribution.forEach(({ week, hours }) => {
+          if (!aggregatedData[moduleCode][week]) {
+            aggregatedData[moduleCode][week] = 0;
+          }
+          aggregatedData[moduleCode][week] += hours;
+        });
+      }
+    });
+
+    // Convert aggregatedData into an array of objects suitable for the frontend
+
+    // Determine the maximum week number from the aggregated data
+    const maxWeek = Math.max(
+      ...moduleCodes.map((moduleCode) =>
+        Math.max(...Object.keys(aggregatedData[moduleCode]).map(Number)),
+      ),
+    );
+
+    // Generate the weeks array dynamically based on the data
+    const weeks = Array.from({ length: maxWeek }, (_, i) => i + 1);
+
+    // Convert aggregatedData into an array of objects suitable for the frontend
+    const result = weeks.map((week) => {
+      const weekData = { week: `Week ${week}` };
+      moduleCodes.forEach((moduleCode) => {
+        weekData[moduleCode] = aggregatedData[moduleCode][week] || 0;
+      });
+      return weekData;
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error aggregating module data:', error);
+    throw new Error('Data aggregation failed');
+  }
+};
+
 module.exports = {
   calculatePreparationTimeDistributions,
   calculatePrivateStudyDistributions,
   calculateCompleteDistributions,
+  calculateAggregatedData,
 };

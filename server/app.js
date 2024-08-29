@@ -20,7 +20,7 @@ const moduleController = require('./src/controllers/moduleController');
 const programmeController = require('./src/controllers/programmeController');
 const calendarController = require('./src/controllers/calendarController');
 const distributionController = require('./src/controllers/distributionController');
-const settingsController = require('./src/controllers/settingsController'); 
+const settingsController = require('./src/controllers/settingsController');
 
 // Module routes
 app.get('/modules/module-template', moduleController.getModuleTemplate);
@@ -69,6 +69,7 @@ app.post(
   '/private-study-distributions',
   distributionController.getDistributions,
 );
+app.post('/aggregate-data', distributionController.aggregateModuleData);
 
 // Admin settings routes
 app.get(

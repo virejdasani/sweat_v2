@@ -1,5 +1,5 @@
 const { roundToNearestHalf, safeDivide } = require('./helpers');
-const Module = require('../models/Module');
+const Module = require('../models/module');
 
 // Calculate preparation time distributions for coursework that is not of type exam
 const calculatePreparationDistributions = (

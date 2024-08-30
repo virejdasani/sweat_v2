@@ -174,10 +174,6 @@ const getFilteredModules = async (req, res) => {
   try {
     const { studyYear, programme, semester } = req.query;
 
-    // Normalize the semester value
-    const normalizedSemester =
-      semester === 'wholeSession' ? 'whole session' : semester;
-
     // Construct the filter object
     const filter = {};
     if (studyYear) {
@@ -186,15 +182,46 @@ const getFilteredModules = async (req, res) => {
     if (programme) {
       filter['moduleSetup.programme'] = { $in: [programme] };
     }
-    if (normalizedSemester) {
-      filter['moduleSetup.semester'] = normalizedSemester;
-    }
+    filter['moduleSetup.semester'] = { $in: [semester, 'whole session'] };
 
     // Fetch the modules based on the constructed filter
     const modules = await Module.find(filter);
 
+    // Filter courseworkList based on the selected semester
+    const filteredModules = modules.map((module) => {
+      let filteredCourseworkList = module.courseworkList;
+
+      if (semester === 'first') {
+        // Filter for first semester weeks 1-15
+        filteredCourseworkList = filteredCourseworkList.filter(
+          (coursework) =>
+            coursework.deadlineWeek >= 1 && coursework.deadlineWeek <= 15,
+        );
+      } else if (semester === 'second') {
+        // Filter for second semester
+        if (module.moduleSetup.semester === 'second') {
+          // For regular second semester, use weeks 1-18
+          filteredCourseworkList = filteredCourseworkList.filter(
+            (coursework) =>
+              coursework.deadlineWeek >= 1 && coursework.deadlineWeek <= 18,
+          );
+        } else if (module.moduleSetup.semester === 'whole session') {
+          // For whole session modules, use weeks 16-33
+          filteredCourseworkList = filteredCourseworkList.filter(
+            (coursework) =>
+              coursework.deadlineWeek >= 16 && coursework.deadlineWeek <= 33,
+          );
+        }
+      }
+
+      return {
+        ...module.toObject(),
+        courseworkList: filteredCourseworkList,
+      };
+    });
+
     // Respond with the filtered modules
-    res.json(modules);
+    res.json(filteredModules);
   } catch (error) {
     handleError(res, error);
   }
@@ -208,5 +235,5 @@ module.exports = {
   deleteModuleById,
   updateProgrammeArrayInModules,
   getModuleTemplate,
-  getFilteredModules, // Export the new controller
+  getFilteredModules,
 };

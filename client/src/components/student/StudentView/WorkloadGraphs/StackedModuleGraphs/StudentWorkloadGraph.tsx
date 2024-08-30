@@ -12,7 +12,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Dropdown } from 'primereact/dropdown';
-import { Tooltip as PrimeTooltip } from 'primereact/tooltip';
 import {
   OptionType,
   StudentWorkloadGraphProps,
@@ -50,6 +49,7 @@ const CustomOption = (props: OptionProps<OptionType>) => {
 
 const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
   modules,
+  semester,
 }) => {
   const [selectedModules, setSelectedModules] = useState<
     MultiValue<OptionType>
@@ -90,11 +90,12 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
       Array.from(selectedModules),
       studyStyle,
       ratio,
+      semester, // Pass semester to fetchAggregatedData
       setData,
       lineColors,
       setLineColors,
     );
-  }, [selectedModules, studyStyle, ratio]);
+  }, [selectedModules, studyStyle, ratio, semester]); // Depend on semester as well
 
   return (
     <Box width="80%" height="80vh" p={4} bg="white">
@@ -109,13 +110,7 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
       {/* Filters */}
       <Flex justifyContent="center" mb={4}>
         <Box mr={8}>
-          <span>
-            Select study style{' '}
-            <i
-              className="pi pi-info-circle ml-2"
-              data-pr-tooltip="3 different study styles for students with different studying habits"
-            />
-          </span>{' '}
+          <span>When it comes to coursework, I could be described as</span>{' '}
           <Dropdown
             value={studyStyle}
             options={studyStyleOptions}
@@ -123,15 +118,10 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
             placeholder="Select a Study Style"
             className="w-full md:w-10rem"
           />
-          <PrimeTooltip target=".pi-info-circle" />
         </Box>{' '}
         <Box>
           <span>
-            Select study hour ratio{' '}
-            <i
-              className="pi pi-info-circle ml-2"
-              data-pr-tooltip={`For every 1 hour spent in class, the student will study ${ratio} hour(s) at home`}
-            />
+            My study style: for every 1 hour in class, I tend to study{' '}
           </span>{' '}
           <Dropdown
             value={ratio}
@@ -139,8 +129,8 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
             onChange={(e) => setRatio(e.value)}
             placeholder="Select a Ratio"
             className="w-full md:w-10rem"
-          />
-          <PrimeTooltip target=".pi-info-circle" />
+          />{' '}
+          <span>hours at home</span>{' '}
         </Box>
       </Flex>
 
@@ -161,7 +151,7 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
               />
               <YAxis
                 label={{
-                  value: 'Effort Hours',
+                  value: 'Private Study (hours/week)',
                   angle: -90,
                   position: 'insideLeft',
                 }}

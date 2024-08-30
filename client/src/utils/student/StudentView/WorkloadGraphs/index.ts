@@ -22,6 +22,7 @@ export const fetchAggregatedData = async (
   selectedModules: OptionType[],
   studyStyle: string,
   ratio: string,
+  semester: 'first' | 'second' | 'whole session' | 'wholeSession', // Added semester parameter
   setData: (data: AggregatedData[]) => void,
   lineColors: { [key: string]: string },
   setLineColors: (colors: { [key: string]: string }) => void,
@@ -38,6 +39,7 @@ export const fetchAggregatedData = async (
       moduleCodes,
       studyStyle,
       ratio,
+      semester, // Include semester in the request
     });
 
     const fetchedData: AggregatedData[] = response.data;

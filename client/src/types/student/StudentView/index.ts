@@ -30,5 +30,5 @@ export interface AggregatedData {
 
 export interface StudentWorkloadGraphProps {
   modules: ModuleDocument[];
-  semester: 'first' | 'second';
+  semester: 'first' | 'second' | 'whole session' | 'wholeSession';
 }

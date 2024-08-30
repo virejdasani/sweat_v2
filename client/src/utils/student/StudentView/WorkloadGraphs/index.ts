@@ -22,7 +22,7 @@ export const fetchAggregatedData = async (
   selectedModules: OptionType[],
   studyStyle: string,
   ratio: string,
-  semester: 'first' | 'second', // Added semester parameter
+  semester: 'first' | 'second' | 'whole session' | 'wholeSession', // Added semester parameter
   setData: (data: AggregatedData[]) => void,
   lineColors: { [key: string]: string },
   setLineColors: (colors: { [key: string]: string }) => void,

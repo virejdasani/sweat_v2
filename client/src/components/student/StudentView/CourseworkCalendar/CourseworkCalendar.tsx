@@ -59,7 +59,11 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
     }
   };
 
-  const renderTableHeader = (startWeek: number, endWeek: number) => {
+  const renderTableHeader = (
+    startWeek: number,
+    endWeek: number,
+    semester: 'first' | 'second',
+  ) => {
     const numWeeks = endWeek - startWeek + 1;
 
     return (
@@ -89,8 +93,14 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
             // Checking if the current week is within the Easter Break period
             const isEasterBreak =
-              (startWeek <= 9 && weekNumber >= 9 && weekNumber <= 11) ||
-              (startWeek > 15 && weekNumber >= 24 && weekNumber <= 26);
+              (semester === 'second' &&
+                startWeek <= 9 &&
+                weekNumber >= 9 &&
+                weekNumber <= 11) ||
+              (semester === 'second' &&
+                startWeek > 15 &&
+                weekNumber >= 24 &&
+                weekNumber <= 26);
 
             const weekLabel = isEasterBreak
               ? `Week ${weekNumber} (Easter Break)`
@@ -130,9 +140,25 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             </Td>
             {Array.from({ length: numWeeks }, (_, i) => {
               const weekNumber = startWeek + i;
-              const courseworkForWeek = module.courseworkList.filter(
-                (coursework) => coursework.deadlineWeek === weekNumber,
-              );
+
+              // Mapping logic for whole session modules in the second semester
+              let courseworkForWeek = [];
+              if (
+                semester === 'second' &&
+                module.moduleSetup.semester === 'whole session'
+              ) {
+                courseworkForWeek = module.courseworkList.filter(
+                  (coursework) => {
+                    const adjustedWeek = coursework.deadlineWeek - 15;
+                    return adjustedWeek === weekNumber;
+                  },
+                );
+              } else {
+                courseworkForWeek = module.courseworkList.filter(
+                  (coursework) => coursework.deadlineWeek === weekNumber,
+                );
+              }
+
               return (
                 <Td
                   key={i}
@@ -170,31 +196,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   };
 
   const renderTables = () => {
-    if (semester === 'wholeSession') {
-      return (
-        <>
-          <Heading size="md" mb={4}>
-            First Semester - {programme}
-          </Heading>
-          <Box width="100%" margin="0 auto">
-            <Table {...tableStyle} mb={8}>
-              {renderTableHeader(1, 15)}
-              {renderTableBody(1, 15)}
-            </Table>
-          </Box>
-
-          <Heading size="md" mb={4}>
-            Second Semester - {programme}
-          </Heading>
-          <Box width="100%" margin="0 auto">
-            <Table {...tableStyle}>
-              {renderTableHeader(1, 18)}
-              {renderTableBody(16, 33)}
-            </Table>
-          </Box>
-        </>
-      );
-    } else if (semester === 'first') {
+    if (semester === 'first') {
       return (
         <>
           <Heading size="md" mb={4}>
@@ -202,13 +204,14 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           </Heading>
           <Box width="100%" margin="0 auto">
             <Table {...tableStyle}>
-              {renderTableHeader(1, 15)}
+              {renderTableHeader(1, 15, 'first')}
               {renderTableBody(1, 15)}
             </Table>
           </Box>
         </>
       );
     } else {
+      // second semester
       return (
         <>
           <Heading size="md" mb={4}>
@@ -216,7 +219,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           </Heading>
           <Box width="100%" margin="0 auto">
             <Table {...tableStyle}>
-              {renderTableHeader(1, 18)}
+              {renderTableHeader(1, 18, 'second')}
               {renderTableBody(1, 18)}
             </Table>
           </Box>

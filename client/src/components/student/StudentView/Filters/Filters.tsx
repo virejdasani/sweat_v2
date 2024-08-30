@@ -45,6 +45,7 @@ const Filters: React.FC<FiltersProps> = ({
           onChange={(e) => setYear(e.value)}
           placeholder="Select Year"
           style={{ width: '100%', fontSize: '0.875rem', padding: '0.25rem' }}
+          scrollHeight="500px"
           panelClassName="custom-dropdown-panel"
         />
       </div>
@@ -67,6 +68,7 @@ const Filters: React.FC<FiltersProps> = ({
           onChange={(e) => setProgramme(e.value)}
           placeholder="Select Programme"
           style={{ width: '100%', fontSize: '0.875rem', padding: '0.25rem' }}
+          scrollHeight="500px"
           panelClassName="custom-dropdown-panel"
         />
       </div>
@@ -89,6 +91,7 @@ const Filters: React.FC<FiltersProps> = ({
           onChange={(e) => setSemester(e.value)}
           placeholder="Select Semester"
           style={{ width: '100%', fontSize: '0.875rem', padding: '0.25rem' }}
+          scrollHeight="500px"
           panelClassName="custom-dropdown-panel"
         />
       </div>

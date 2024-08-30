@@ -80,11 +80,12 @@ const getDistributions = async (req, res) => {
 
 const aggregateModuleData = async (req, res) => {
   try {
-    const { moduleCodes, studyStyle, ratio } = req.body;
+    const { moduleCodes, studyStyle, ratio, semester } = req.body;
     const result = await calculateAggregatedData(
       moduleCodes,
       studyStyle,
       ratio,
+      semester,
     );
 
     // Check if the result is empty or null and return an empty array

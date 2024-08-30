@@ -335,7 +335,12 @@ const calculateCompleteDistributions = (
   }
 };
 
-const calculateAggregatedData = async (moduleCodes, studyStyle, ratio) => {
+const calculateAggregatedData = async (
+  moduleCodes,
+  studyStyle,
+  ratio,
+  semester,
+) => {
   try {
     const modules = await Module.find({
       'moduleSetup.moduleCode': { $in: moduleCodes },
@@ -345,20 +350,38 @@ const calculateAggregatedData = async (moduleCodes, studyStyle, ratio) => {
 
     modules.forEach((module) => {
       const moduleCode = module.moduleSetup.moduleCode;
+      const moduleSemester = module.moduleSetup.semester;
 
       // Initialize the module's data in the aggregatedData object
       if (!aggregatedData[moduleCode]) {
         aggregatedData[moduleCode] = {};
       }
 
+      // Helper function to handle week adjustments based on semester
+      const adjustWeek = (week) => {
+        if (moduleSemester === 'whole session') {
+          if (semester === 'second' && week > 15) {
+            return week - 15; // Map weeks 16-33 to weeks 1-18 for the second semester
+          } else if (semester === 'first' && week <= 15) {
+            return week; // Use weeks 1-15 as-is for the first semester
+          }
+        } else if (moduleSemester === semester) {
+          return week; // Use week as-is if module's semester matches the requested semester
+        }
+        return null; // Week should not be considered for this semester
+      };
+
       // Step 1: Aggregate Teaching Schedule Distributions
       Object.values(module.teachingSchedule).forEach((schedule) => {
         if (schedule && schedule.distribution) {
           schedule.distribution.forEach(({ week, hours }) => {
-            if (!aggregatedData[moduleCode][week]) {
-              aggregatedData[moduleCode][week] = 0;
+            const adjustedWeek = adjustWeek(week);
+            if (adjustedWeek !== null) {
+              if (!aggregatedData[moduleCode][adjustedWeek]) {
+                aggregatedData[moduleCode][adjustedWeek] = 0;
+              }
+              aggregatedData[moduleCode][adjustedWeek] += hours;
             }
-            aggregatedData[moduleCode][week] += hours;
           });
         }
       });
@@ -380,10 +403,13 @@ const calculateAggregatedData = async (moduleCodes, studyStyle, ratio) => {
 
         if (relevantDistribution) {
           relevantDistribution.distribution.forEach(({ week, hours }) => {
-            if (!aggregatedData[moduleCode][week]) {
-              aggregatedData[moduleCode][week] = 0;
+            const adjustedWeek = adjustWeek(week);
+            if (adjustedWeek !== null) {
+              if (!aggregatedData[moduleCode][adjustedWeek]) {
+                aggregatedData[moduleCode][adjustedWeek] = 0;
+              }
+              aggregatedData[moduleCode][adjustedWeek] += hours;
             }
-            aggregatedData[moduleCode][week] += hours;
           });
         }
       });
@@ -395,24 +421,21 @@ const calculateAggregatedData = async (moduleCodes, studyStyle, ratio) => {
 
       if (privateStudyDistribution) {
         privateStudyDistribution.distribution.forEach(({ week, hours }) => {
-          if (!aggregatedData[moduleCode][week]) {
-            aggregatedData[moduleCode][week] = 0;
+          const adjustedWeek = adjustWeek(week);
+          if (adjustedWeek !== null) {
+            if (!aggregatedData[moduleCode][adjustedWeek]) {
+              aggregatedData[moduleCode][adjustedWeek] = 0;
+            }
+            aggregatedData[moduleCode][adjustedWeek] += hours;
           }
-          aggregatedData[moduleCode][week] += hours;
         });
       }
     });
 
-    // Convert aggregatedData into an array of objects suitable for the frontend
+    // Determine the maximum week number based on the semester
+    const maxWeek = semester === 'second' ? 18 : 15;
 
-    // Determine the maximum week number from the aggregated data
-    const maxWeek = Math.max(
-      ...moduleCodes.map((moduleCode) =>
-        Math.max(...Object.keys(aggregatedData[moduleCode]).map(Number)),
-      ),
-    );
-
-    // Generate the weeks array dynamically based on the data
+    // Generate the weeks array dynamically based on the maxWeek value
     const weeks = Array.from({ length: maxWeek }, (_, i) => i + 1);
 
     // Convert aggregatedData into an array of objects suitable for the frontend

@@ -77,13 +77,25 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     };
 
     const getLabel = (week: number) => {
+      let label = '';
+
+      if (semester === 'whole session') {
+        if (week <= 15) {
+          label = `S1 W${week}`;
+        } else {
+          label = `S2 W${week - 15}`;
+        }
+      }
+
       if (isReadingWeek(week)) {
-        return `${week} (Private Study Week)`;
+        label += ` (Private Study Week)`;
+      } else if (week >= 24 && week <= 26) {
+        label += ` (Easter Break Week ${week - 23})`;
+      } else if (!label) {
+        label = week.toString();
       }
-      if (week >= 24 && week <= 26) {
-        return `${week} (Easter Break Week ${week - 23})`;
-      }
-      return week.toString();
+
+      return label;
     };
 
     if (semester === 'second') {
@@ -117,13 +129,13 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
           options.push(
             <React.Fragment key="easterBreak1">
               <option key={24} value="24">
-                24 (Easter Break Week 1)
+                S2 W9 (Easter Break Week 1)
               </option>
               <option key={25} value="25">
-                25 (Easter Break Week 2)
+                S2 W10 (Easter Break Week 2)
               </option>
               <option key={26} value="26">
-                26 (Easter Break Week 3)
+                S2 W11 (Easter Break Week 3)
               </option>
             </React.Fragment>,
           );

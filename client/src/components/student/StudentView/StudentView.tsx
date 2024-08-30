@@ -165,9 +165,12 @@ const StudentView: React.FC = () => {
               readingWeeks={readingWeeks}
             />
             <Text fontSize="xx-large" fontWeight="bold" mb={6} color="teal.600">
-              Workload Graph
+              Simulated Workload
             </Text>
-            <StudentWorkloadGraph modules={filteredModules} />
+            <StudentWorkloadGraph
+              modules={filteredModules}
+              semester={semester}
+            />
           </>
         )}
         <Box mt={50}>

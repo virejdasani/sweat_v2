@@ -11,11 +11,11 @@ export const programmeOptions = [
   { label: 'MRS', value: 'MRS' },
   { label: 'EEE', value: 'EEE' },
   { label: 'EEEP', value: 'EEEP' },
-  { label: 'EEMS', value: 'EETW' },
+  { label: 'EEMS', value: 'EEMS' },
+  { label: 'EETW', value: 'EETW' },
 ];
 
 export const semesterOptions = [
   { label: 'First', value: 'first' },
   { label: 'Second', value: 'second' },
-  { label: 'Whole Session', value: 'wholeSession' },
 ];

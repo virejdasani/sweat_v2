@@ -132,31 +132,6 @@ const StudentView: React.FC = () => {
           setSemester={setSemester}
         />
 
-        <Box mb={6} mt={6}>
-          <Input
-            placeholder="Enter Calendar Version (e.g., CV1)"
-            value={currentVersion}
-            onChange={(e) => setCurrentVersion(e.target.value)}
-            mr={2}
-          />
-          <Button onClick={handleSetVersion} colorScheme="teal">
-            Set New Calendar Version
-          </Button>
-        </Box>
-
-        <Box mb={6}>
-          <Select
-            placeholder="View All Calendar Versions"
-            onChange={handleVersionChange}
-          >
-            {availableVersions.map((version) => (
-              <option key={version} value={version}>
-                {version}
-              </option>
-            ))}
-          </Select>
-        </Box>
-
         {loading ? (
           <Text>Loading modules...</Text>
         ) : error ? (

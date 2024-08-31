@@ -1,6 +1,6 @@
-// EditingStatus.tsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Button, Box, Text } from '@chakra-ui/react';
 
 const baseURL = import.meta.env.VITE_API_BASE_URL + 'settings/editing-status/';
 
@@ -40,15 +40,41 @@ const EditingStatus: React.FC = () => {
   };
 
   return (
-    <div>
-      <p>Editing is currently: {editingStatus ? 'Enabled' : 'Disabled'}</p>
-      <button onClick={handleLockEditing} disabled={!editingStatus}>
+    <Box
+      width="100%"
+      maxWidth="500px"
+      margin="0 auto"
+      padding="20px"
+      border="1px solid #e2e8f0"
+      borderRadius="8px"
+      boxShadow="0 4px 8px rgba(0, 0, 0, 0.1)"
+      backgroundColor="white"
+      textAlign="center"
+    >
+      <Text
+        fontSize="lg"
+        fontWeight="bold"
+        color={editingStatus ? 'green.500' : 'red.500'}
+        marginBottom="16px"
+      >
+        Editing is currently: {editingStatus ? 'Enabled' : 'Disabled'}
+      </Text>
+      <Button
+        colorScheme="red"
+        onClick={handleLockEditing}
+        disabled={!editingStatus}
+        marginRight="8px"
+      >
         Lock Editing
-      </button>
-      <button onClick={handleUnlockEditing} disabled={editingStatus}>
+      </Button>
+      <Button
+        colorScheme="green"
+        onClick={handleUnlockEditing}
+        disabled={editingStatus}
+      >
         Unlock Editing
-      </button>
-    </div>
+      </Button>
+    </Box>
   );
 };
 

@@ -18,7 +18,7 @@ const AdminSettings: React.FC = () => {
         <SetDefaultFormFactor onFormFactorChange={handleFormFactorChange} />
       </Box>
 
-      <Box>
+      <Box style={{ marginTop: '20px' }}>
         <EditingStatus />
       </Box>
     </Box>

@@ -16,6 +16,10 @@ export interface CourseworkCalendarProps {
   programme: string;
   modules: ModuleDocument[];
   readingWeeks?: number[] | { sem1: number[]; sem2: number[] };
+  // @ts-expect-error any type here works
+  semester1Start?;
+  // @ts-expect-error any type here works
+  semester2Start?;
 }
 
 export interface OptionType {

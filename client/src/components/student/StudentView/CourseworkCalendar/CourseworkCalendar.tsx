@@ -30,6 +30,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   programme,
   modules,
   readingWeeks,
+  semester1Start,
+  semester2Start,
 }) => {
   const [displayedModules, setDisplayedModules] =
     useState<ModuleDocument[]>(modules);
@@ -57,6 +59,30 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
       setSelectedModule(null); // Clear selection after adding
       setFilterText(''); // Clear the filter text
     }
+  };
+
+  const DAYS_OF_WEEK = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  // Function to get the date of a specific week and day in the semester
+  const getDateForWeekAndDay = (
+    semesterStart: Date,
+    week: number,
+    day: string,
+  ) => {
+    const startDate = new Date(semesterStart);
+    const dayOffset = DAYS_OF_WEEK.indexOf(day);
+    const date = new Date(
+      startDate.setDate(startDate.getDate() + (week - 1) * 7 + dayOffset),
+    );
+    return date;
   };
 
   const renderTableHeader = (
@@ -106,7 +132,13 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               ? `Week ${weekNumber} (Easter Break)`
               : isReadingWeek
                 ? `Week ${weekNumber} (Private Study Week)`
-                : `Week ${weekNumber}`;
+                : `Week ${weekNumber} ${getDateForWeekAndDay(
+                    semester === 'first' ? semester1Start : semester2Start,
+                    weekNumber,
+                    'Sunday',
+                  )
+                    .toLocaleDateString()
+                    .slice(0, -5)}`;
 
             return (
               <Th key={i} {...cellStyle} {...headerStyle}>

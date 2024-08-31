@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const programmeSchema = new mongoose.Schema({
   id: {
     type: String,
-    enum: ['CSEE', 'AVS', 'MCR', 'EEE'],
     required: true,
     unique: true,
   },

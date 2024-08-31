@@ -3,7 +3,7 @@ import { ApiError } from '../../../shared/api/types';
 import { ModuleDocument } from '../../../types/admin/CreateModule';
 
 export const fetchFilteredModules = async (
-  studyYear: number,
+  studyYear: number | undefined,
   programme: string,
   semester: string,
 ): Promise<ModuleDocument[]> => {
@@ -12,7 +12,7 @@ export const fetchFilteredModules = async (
       '/modules/filtered',
       {
         params: {
-          studyYear,
+          studyYear: studyYear !== undefined ? studyYear : undefined, // Pass studyYear only if it's defined
           programme,
           semester: semester === 'whole session' ? 'wholeSession' : semester,
         },

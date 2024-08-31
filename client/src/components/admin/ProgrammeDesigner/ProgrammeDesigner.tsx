@@ -25,6 +25,9 @@ import ModuleYearFilter from './ModuleFilters/YearFilter/YearFilter';
 import ModuleTypeFilter from './ModuleFilters/TypeFilter/TypeFilter';
 import { ModuleDocument } from '../../../types/admin/CreateModule';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+const baseURL = import.meta.env.VITE_API_BASE_URL + 'settings/editing-status/';
 
 function ProgrammeDesigner() {
   const [programmeState, setProgrammeState] = useState<Programme[]>([]);
@@ -35,12 +38,24 @@ function ProgrammeDesigner() {
     null,
   );
   const [moduleInstances, setModuleInstances] = useState<ModuleInstance[]>([]);
+  const [editingStatus, setEditingStatus] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData(setProgrammeState, setSearchResults, setModuleInstances);
+    fetchEditingStatus();
   }, []);
+
+  const fetchEditingStatus = async () => {
+    try {
+      const response = await axios.get(baseURL);
+      setEditingStatus(response.data.editingStatus);
+      console.log('Editing status:', response.data.editingStatus);
+    } catch (error) {
+      console.error('Error fetching editing status:', error);
+    }
+  };
 
   const { handleEditModule } = useModuleActions(
     moduleInstances,
@@ -52,6 +67,19 @@ function ProgrammeDesigner() {
   return (
     <>
       <div className="programme-designer">
+        {/* Disclaimer Section */}
+        {!editingStatus && (
+          <p style={{ color: '#Fa8072' }} className="disclaimer">
+            Editing has been disabled by the admin, this page is now read-only
+          </p>
+        )}
+
+        {editingStatus && (
+          <p style={{ color: 'gray' }} className="disclaimer">
+            Editing is currently enabled
+          </p>
+        )}
+
         <button
           className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
           onClick={() => {
@@ -154,7 +182,7 @@ function ProgrammeDesigner() {
                             >
                               <ModuleList
                                 modules={[mi.module]}
-                                programmeId={'null'} // No programme ID for the all modules box
+                                programmeId={'null'}
                                 moduleInstances={moduleInstances}
                                 setModuleInstances={setModuleInstances}
                                 programmeState={programmeState}
@@ -219,13 +247,25 @@ function ProgrammeDesigner() {
           </div>
         </DragDropContext>
         <div className="save-button-container">
-          <Button
-            colorScheme="blue"
-            onClick={(event) => handleSaveAllProgrammes(event, programmeState)}
-            className="save-programme-button"
-          >
-            Save All Programmes
-          </Button>
+          {editingStatus ? (
+            <Button
+              colorScheme="blue"
+              onClick={(event) =>
+                handleSaveAllProgrammes(event, programmeState)
+              }
+              className="save-programme-button"
+            >
+              Save All Programmes
+            </Button>
+          ) : (
+            <Button
+              colorScheme="red"
+              isDisabled
+              className="save-programme-button"
+            >
+              CANNOT EDIT
+            </Button>
+          )}
         </div>
       </div>
     </>

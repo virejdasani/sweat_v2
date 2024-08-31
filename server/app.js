@@ -81,6 +81,29 @@ app.post(
   settingsController.setDefaultFormFactor,
 );
 
+const editingStatusSchema = new mongoose.Schema({
+  editingStatus: { type: Boolean, default: true },
+});
+
+const EditingStatus = mongoose.model('EditingStatus', editingStatusSchema);
+
+// Endpoint to get the editing status
+app.get('/settings/editing-status', async (req, res) => {
+  const status = await EditingStatus.findOne({});
+  res.json(status);
+});
+
+// Endpoint to update the editing status
+app.put('/settings/editing-status', async (req, res) => {
+  const { editingStatus } = req.body;
+  const status = await EditingStatus.findOneAndUpdate(
+    {},
+    { editingStatus },
+    { new: true, upsert: true },
+  );
+  res.json(status);
+});
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGODB_URI)

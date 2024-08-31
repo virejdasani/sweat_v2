@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Heading } from '@chakra-ui/react';
 import SetDefaultFormFactor from './FormFactor/SetDefaultFormFactor';
 import adminSettingsStyles from './adminSettingsStyles';
+import EditingStatus from './EditingStatus';
 
 const AdminSettings: React.FC = () => {
   const handleFormFactorChange = (value: number) => {
@@ -15,6 +16,10 @@ const AdminSettings: React.FC = () => {
       </Heading>
       <Box style={adminSettingsStyles.formFactorContainer}>
         <SetDefaultFormFactor onFormFactorChange={handleFormFactorChange} />
+      </Box>
+
+      <Box>
+        <EditingStatus />
       </Box>
     </Box>
   );

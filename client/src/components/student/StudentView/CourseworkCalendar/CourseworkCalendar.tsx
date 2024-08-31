@@ -131,17 +131,30 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             const weekLabel = isEasterBreak
               ? `Week ${weekNumber} (Easter Break)`
               : isReadingWeek
-                ? `Week ${weekNumber} (Private Study Week)`
-                : `Week ${weekNumber} ${getDateForWeekAndDay(
+                ? `Week ${weekNumber} (Private Study Week) (${getDateForWeekAndDay(
                     semester === 'first' ? semester1Start : semester2Start,
                     weekNumber,
                     'Sunday',
                   )
                     .toLocaleDateString()
-                    .slice(0, -5)}`;
-
+                    .slice(0, -5)})`
+                : `Week ${weekNumber} (${getDateForWeekAndDay(
+                    semester === 'first' ? semester1Start : semester2Start,
+                    weekNumber,
+                    'Sunday',
+                  )
+                    .toLocaleDateString()
+                    .slice(0, -5)})`;
             return (
-              <Th key={i} {...cellStyle} {...headerStyle}>
+              <Th
+                key={i}
+                {...cellStyle}
+                {...headerStyle}
+                style={{
+                  whiteSpace: 'nowrap',
+                  minWidth: '150px',
+                }}
+              >
                 {weekLabel}
               </Th>
             );

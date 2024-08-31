@@ -32,8 +32,22 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
   templateData,
   setTemplateData,
   editingScheduleData,
-  readingWeeks,
 }) => {
+  // Define readingWeeks based on the selected semester
+  const readingWeeks = (() => {
+    if (semester === 'first') {
+      return [7]; // Week 7 is a reading week for the first semester
+    } else if (semester === 'second') {
+      return []; // No reading weeks for the second semester
+    } else if (semester === 'whole session') {
+      return {
+        sem1: [7], // Week 7 is a reading week for the first semester
+        sem2: [], // No reading weeks in the second semester
+      };
+    }
+    return [];
+  })();
+
   useEffect(() => {
     const fetchData = async () => {
       if (editingScheduleData) {
@@ -46,11 +60,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
         await fetchTemplateData(moduleCredit, semester, setTemplateData);
       }
 
-      if (
-        templateData.length > 0 &&
-        readingWeeks &&
-        (Array.isArray(readingWeeks) || typeof readingWeeks === 'object')
-      ) {
+      if (templateData.length > 0 && readingWeeks) {
         const transformedData = updateTemplateDataForReadingWeek(
           templateData,
           readingWeeks,
@@ -78,7 +88,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
         <Tr>
           <Th sx={headerStyle}></Th>
           {Array.from({ length: numWeeks }, (_, i) => {
-            const weekNumber = isSecondSemester ? i + 1 : i + 1;
+            const weekNumber = i + 1;
             const isReadingWeek = Array.isArray(readingWeeks)
               ? readingWeeks.includes(weekNumber)
               : semester === 'whole session'
@@ -128,9 +138,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
           <Td sx={headerStyle}>{row}</Td>
           {(templateData[tableIndex]?.[rowIndex] || []).map(
             (value, colIndex) => {
-              const adjustedWeekIndex = isSecondSemester
-                ? colIndex + 1
-                : colIndex + 1;
+              const adjustedWeekIndex = colIndex + 1;
               const isReadingWeek = Array.isArray(readingWeeks)
                 ? readingWeeks.includes(adjustedWeekIndex)
                 : semester === 'whole session'

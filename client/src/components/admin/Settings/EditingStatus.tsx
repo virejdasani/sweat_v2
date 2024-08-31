@@ -51,29 +51,21 @@ const EditingStatus: React.FC = () => {
       backgroundColor="white"
       textAlign="center"
     >
-      <Text
-        fontSize="lg"
-        fontWeight="bold"
-        color={editingStatus ? 'green.500' : 'red.500'}
-        marginBottom="16px"
-      >
-        Editing is currently: {editingStatus ? 'Enabled' : 'Disabled'}
+      <Text fontSize="lg" fontWeight="bold" marginBottom="10px">
+        Editing Status
       </Text>
-      <Button
-        colorScheme="red"
-        onClick={handleLockEditing}
-        disabled={!editingStatus}
-        marginRight="8px"
-      >
-        Lock Editing
-      </Button>
-      <Button
-        colorScheme="green"
-        onClick={handleUnlockEditing}
-        disabled={editingStatus}
-      >
-        Unlock Editing
-      </Button>
+      <Text marginBottom="20px">
+        Editing is currently {editingStatus ? 'enabled' : 'disabled'}
+      </Text>
+      {editingStatus ? (
+        <Button colorScheme="red" onClick={handleLockEditing}>
+          Lock Editing
+        </Button>
+      ) : (
+        <Button colorScheme="green" onClick={handleUnlockEditing}>
+          Unlock Editing
+        </Button>
+      )}
     </Box>
   );
 };

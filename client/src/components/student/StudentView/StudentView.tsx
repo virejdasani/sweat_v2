@@ -26,7 +26,14 @@ const StudentView: React.FC = () => {
       setError(null);
 
       try {
-        const data = await fetchFilteredModules(year, programme, semester);
+        // Programmes for which the year should be ignored
+        const programmesToIgnoreYear = ['EEEP', 'EEMS', 'EETW'];
+
+        const data = await fetchFilteredModules(
+          programmesToIgnoreYear.includes(programme) ? undefined : year,
+          programme,
+          semester,
+        );
         setModules(data);
         if (data.length === 0) {
           setError('No modules found');

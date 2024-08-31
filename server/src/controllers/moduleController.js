@@ -220,10 +220,10 @@ const getFilteredModules = async (req, res) => {
       };
     });
 
-    // Respond with the filtered modules
-    res.json(filteredModules);
+    res.status(200).json(filteredModules);
   } catch (error) {
-    handleError(res, error);
+    console.error('Error fetching filtered modules:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

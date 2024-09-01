@@ -6,13 +6,13 @@ export const yearOptions = [
 ];
 
 export const programmeOptions = [
-  { label: 'CSEE', value: 'CSEE' },
-  { label: 'AVS', value: 'AVS' },
-  { label: 'MRS', value: 'MRS' },
-  { label: 'EEE', value: 'EEE' },
-  { label: 'EEEP', value: 'EEEP' },
-  { label: 'EEMS', value: 'EEMS' },
-  { label: 'EETW', value: 'EETW' },
+  { label: 'Computer Science and Elec Eng', value: 'CSEE' },
+  { label: 'Avionic Systems', value: 'AVS' },
+  { label: 'Mechatronic and Robotic Systems', value: 'MRS' },
+  { label: 'Electrical Engineering and Electronics', value: 'EEE' },
+  { label: 'Energy and Power Systems', value: 'EEEP' },
+  { label: 'Microelectronic Systems', value: 'EEMS' },
+  { label: 'Telecommunications and Wireless Systems', value: 'EETW' },
 ];
 
 export const semesterOptions = [

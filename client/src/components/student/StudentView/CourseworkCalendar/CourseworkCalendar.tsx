@@ -24,6 +24,9 @@ import {
   tableStyle,
 } from './CourseworkCalendar.styles';
 import { CourseworkCalendarProps } from '../../../../types/student/StudentView';
+import axios from 'axios';
+
+const baseURL = import.meta.env.VITE_API_BASE_URL + 'settings/editing-status/';
 
 const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   semester,
@@ -37,10 +40,22 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
     useState<ModuleDocument[]>(modules);
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [filterText, setFilterText] = useState<string>('');
+  const [editingStatus, setEditingStatus] = useState<boolean>(false);
 
   useEffect(() => {
     setDisplayedModules(modules);
+    fetchEditingStatus();
   }, [modules]);
+
+  const fetchEditingStatus = async () => {
+    try {
+      const response = await axios.get(baseURL);
+      setEditingStatus(response.data.editingStatus);
+      console.log('Editing status:', response.data.editingStatus);
+    } catch (error) {
+      console.error('Error fetching editing status:', error);
+    }
+  };
 
   const removeModule = (moduleCode: string) => {
     setDisplayedModules(
@@ -71,7 +86,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
     'Saturday',
   ];
 
-  // Function to get the date of a specific week and day in the semester
   const getDateForWeekAndDay = (
     semesterStart: Date,
     week: number,
@@ -101,7 +115,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           {Array.from({ length: numWeeks }, (_, i) => {
             const weekNumber = startWeek + i;
 
-            // Handling reading weeks based on the type of semester
             let isReadingWeek = false;
             if (Array.isArray(readingWeeks)) {
               isReadingWeek = readingWeeks.includes(weekNumber);
@@ -117,7 +130,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               }
             }
 
-            // Checking if the current week is within the Easter Break period
             const isEasterBreak =
               (semester === 'second' &&
                 startWeek <= 9 &&
@@ -186,7 +198,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             {Array.from({ length: numWeeks }, (_, i) => {
               const weekNumber = startWeek + i;
 
-              // Mapping logic for whole session modules in the second semester
               let courseworkForWeek = [];
               if (
                 semester === 'second' &&
@@ -261,7 +272,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
         </>
       );
     } else {
-      // second semester
       return (
         <>
           <Heading size="md" mb={4}>
@@ -280,6 +290,26 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
   return (
     <Box width="90%" overflowX="auto">
+      {/* Display the draft message if editingStatus is true */}
+      {editingStatus && (
+        <Text
+          color="red"
+          fontSize="lg"
+          mb={4}
+          mt={14}
+          fontWeight="bold"
+          textAlign="center"
+        >
+          This is a draft and is subject to changes.
+        </Text>
+      )}
+
+      {/* {!editingStatus && (
+        <Text color="green.500" fontSize="lg" mb={4} fontWeight="bold">
+          This is the final version.
+        </Text>
+      )} */}
+
       <Box mb={4} maxWidth="200px">
         <Dropdown
           value={selectedModule}

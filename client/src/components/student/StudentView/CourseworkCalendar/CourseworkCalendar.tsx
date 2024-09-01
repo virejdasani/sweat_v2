@@ -162,10 +162,12 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                 key={i}
                 {...cellStyle}
                 {...headerStyle}
-                style={{
-                  whiteSpace: 'nowrap',
-                  minWidth: '150px',
-                }}
+                style={
+                  {
+                    // whiteSpace: 'nowrap',
+                    // minWidth: '10px',
+                  }
+                }
               >
                 {weekLabel}
               </Th>
@@ -225,7 +227,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                   key={i}
                   textAlign="center"
                   py={1}
-                  whiteSpace="nowrap"
+                  // whiteSpace="nowrap"
                   {...cellStyle}
                 >
                   {courseworkForWeek.length > 0 && (

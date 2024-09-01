@@ -1,0 +1,25 @@
+.footer {
+    background-color: #0a0a94;
+    color: #fff;
+    padding: 10px 20px; 
+    text-align: left;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 22px;
+    z-index: 1000;
+    height: 45px;
+}
+
+.footer::before {
+    content: " ";
+    display: block;
+    height: 2px;
+    background-color: #fff;
+    position: absolute;
+    top: 10px;
+    left: 20px; 
+    right: auto;
+    width: 97%;  
+}

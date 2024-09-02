@@ -114,7 +114,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           </Th>
           {Array.from({ length: numWeeks }, (_, i) => {
             const weekNumber = startWeek + i;
-            let displayWeekNumber = weekNumber;
+            let displayWeekNumber = weekNumber.toString();
 
             // Adjust week numbers based on the provided rules
             if (semester === 'second') {
@@ -122,7 +122,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               else if (weekNumber === 10) displayWeekNumber = 'E2';
               else if (weekNumber === 11) displayWeekNumber = 'E3';
               else if (weekNumber >= 12 && weekNumber <= 18) {
-                displayWeekNumber = weekNumber - 3;
+                displayWeekNumber = (weekNumber - 3).toString();
               }
             }
 
@@ -192,7 +192,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             </Td>
             {Array.from({ length: numWeeks }, (_, i) => {
               const weekNumber = startWeek + i;
-              let displayWeekNumber = weekNumber;
+              let displayWeekNumber = weekNumber.toString();
 
               // Adjust week numbers based on the provided rules
               if (semester === 'second') {
@@ -200,7 +200,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                 else if (weekNumber === 10) displayWeekNumber = 'E2';
                 else if (weekNumber === 11) displayWeekNumber = 'E3';
                 else if (weekNumber >= 12 && weekNumber <= 18) {
-                  displayWeekNumber = weekNumber - 3;
+                  displayWeekNumber = (weekNumber - 3).toString();
                 }
               }
 

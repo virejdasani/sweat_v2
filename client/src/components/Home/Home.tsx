@@ -154,6 +154,22 @@ const Home = () => {
           </Link>
         </div>
       </div>
+      <div 
+        style={{
+          position: 'fixed' as 'fixed',
+          bottom: '10px',
+          right: '10px',
+          backgroundColor: '#ff0000',
+          color: 'white',
+          padding: '5px 10px',
+          borderRadius: '5px',
+          fontSize: '14px',
+          fontWeight: 'bold' as 'bold',
+          zIndex: '1000',
+        }}
+      >
+        BETA
+      </div>
     </div>
   );
 };

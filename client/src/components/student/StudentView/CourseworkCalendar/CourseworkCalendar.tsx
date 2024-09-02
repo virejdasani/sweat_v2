@@ -107,13 +107,18 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
     const numWeeks = endWeek - startWeek + 1;
 
     return (
-      <Thead bg="gray.50">
+      <Thead bg="">
         <Tr>
           <Th {...cellStyle} {...headerStyle}>
             Module Code
           </Th>
           {Array.from({ length: numWeeks }, (_, i) => {
             const weekNumber = startWeek + i;
+
+            // Skip columns 14 and 15
+            if (weekNumber === 14 || weekNumber === 15) {
+              return null;
+            }
 
             let isReadingWeek = false;
             if (Array.isArray(readingWeeks)) {
@@ -162,12 +167,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                 key={i}
                 {...cellStyle}
                 {...headerStyle}
-                style={
-                  {
-                    // whiteSpace: 'nowrap',
-                    // minWidth: '10px',
-                  }
-                }
+                style={{
+                  backgroundColor: weekNumber === 13 ? '#c9c9c9' : '',
+                }}
               >
                 {weekLabel}
               </Th>
@@ -200,6 +202,11 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             {Array.from({ length: numWeeks }, (_, i) => {
               const weekNumber = startWeek + i;
 
+              // Skip columns 14 and 15
+              if (weekNumber === 14 || weekNumber === 15) {
+                return null;
+              }
+
               let courseworkForWeek = [];
               if (
                 semester === 'second' &&
@@ -230,6 +237,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                   textAlign="center"
                   py={1}
                   // whiteSpace="nowrap"
+                  style={{
+                    backgroundColor: weekNumber === 13 ? '#c9c9c9' : '',
+                  }}
                   {...cellStyle}
                 >
                   {courseworkForWeek.length > 0 && (
@@ -238,7 +248,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                         <Text
                           key={coursework.shortTitle}
                           fontSize="sm"
-                          bg="teal.100"
                           p={1}
                           borderRadius="md"
                           width="100%"
@@ -307,12 +316,6 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           This is a draft and is subject to changes.
         </Text>
       )}
-
-      {/* {!editingStatus && (
-        <Text color="green.500" fontSize="lg" mb={4} fontWeight="bold">
-          This is the final version.
-        </Text>
-      )} */}
 
       <Box mb={4} maxWidth="200px">
         <Dropdown

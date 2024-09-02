@@ -32,7 +32,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   semester,
   programme,
   modules,
-  readingWeeks,
+  // readingWeeks,
   semester1Start,
   semester2Start,
 }) => {
@@ -203,6 +203,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                   displayWeekNumber = (weekNumber - 3).toString();
                 }
               }
+
+              console.log(displayWeekNumber);
 
               // Logic for Semester 1
               if (semester === 'first') {

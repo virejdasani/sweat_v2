@@ -110,7 +110,14 @@ const StudentView: React.FC = () => {
   return (
     <Box p={4} bg="gray.100" minHeight="100vh">
       <Flex justifyContent="center" alignItems="center" direction="column">
-        <Text fontSize="xxx-large" fontWeight="bold" mb={6} color="teal.600">
+        <Text
+          fontSize="xxx-large"
+          fontWeight="bold"
+          mb={6}
+          color="teal.600"
+          padding="40px"
+          textAlign={'center'}
+        >
           Coursework Calendar
         </Text>
 

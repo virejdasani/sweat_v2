@@ -44,11 +44,11 @@ const About = () => {
             <h2>Meet the team</h2>
             <ul>
               <li>
-                <a href="http://https%3A%2F%2Fwww.liverpool.ac.uk%2Felectrical-engineering-and-electronics%2Fstaff%2Fwaleed-al-nuaimy%2F&usg=AOvVaw0ujNrvc3PSg_Csqzrw4etY&opi=89978449">Waleed Al-Nuaimy</a> – Department of Electrical Engineering and
+                <a href="https://www.liverpool.ac.uk/electrical-engineering-and-electronics/staff/waleed-al-nuaimy/">Waleed Al-Nuaimy</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>
-                <a href="https://uk.linkedin.com/in/lee-devlin-08495351?original_referer=https%3A%2F%2Fwww.google.com%2F"></a>Lee Devlin – Department of Electrical Engineering and
+                <a href="https://uk.linkedin.com/in/lee-devlin-08495351?original_referer=https%3A%2F%2Fwww.google.com%2F">Lee Devlin</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>
@@ -76,7 +76,7 @@ const About = () => {
                 in 2024-25.
               </li>
               <li>
-                Rahul Manikandan – EEE MSc student in 2024, worked with the team
+                <a href="https://www.linkedin.com/in/rahul-manikandan-4160351b8?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app">Rahul Manikandan</a> – EEE MSc student in 2024, worked with the team
                 on some key enhancements and refinements of the portal
                 appearance and functionality.
               </li>

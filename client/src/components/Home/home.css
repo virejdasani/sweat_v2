@@ -2,6 +2,8 @@
 .buttonContainer {
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
+  /* Ensure buttons wrap to new lines if needed */
   margin-top: 100px;
 }
 
@@ -11,17 +13,30 @@
   border-radius: 50%;
   background-color: white;
   margin: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonContainer .buttonImage {
+  width: 100px;
+  /* Adjust as needed */
+  height: 100px;
+  /* Adjust as needed */
+  border-radius: 50%;
 }
 
 /* Styles for mobile view */
 @media (max-width: 768px) {
   .buttonContainer {
-    display: block;
-    text-align: center;
+    flex-direction: column;
+    /* Stack buttons vertically on smaller screens */
+    align-items: center;
+    margin-top: 20px;
   }
 
   .buttonContainer .button {
-    margin: 20px auto;
+    margin: 10px 0;
   }
 }
 
@@ -58,6 +73,25 @@
 }
 
 .linkContainer {
-  display: flex;
-  flex-direction: row;
+  position: relative;
+  margin: 1rem;
+}
+
+.linkContainer a {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px 20px;
+  background-color: #0a0a94;
+  color: white;
+  text-decoration: none;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.linkContainer a:hover {
+  background-color: #1a1a99;
 }

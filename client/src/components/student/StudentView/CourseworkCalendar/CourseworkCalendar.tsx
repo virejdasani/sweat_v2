@@ -114,61 +114,52 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           </Th>
           {Array.from({ length: numWeeks }, (_, i) => {
             const weekNumber = startWeek + i;
+            let displayWeekNumber = weekNumber;
 
-            // Skip columns 14 and 15
-            if (weekNumber === 14 || weekNumber === 15) {
-              return null;
-            }
-
-            let isReadingWeek = false;
-            if (Array.isArray(readingWeeks)) {
-              isReadingWeek = readingWeeks.includes(weekNumber);
-            } else if (
-              typeof readingWeeks === 'object' &&
-              readingWeeks.sem1 &&
-              readingWeeks.sem2
-            ) {
-              if (startWeek <= 15) {
-                isReadingWeek = readingWeeks.sem1.includes(weekNumber);
-              } else {
-                isReadingWeek = readingWeeks.sem2.includes(weekNumber);
+            // Adjust week numbers based on the provided rules
+            if (semester === 'second') {
+              if (weekNumber === 9) displayWeekNumber = 'E1';
+              else if (weekNumber === 10) displayWeekNumber = 'E2';
+              else if (weekNumber === 11) displayWeekNumber = 'E3';
+              else if (weekNumber >= 12 && weekNumber <= 18) {
+                displayWeekNumber = weekNumber - 3;
               }
             }
 
-            const isEasterBreak =
-              (semester === 'second' &&
-                startWeek <= 9 &&
-                weekNumber >= 9 &&
-                weekNumber <= 11) ||
-              (semester === 'second' &&
-                startWeek > 15 &&
-                weekNumber >= 24 &&
-                weekNumber <= 26);
+            // Logic for Semester 1
+            if (semester === 'first') {
+              if (weekNumber === 14 || weekNumber === 15) {
+                return null; // Hide weeks 14 and 15
+              }
+            }
 
-            const weekLabel = isEasterBreak
-              ? `Week ${weekNumber} (Easter Break)`
-              : isReadingWeek
-                ? `Week ${weekNumber} (Private Study Week) (${getDateForWeekAndDay(
-                    semester === 'first' ? semester1Start : semester2Start,
-                    weekNumber,
-                    'Sunday',
-                  )
-                    .toLocaleDateString()
-                    .slice(0, -5)})`
-                : `Week ${weekNumber} (${getDateForWeekAndDay(
-                    semester === 'first' ? semester1Start : semester2Start,
-                    weekNumber,
-                    'Sunday',
-                  )
-                    .toLocaleDateString()
-                    .slice(0, -5)})`;
+            if (semester === 'second' && weekNumber > 16) {
+              return null;
+            }
+
+            const grayOutWeek =
+              (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
+              (semester === 'second' &&
+                (weekNumber === 9 ||
+                  weekNumber === 10 ||
+                  weekNumber === 11 ||
+                  weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
+
+            const weekLabel = `Week ${displayWeekNumber} (${getDateForWeekAndDay(
+              semester === 'first' ? semester1Start : semester2Start,
+              weekNumber,
+              'Sunday',
+            )
+              .toLocaleDateString()
+              .slice(0, -5)})`;
+
             return (
               <Th
                 key={i}
                 {...cellStyle}
                 {...headerStyle}
                 style={{
-                  backgroundColor: weekNumber === 13 ? '#c9c9c9' : '',
+                  backgroundColor: grayOutWeek ? '#c9c9c9' : '', // Gray out the specified weeks
                 }}
               >
                 {weekLabel}
@@ -201,11 +192,36 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             </Td>
             {Array.from({ length: numWeeks }, (_, i) => {
               const weekNumber = startWeek + i;
+              let displayWeekNumber = weekNumber;
 
-              // Skip columns 14 and 15
-              if (weekNumber === 14 || weekNumber === 15) {
+              // Adjust week numbers based on the provided rules
+              if (semester === 'second') {
+                if (weekNumber === 9) displayWeekNumber = 'E1';
+                else if (weekNumber === 10) displayWeekNumber = 'E2';
+                else if (weekNumber === 11) displayWeekNumber = 'E3';
+                else if (weekNumber >= 12 && weekNumber <= 18) {
+                  displayWeekNumber = weekNumber - 3;
+                }
+              }
+
+              // Logic for Semester 1
+              if (semester === 'first') {
+                if (weekNumber === 14 || weekNumber === 15) {
+                  return null; // Hide weeks 14 and 15
+                }
+              }
+
+              if (semester === 'second' && weekNumber > 16) {
                 return null;
               }
+
+              const grayOutWeek =
+                (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
+                (semester === 'second' &&
+                  (weekNumber === 9 ||
+                    weekNumber === 10 ||
+                    weekNumber === 11 ||
+                    weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
 
               let courseworkForWeek = [];
               if (
@@ -236,9 +252,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                   key={i}
                   textAlign="center"
                   py={1}
-                  // whiteSpace="nowrap"
                   style={{
-                    backgroundColor: weekNumber === 13 ? '#c9c9c9' : '',
+                    backgroundColor: grayOutWeek ? '#c9c9c9' : '', // Gray out the specified weeks
                   }}
                   {...cellStyle}
                 >

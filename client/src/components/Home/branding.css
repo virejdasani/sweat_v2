@@ -26,9 +26,9 @@
 }
 
 .about {
-  position: absolute;
+  /* position: absolute;
   top: 0px;
-  left: 120px;
+  left: 120px; */
 }
 
 /* Responsive styles */
@@ -49,8 +49,8 @@
   }
 
   .about {
-    position: absolute;
+    /* position: absolute;
     top: -20px;
-    left: 120px;
+    left: 120px; */
   }
 }

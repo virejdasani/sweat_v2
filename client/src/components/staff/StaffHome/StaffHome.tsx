@@ -113,18 +113,13 @@ const StaffHome = () => {
               <Link to="/admin/set-key-dates">Set Key Dates</Link>
             </div>
             <div className="linkContainer">
-              <Link to="/coursework-calendar">
-                Coursework Calendar (for testing)
-              </Link>
-            </div>
-            <div className="linkContainer">
-              <Link to="/admin/programme-design">Programme Design</Link>
+              <Link to="/admin/programme-design">Modules</Link>
             </div>
             <div className="linkContainer">
               <Link to="/academic-event-calendar">Academic Event Calendar</Link>
             </div>
             <div className="linkContainer">
-              <Link to="/Graph">Workload Profiles</Link>
+              <Link to="/student">Workload Profiles</Link>
             </div>
           </div>
         </>

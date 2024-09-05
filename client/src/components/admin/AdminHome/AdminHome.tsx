@@ -98,12 +98,7 @@ const AdminHome = () => {
         >
           <div className="linkContainer mt-50">
             <Link to="/admin/set-key-dates">
-              Set Key Dates (Admin access only)
-            </Link>
-          </div>
-          <div className="linkContainer">
-            <Link to="/coursework-calendar">
-              Coursework Calendar (for testing)
+              Set Key Dates
             </Link>
           </div>
           <div className="linkContainer">
@@ -116,13 +111,27 @@ const AdminHome = () => {
             <Link to="/academic-event-calendar">Academic Event Calendar</Link>
           </div>
           <div className="linkContainer">
-            <Link to="/Graph">Workload Profiles</Link>
+            <Link to="/student">Workload Profiles</Link>
           </div>
           <div className="linkContainer">
             <Link to="/admin/settings">Settings</Link>
           </div>
         </div>
       )}
+      <div style={{
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        backgroundColor: '#ff0000',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        zIndex: '1000',
+      }}>
+        BETA
+      </div>
     </div>
   );
 };

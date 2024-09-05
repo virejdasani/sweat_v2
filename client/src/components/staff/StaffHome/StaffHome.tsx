@@ -98,13 +98,6 @@ const StaffHome = () => {
             </select>
           </div>
 
-          <div>
-            <label>Calendar Version: </label>
-            {/* Dropdown for selecting calendar version */}
-            <select className="mb-4">
-              <option value="CV1">CV1</option>
-            </select>
-          </div>
           <div
             className="makeResponsiveScrollable"
             style={{

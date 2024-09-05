@@ -1,0 +1,56 @@
+/* Container for the logos */
+.branding-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  position: relative;
+}
+
+/* Styles for the main logo */
+.logo {
+  width: 150px;
+  height: auto;
+  /* Maintain aspect ratio */
+  margin-left: auto;
+  /* Center horizontally */
+  margin-right: auto;
+  /* Center horizontally */
+}
+
+/* Styles for the university logo */
+.uniLogo {
+  width: 300px;
+  height: auto;
+  /* Maintain aspect ratio */
+}
+
+.about {
+  /* position: absolute;
+  top: 0px;
+  left: 120px; */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .branding-container {
+    /* flex-direction: column; */
+    align-items: center;
+  }
+
+  .logo {
+    width: 120px;
+    /* Adjust logo size for smaller screens */
+  }
+
+  .uniLogo {
+    width: 250px;
+    /* Adjust university logo size for smaller screens */
+  }
+
+  .about {
+    /* position: absolute;
+    top: -20px;
+    left: 120px; */
+  }
+}

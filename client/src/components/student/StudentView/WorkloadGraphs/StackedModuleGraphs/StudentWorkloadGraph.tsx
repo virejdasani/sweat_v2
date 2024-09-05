@@ -91,7 +91,18 @@ const StudentWorkloadGraph: React.FC<StudentWorkloadGraphProps> = ({
       studyStyle,
       ratio,
       semester, // Pass semester to fetchAggregatedData
-      setData,
+      (fetchedData: AggregatedData[]) => {
+        // Filter the data based on the semester
+        let filteredData;
+        if (semester === 'first') {
+          filteredData = fetchedData.slice(0, 12); // Show weeks 1-12
+        } else if (semester === 'second') {
+          filteredData = fetchedData.slice(0, 15); // Show weeks 1-15
+        } else {
+          filteredData = fetchedData; // For whole session or others, show all
+        }
+        setData(filteredData);
+      },
       lineColors,
       setLineColors,
     );

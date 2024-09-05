@@ -96,7 +96,7 @@ const AdminHome = () => {
             gap: '10px',
           }}
         >
-          <div className="linkContainer">
+          <div className="linkContainer mt-50">
             <Link to="/admin/set-key-dates">
               Set Key Dates (Admin access only)
             </Link>

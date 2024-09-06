@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Table,
@@ -33,6 +33,8 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
   setTemplateData,
   editingScheduleData,
 }) => {
+  const [isDataInitialized, setIsDataInitialized] = useState(false); // New flag to prevent re-initialization
+
   // Define readingWeeks based on the selected semester
   const readingWeeks = (() => {
     if (semester === 'first') {
@@ -50,33 +52,38 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      if (editingScheduleData) {
-        const transformedData = transformEditingDataToTemplateData(
-          editingScheduleData,
-          semester as 'first' | 'second' | 'whole session',
-        );
-        setTemplateData(transformedData);
-      } else if (templateData.length === 0) {
-        await fetchTemplateData(moduleCredit, semester, setTemplateData);
-      }
+      if (!isDataInitialized) {
+        if (editingScheduleData) {
+          const transformedData = transformEditingDataToTemplateData(
+            editingScheduleData,
+            semester as 'first' | 'second' | 'whole session',
+          );
+          setTemplateData(transformedData);
 
-      if (templateData.length > 0 && readingWeeks) {
-        const transformedData = updateTemplateDataForReadingWeek(
-          templateData,
-          readingWeeks,
-        );
-        setTemplateData(transformedData);
+          // Apply reading week adjustments if necessary
+          if (readingWeeks) {
+            const updatedDataWithReadingWeeks =
+              updateTemplateDataForReadingWeek(transformedData, readingWeeks);
+            setTemplateData(updatedDataWithReadingWeeks);
+          }
+        } else if (templateData.length === 0) {
+          // Only fetch the template data if no data exists
+          await fetchTemplateData(moduleCredit, semester, setTemplateData);
+        }
+
+        setIsDataInitialized(true); // Mark data as initialized
       }
     };
+
+    // Fetch data only when the component mounts and not on every re-render
     fetchData();
   }, [
     moduleCredit,
     semester,
     setTemplateData,
     editingScheduleData,
-    templateData.length,
     readingWeeks,
-    templateData,
+    isDataInitialized, // Ensure it only runs once
   ]);
 
   const renderTableHeader = (isSecondSemester = false) => {
@@ -154,7 +161,7 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
                 <Td key={colIndex} sx={rowStyle}>
                   <Input
                     type="number"
-                    value={value}
+                    value={isReadingWeek ? 0 : isNaN(value) ? '' : value} // Keep reading weeks at 0, allow empty string for NaN (backspacing)
                     onChange={(e) =>
                       handleInputChange(
                         tableIndex,
@@ -163,12 +170,13 @@ const TeachingSchedule: React.FC<TeachingScheduleProps> = ({
                         e.target.value,
                         templateData,
                         setTemplateData,
+                        isReadingWeek, // Pass whether it's a reading week
                       )
                     }
                     {...inputStyle}
-                    sx={isReadingWeek ? greyedOutInputStyle : {}}
+                    sx={isReadingWeek ? greyedOutInputStyle : {}} // Grey out input for reading week
                     as="input"
-                    disabled={isReadingWeek}
+                    disabled={isReadingWeek} // Disable input during reading week
                   />
                 </Td>
               );

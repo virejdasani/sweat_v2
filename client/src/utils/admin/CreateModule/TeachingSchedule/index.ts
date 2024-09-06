@@ -241,12 +241,47 @@ export const handleInputChange = (
   tableIndex: number,
   rowIndex: number,
   colIndex: number,
-  value: string,
+  value: string, // Keep value as a string
   templateData: number[][][],
   setTemplateData: (data: number[][][]) => void,
+  isReadingWeek: boolean, // Pass whether it's a reading week
 ) => {
+  // Create a deep copy of templateData to ensure immutability
   const updatedData = [...templateData];
-  updatedData[tableIndex][rowIndex][colIndex] = parseInt(value);
+
+  // If it's a reading week, force the value to be 0
+  if (isReadingWeek) {
+    updatedData[tableIndex][rowIndex][colIndex] = 0;
+    setTemplateData(updatedData);
+    return;
+  }
+
+  // Allow empty string for backspacing (for UI purposes)
+  if (value === '') {
+    // Ensure row and column are properly initialized before assignment
+    if (!updatedData[tableIndex]) updatedData[tableIndex] = [];
+    if (!updatedData[tableIndex][rowIndex])
+      updatedData[tableIndex][rowIndex] = [];
+
+    // Temporarily hold an empty string (don't update the underlying data yet)
+    updatedData[tableIndex][rowIndex][colIndex] = NaN; // Store NaN temporarily, which we'll ignore in display
+    setTemplateData(updatedData);
+    return;
+  }
+
+  // Parse the input value into a number once it’s no longer an empty string
+  const parsedValue = parseInt(value);
+  if (isNaN(parsedValue)) return; // Don't update if the value isn't a valid number
+
+  // Ensure row and column are properly initialized before assignment
+  if (!updatedData[tableIndex]) updatedData[tableIndex] = [];
+  if (!updatedData[tableIndex][rowIndex])
+    updatedData[tableIndex][rowIndex] = [];
+
+  // Update the specific cell with the parsed number
+  updatedData[tableIndex][rowIndex][colIndex] = parsedValue;
+
+  // Set the new templateData state
   setTemplateData(updatedData);
 };
 

@@ -36,6 +36,23 @@ const StaffHome = () => {
 
   return (
     <div className="home">
+      <div
+      style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        backgroundColor: '#ff0000',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        zIndex: 1000, 
+      }}
+      >
+        BETA
+      </div>
+
       <img
         src={logo}
         alt="Logo"

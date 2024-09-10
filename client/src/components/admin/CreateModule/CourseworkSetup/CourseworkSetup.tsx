@@ -40,7 +40,6 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
   examPercentage,
   formFactor,
   onFormFactorChange,
-  readingWeeks,
 }) => {
   const {
     handleAddCoursework,
@@ -60,6 +59,21 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       onCourseworkListChange(updatedCourseworkList);
     }
   }, [examPercentage, semester, courseworkList, onCourseworkListChange]);
+
+  // Define readingWeeks based on the selected semester
+  const readingWeeks: number[] | { sem1: number[]; sem2: number[] } = (() => {
+    if (semester === 'first') {
+      return [7]; // Week 7 is a reading week for the first semester
+    } else if (semester === 'second') {
+      return []; // No reading weeks for the second semester
+    } else if (semester === 'whole session') {
+      return {
+        sem1: [7], // Week 7 is a reading week for the first semester
+        sem2: [], // No reading weeks in the second semester
+      };
+    }
+    return [];
+  })();
 
   const renderWeekOptions = () => {
     const options = [];
@@ -100,7 +114,43 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       return label;
     };
 
-    if (semester === 'whole session' || semester === 'Whole Session') {
+    if (semester === 'second') {
+      // Display weeks 1 to 8
+      for (let i = 1; i <= 8; i++) {
+        options.push(
+          <option key={i} value={i.toString()}>
+            {`S2 W${i}`}
+          </option>,
+        );
+      }
+
+      // Add Easter Break Weeks with underlying values 9, 10, and 11
+      options.push(
+        <option key="9" value="9">
+          S2 E1 (Easter Break Week 1)
+        </option>,
+      );
+      options.push(
+        <option key="10" value="10">
+          S2 E2 (Easter Break Week 2)
+        </option>,
+      );
+      options.push(
+        <option key="11" value="11">
+          S2 E3 (Easter Break Week 3)
+        </option>,
+      );
+
+      // Display weeks 9 to 15 with adjusted underlying values 12 to 18
+      for (let i = 9; i <= 15; i++) {
+        const underlyingValue = i + 3; // Adjusting the underlying value
+        options.push(
+          <option key={underlyingValue} value={underlyingValue.toString()}>
+            {`S2 W${i}`}
+          </option>,
+        );
+      }
+    } else if (semester === 'whole session' || semester === 'Whole Session') {
       // First semester: weeks 1 to 15 (unchanged)
       for (let i = 1; i <= 15; i++) {
         options.push(

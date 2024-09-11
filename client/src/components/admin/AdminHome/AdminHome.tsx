@@ -60,6 +60,20 @@ const AdminHome = () => {
       <h1 className="">Admin Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        style={{
+          position: 'absolute', 
+           top: '10px', 
+           left: '10px',
+           padding: '10px 20px',
+           backgroundColor: '#0a0a94',
+           color: 'white',
+           textDecoration: 'none',
+           borderRadius: '15px',
+           fontSize: '1.2rem',
+           textAlign: 'center',
+           transition: 'background-color 0.3s ease',
+           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        }}
         onClick={() => {
           window.history.back();
         }}

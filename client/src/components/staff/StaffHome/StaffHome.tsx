@@ -78,7 +78,20 @@ const StaffHome = () => {
       />
       <h1 className="">Staff Portal</h1>
       <button
-        style={{ position: 'absolute', top: '0', left: '0' }}
+        style={{
+           position: 'absolute', 
+           top: '10px', 
+           left: '10px',
+           padding: '10px 20px',
+           backgroundColor: '#0a0a94',
+           color: 'white',
+           textDecoration: 'none',
+           borderRadius: '15px',
+           fontSize: '1.2rem',
+           textAlign: 'center',
+           transition: 'background-color 0.3s ease',
+           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+          }}
         onClick={() => {
           window.history.back();
         }}

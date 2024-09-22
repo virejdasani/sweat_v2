@@ -278,6 +278,11 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                               {coursework.deadlineDay}
                             </Text>
                           )}
+                          {coursework.weight === 0 && (
+                            <Text as="span" fontWeight="">
+                              {coursework.longTitle} {coursework.deadlineDay}
+                            </Text>
+                          )}
                         </Text>
                       ))}
                     </VStack>

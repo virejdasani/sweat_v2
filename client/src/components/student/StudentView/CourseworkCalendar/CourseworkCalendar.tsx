@@ -118,10 +118,10 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
             // Adjust week numbers based on the provided rules
             if (semester === 'second') {
-              if (weekNumber === 9) displayWeekNumber = 'E1';
-              else if (weekNumber === 10) displayWeekNumber = 'E2';
-              else if (weekNumber === 11) displayWeekNumber = 'E3';
-              else if (weekNumber >= 12 && weekNumber <= 18) {
+              if (weekNumber === 10) displayWeekNumber = 'E1';
+              else if (weekNumber === 11) displayWeekNumber = 'E2';
+              else if (weekNumber === 12) displayWeekNumber = 'E3';
+              else if (weekNumber >= 13 && weekNumber <= 18) {
                 displayWeekNumber = (weekNumber - 3).toString();
               }
             }
@@ -140,7 +140,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             const grayOutWeek =
               (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
               (semester === 'second' &&
-                (weekNumber === 9 ||
+                (weekNumber === 12 ||
                   weekNumber === 10 ||
                   weekNumber === 11 ||
                   weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
@@ -196,10 +196,10 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
               // Adjust week numbers based on the provided rules
               if (semester === 'second') {
-                if (weekNumber === 9) displayWeekNumber = 'E1';
-                else if (weekNumber === 10) displayWeekNumber = 'E2';
-                else if (weekNumber === 11) displayWeekNumber = 'E3';
-                else if (weekNumber >= 12 && weekNumber <= 18) {
+                if (weekNumber === 10) displayWeekNumber = 'E1';
+                else if (weekNumber === 11) displayWeekNumber = 'E2';
+                else if (weekNumber === 12) displayWeekNumber = 'E3';
+                else if (weekNumber >= 13 && weekNumber <= 18) {
                   displayWeekNumber = (weekNumber - 3).toString();
                 }
               }
@@ -220,7 +220,7 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               const grayOutWeek =
                 (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
                 (semester === 'second' &&
-                  (weekNumber === 9 ||
+                  (weekNumber === 12 ||
                     weekNumber === 10 ||
                     weekNumber === 11 ||
                     weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2

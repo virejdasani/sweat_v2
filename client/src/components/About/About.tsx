@@ -13,7 +13,7 @@ const About = () => {
       >
         Home
       </button>
-      <h1 className="text-center mt-4 mb-4">About</h1>
+      <h1 className="text-center mt-4 mb-4">About Coursework Calendar</h1>
       <div className="container">
         <div className="row">
           <div className="col-12">

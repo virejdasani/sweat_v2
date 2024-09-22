@@ -271,8 +271,13 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                           textOverflow="ellipsis"
                           overflow="hidden"
                         >
-                          {coursework.longTitle} ({coursework.weight}%){' '}
-                          {coursework.deadlineDay}
+                          {/* only show if coursework weight > 0% */}
+                          {coursework.weight > 0 && (
+                            <Text as="span" fontWeight="">
+                              {coursework.longTitle} ({coursework.weight}%){' '}
+                              {coursework.deadlineDay}
+                            </Text>
+                          )}
                         </Text>
                       ))}
                     </VStack>

@@ -118,10 +118,10 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
             // Adjust week numbers based on the provided rules
             if (semester === 'second') {
-              if (weekNumber === 10) displayWeekNumber = 'E1';
-              else if (weekNumber === 11) displayWeekNumber = 'E2';
-              else if (weekNumber === 12) displayWeekNumber = 'E3';
-              else if (weekNumber >= 13 && weekNumber <= 18) {
+              if (weekNumber === 11) displayWeekNumber = 'E1';
+              else if (weekNumber === 12) displayWeekNumber = 'E2';
+              else if (weekNumber === 13) displayWeekNumber = 'E3';
+              else if (weekNumber >= 14 && weekNumber <= 18) {
                 displayWeekNumber = (weekNumber - 3).toString();
               }
             }
@@ -196,10 +196,10 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
               // Adjust week numbers based on the provided rules
               if (semester === 'second') {
-                if (weekNumber === 10) displayWeekNumber = 'E1';
-                else if (weekNumber === 11) displayWeekNumber = 'E2';
-                else if (weekNumber === 12) displayWeekNumber = 'E3';
-                else if (weekNumber >= 13 && weekNumber <= 18) {
+                if (weekNumber === 11) displayWeekNumber = 'E1';
+                else if (weekNumber === 12) displayWeekNumber = 'E2';
+                else if (weekNumber === 13) displayWeekNumber = 'E3';
+                else if (weekNumber >= 14 && weekNumber <= 18) {
                   displayWeekNumber = (weekNumber - 3).toString();
                 }
               }

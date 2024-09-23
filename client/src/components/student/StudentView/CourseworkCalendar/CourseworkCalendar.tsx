@@ -140,9 +140,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             const grayOutWeek =
               (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
               (semester === 'second' &&
-                (weekNumber === 12 ||
-                  weekNumber === 10 ||
-                  weekNumber === 11 ||
+                (weekNumber === 11 ||
+                  weekNumber === 12 ||
+                  weekNumber === 13 ||
                   weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
 
             const weekLabel = `Week ${displayWeekNumber} (${getDateForWeekAndDay(
@@ -220,9 +220,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               const grayOutWeek =
                 (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
                 (semester === 'second' &&
-                  (weekNumber === 12 ||
-                    weekNumber === 10 ||
-                    weekNumber === 11 ||
+                  (weekNumber === 11 ||
+                    weekNumber === 12 ||
+                    weekNumber === 13 ||
                     weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
 
               let courseworkForWeek = [];

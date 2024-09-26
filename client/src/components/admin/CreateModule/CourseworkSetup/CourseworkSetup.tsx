@@ -126,17 +126,17 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
 
       // Add Easter Break Weeks with underlying values 9, 10, and 11
       options.push(
-        <option key="9" value="9">
+        <option key="11" value="11">
           S2 E1 (Easter Break Week 1)
         </option>,
       );
       options.push(
-        <option key="10" value="10">
+        <option key="12" value="12">
           S2 E2 (Easter Break Week 2)
         </option>,
       );
       options.push(
-        <option key="11" value="11">
+        <option key="13" value="13">
           S2 E3 (Easter Break Week 3)
         </option>,
       );

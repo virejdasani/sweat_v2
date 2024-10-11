@@ -63,7 +63,7 @@ const StaffHome = () => {
       <button
         style={{ position: 'absolute', top: '0', left: '0' }}
         onClick={() => {
-          window.history.back();
+          window.location.href = '/';
         }}
       >
         Home

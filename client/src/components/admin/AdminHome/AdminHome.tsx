@@ -61,7 +61,7 @@ const AdminHome = () => {
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
         onClick={() => {
-          window.history.back();
+          window.location.href = '/';
         }}
       >
         Home

@@ -96,12 +96,28 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       if (semester === 'whole session') {
         if (week <= 15) {
           label = `S1 W${week}`;
-        } else if (week >= 16 && week <= 23) {
-          label = `S2 W${week - 15}`; // Weeks 1-8 of second semester
-        } else if (week >= 24 && week <= 26) {
-          label = `S2 E${week - 23} (Easter Break Week ${week - 23})`; // Easter Break weeks 1-3 with brackets
-        } else if (week >= 27 && week <= 33) {
-          label = `S2 W${week - 18}`; // Weeks 9-15 of second semester
+        } else if (week >= 16 && week <= 25) {
+          // Weeks 1-10 of second semester
+          label = `S2 W${week - 15}`;
+        } else if (week >= 26 && week <= 28) {
+          // Easter Break Weeks 11-13
+          label = `S2 E${week - 25} (Easter Break Week ${week - 25})`;
+        } else if (week >= 29 && week <= 33) {
+          // Weeks 14-15 of second semester
+          label = `S2 W${week - 18}`;
+        }
+      }
+
+      if (semester === 'second') {
+        if (week <= 10) {
+          // First 10 weeks of second semester
+          label = `S2 W${week}`;
+        } else if (week >= 11 && week <= 13) {
+          // Easter Break Weeks 11-13
+          label = `S2 E${week - 10} (Easter Break Week ${week - 10})`;
+        } else if (week >= 14 && week <= 18) {
+          // Weeks 14-18 of second semester
+          label = `S2 W${week - 3}`;
         }
       }
 
@@ -115,8 +131,8 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
     };
 
     if (semester === 'second') {
-      // Display weeks 1 to 8
-      for (let i = 1; i <= 8; i++) {
+      // Display weeks 1 to 10
+      for (let i = 1; i <= 10; i++) {
         options.push(
           <option key={i} value={i.toString()}>
             {`S2 W${i}`}
@@ -124,7 +140,7 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
         );
       }
 
-      // Add Easter Break Weeks with underlying values 9, 10, and 11
+      // Add Easter Break Weeks with underlying values 11, 12, and 13
       options.push(
         <option key="11" value="11">
           S2 E1 (Easter Break Week 1)
@@ -141,12 +157,11 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
         </option>,
       );
 
-      // Display weeks 9 to 15 with adjusted underlying values 12 to 18
-      for (let i = 9; i <= 15; i++) {
-        const underlyingValue = i + 3; // Adjusting the underlying value
+      // Display weeks 14 to 18 with adjusted underlying values
+      for (let i = 14; i <= 18; i++) {
         options.push(
-          <option key={underlyingValue} value={underlyingValue.toString()}>
-            {`S2 W${i}`}
+          <option key={i} value={i.toString()}>
+            {`S2 W${i - 3}`}
           </option>,
         );
       }

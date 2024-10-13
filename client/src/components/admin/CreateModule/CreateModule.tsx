@@ -209,7 +209,7 @@ const CreateModule: React.FC = () => {
   };
 
   const handleDiscardAndExit = () => {
-    navigate('/admin');
+    navigate('/');
   };
 
   return (

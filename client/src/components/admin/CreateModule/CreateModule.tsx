@@ -30,12 +30,12 @@ import { createModuleStyles } from './CreateModuleStyles';
 import TeachingSchedule from './TeachingSchedule/TeachingSchedule';
 import { ModuleSetupFormData } from '../../../types/admin/CreateModule/ModuleSetup';
 import CourseworkSetup from './CourseworkSetup/CourseworkSetup';
-import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 import { Coursework } from '../../../types/admin/CreateModule/CourseworkSetup';
 import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSchedule';
 import { fetchCalendarData } from '../../../services/admin/CreateModule/TeachingSchedule';
 import ModuleReview from './ModuleReview/ModuleReview';
 import { getDefaultFormFactor } from '../../../services/admin/Settings';
+import CourseworkScheduleOptimized from './CourseworkSchedule/CourseworkScheduleOptimized';
 
 const MAX_STEPS = 5;
 
@@ -164,7 +164,7 @@ const CreateModule: React.FC = () => {
         );
       case 3:
         return (
-          <CourseworkSchedule
+          <CourseworkScheduleOptimized
             courseworkList={courseworkList}
             moduleCredit={formData.moduleCredit}
             handleScheduleChange={(index, field, value) =>

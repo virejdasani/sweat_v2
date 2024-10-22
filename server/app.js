@@ -1,3 +1,5 @@
+// app.js
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -21,6 +23,9 @@ const programmeController = require('./src/controllers/programmeController');
 const calendarController = require('./src/controllers/calendarController');
 const distributionController = require('./src/controllers/distributionController');
 const settingsController = require('./src/controllers/settingsController');
+
+// **Import the Coursework Controller**
+const courseworkController = require('./src/controllers/courseworkController');
 
 // Module routes
 app.get('/modules/module-template', moduleController.getModuleTemplate);
@@ -81,6 +86,17 @@ app.post(
   settingsController.setDefaultFormFactor,
 );
 
+// **Coursework routes**
+app.post(
+  '/coursework/initialize',
+  courseworkController.initializeCourseworkList,
+);
+app.post(
+  '/coursework/recalculate',
+  courseworkController.recalculateCourseworkList,
+);
+
+// Editing status schema and routes (if needed)
 const editingStatusSchema = new mongoose.Schema({
   editingStatus: { type: Boolean, default: true },
 });

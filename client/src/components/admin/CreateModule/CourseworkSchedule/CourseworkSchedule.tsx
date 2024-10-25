@@ -16,18 +16,15 @@ import {
 import { QuestionOutlineIcon } from '@chakra-ui/icons';
 import { courseworkScheduleStyles } from './CourseworkScheduleStyles';
 import { CourseworkScheduleProps } from '../../../../types/admin/CreateModule/CourseworkSchedule';
-import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
 import {
   calculateTotalTime,
-  expectedTotalTime,
-  initializeCourseworkList,
-  recalculateCourseworkList,
-  // getCourseworkListFromSession,
-  // saveInitialCourseworkListToSession,
-  // handleRestoreDefaults,
   handleInputChange,
   handleInputBlur,
+  // recalculateCourseworkList,
+  expectedTotalTime,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
+import httpClient from '../../../../shared/api/httpClient';
+import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
 
 const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   courseworkList = [],
@@ -40,108 +37,112 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   courseworkPercentage,
 }) => {
   const [internalCourseworkList, setInternalCourseworkList] =
-    useState<Coursework[]>(courseworkList);
+    useState(courseworkList);
   const [manualChanges, setManualChanges] = useState<Record<string, boolean>>(
     {},
   );
-  const isInitialized = useRef(false);
-  const prevDependencies = useRef({ moduleCredit, formFactor });
+
+  const isInitialized = useRef<boolean>(false);
   const initialCourseworkListRef = useRef<Coursework[]>([]);
+  // const prevDependencies = useRef({ moduleCredit, formFactor, courseworkList });
 
-  useEffect(() => {
-    // const savedCourseworkList = getCourseworkListFromSession();
-    // if (savedCourseworkList) {
-    //   setInternalCourseworkList(savedCourseworkList);
-    //   handleCourseworkListChange(savedCourseworkList);
-    //   isInitialized.current = true;
-    // } else if (!isInitialized.current) {
-    if (!isInitialized.current) {
-      // Added to prevent breaking due to commenting out above
-      const adjustedFormFactor =
-        courseworkPercentage === 100 ? 100 : formFactor;
-      const initialList = initializeCourseworkList(
-        courseworkList,
-        templateData,
-        moduleCredit,
-        adjustedFormFactor,
-        isEditing,
-      );
-      setInternalCourseworkList(initialList);
+  const initializeData = async () => {
+    if (isInitialized.current) return;
+
+    if (!isEditing) {
+      try {
+        const adjustedFormFactor =
+          courseworkPercentage === 100 ? 100 : formFactor;
+
+        const requestData = {
+          courseworkList: courseworkList.map((cw) => ({
+            ...cw,
+            weight: Number(cw.weight),
+            deadlineWeek: Number(cw.deadlineWeek),
+          })),
+          templateData,
+          moduleCredit: Number(moduleCredit),
+          formFactor: Number(adjustedFormFactor),
+        };
+
+        const response = await httpClient.post(
+          '/coursework-schedule',
+          requestData,
+        );
+
+        const calculatedCourseworkList = response.data.courseworkList;
+        console.log('calculatedCourseworkList:', calculatedCourseworkList);
+        setInternalCourseworkList(calculatedCourseworkList);
+        initialCourseworkListRef.current = JSON.parse(
+          JSON.stringify(calculatedCourseworkList),
+        );
+        handleCourseworkListChange(calculatedCourseworkList);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(
+            'Error fetching calculated coursework list:',
+            error.message,
+          );
+        } else {
+          console.error(
+            'Error fetching calculated coursework list:',
+            'An unknown error occurred',
+          );
+        }
+      }
+    } else {
+      setInternalCourseworkList(courseworkList);
       initialCourseworkListRef.current = JSON.parse(
-        JSON.stringify(initialList),
-      ); // Deep copy
-      // saveInitialCourseworkListToSession(initialCourseworkListRef.current);
-      handleCourseworkListChange(initialList);
-      isInitialized.current = true;
+        JSON.stringify(courseworkList),
+      );
+      handleCourseworkListChange(courseworkList);
     }
-  }, [
-    courseworkList,
-    templateData,
-    moduleCredit,
-    formFactor,
-    isEditing,
-    handleCourseworkListChange,
-    courseworkPercentage, // Add courseworkPercentage to dependencies
-  ]);
+    isInitialized.current = true;
+  };
 
+  // Initial setup effect
   useEffect(() => {
-    if (
-      isInitialized.current &&
-      !isEditing &&
-      (moduleCredit !== prevDependencies.current.moduleCredit ||
-        formFactor !== prevDependencies.current.formFactor)
-    ) {
-      const recalculatedList = recalculateCourseworkList(
-        initialCourseworkListRef.current, // Use the initial list for recalculation
-        templateData,
-        moduleCredit,
-        formFactor,
-      );
+    initializeData();
+  }, []);
 
-      const updatedList = recalculatedList.map(
-        (recalculatedCoursework, index) => {
-          const currentCoursework = internalCourseworkList[index];
-          return {
-            ...recalculatedCoursework,
-            preparationTime: manualChanges[`${index}-preparationTime`]
-              ? currentCoursework.preparationTime
-              : recalculatedCoursework.preparationTime,
-            privateStudyTime: manualChanges[`${index}-privateStudyTime`]
-              ? currentCoursework.privateStudyTime
-              : recalculatedCoursework.privateStudyTime,
-          };
-        },
-      );
+  // // Effect for handling changes to dependencies
+  // useEffect(() => {
+  //   if (isInitialized.current) {
+  //     const prevValues = prevDependencies.current;
 
-      setInternalCourseworkList(updatedList);
-      handleCourseworkListChange(updatedList);
-    }
-    prevDependencies.current = { moduleCredit, formFactor };
-  }, [
-    moduleCredit,
-    formFactor,
-    templateData,
-    isEditing,
-    manualChanges,
-    internalCourseworkList,
-    handleCourseworkListChange,
-  ]);
+  //     const hasSignificantChanges =
+  //       prevValues.moduleCredit !== moduleCredit ||
+  //       prevValues.formFactor !== formFactor ||
+  //       JSON.stringify(prevValues.courseworkList) !==
+  //         JSON.stringify(courseworkList);
+
+  //     if (hasSignificantChanges) {
+  //       const adjustedFormFactor =
+  //         courseworkPercentage === 100 ? 100 : formFactor;
+
+  //       // Update previous values
+  //       prevDependencies.current = {
+  //         moduleCredit,
+  //         formFactor,
+  //         courseworkList,
+  //       };
+
+  //       // Update coursework list
+  //       const updatedCourseworkList = recalculateCourseworkList(
+  //         courseworkList,
+  //         moduleCredit,
+  //         adjustedFormFactor,
+  //         manualChanges,
+  //       );
+
+  //       setInternalCourseworkList(updatedCourseworkList);
+  //       handleCourseworkListChange(updatedCourseworkList);
+  //     }
+  //   }
+  // }, [moduleCredit, formFactor, courseworkList, courseworkPercentage]);
 
   return (
     <Box>
-      {/* <Button
-        onClick={() =>
-          handleRestoreDefaults(
-            setInternalCourseworkList,
-            handleCourseworkListChange,
-            setManualChanges,
-          )
-        }
-        mb={4}
-        colorScheme="blue"
-      >
-        Restore Defaults
-      </Button> */}
       <Table style={courseworkScheduleStyles.table}>
         <Thead>
           <Tr>
@@ -576,7 +577,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   }}
                 >
                   {calculateTotalTime(coursework)} /{' '}
-                  {expectedTotalTime(coursework.weight || 0, moduleCredit)}
+                  {expectedTotalTime(coursework.weight || 0, moduleCredit)}{' '}
                   {calculateTotalTime(coursework) >
                     expectedTotalTime(coursework.weight || 0, moduleCredit) && (
                     <Text as="span" style={{ color: 'red' }}>
@@ -590,7 +591,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                       {' '}
                       (Warning: Below expected time!)
                     </Text>
-                  )}
+                  )}{' '}
                 </Text>
               </Td>
             ))}

@@ -23,8 +23,6 @@ const programmeController = require('./src/controllers/programmeController');
 const calendarController = require('./src/controllers/calendarController');
 const distributionController = require('./src/controllers/distributionController');
 const settingsController = require('./src/controllers/settingsController');
-
-// **Import the Coursework Controller**
 const courseworkController = require('./src/controllers/courseworkController');
 
 // Module routes
@@ -86,14 +84,10 @@ app.post(
   settingsController.setDefaultFormFactor,
 );
 
-// **Coursework routes**
+// Coursework routes
 app.post(
-  '/coursework/initialize',
-  courseworkController.initializeCourseworkList,
-);
-app.post(
-  '/coursework/recalculate',
-  courseworkController.recalculateCourseworkList,
+  '/coursework-schedule',
+  courseworkController.processCourseworkSchedule,
 );
 
 // Editing status schema and routes (if needed)

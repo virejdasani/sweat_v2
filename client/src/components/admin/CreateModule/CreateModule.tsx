@@ -35,7 +35,7 @@ import { fetchTemplateData } from '../../../utils/admin/CreateModule/TeachingSch
 import { fetchCalendarData } from '../../../services/admin/CreateModule/TeachingSchedule';
 import ModuleReview from './ModuleReview/ModuleReview';
 import { getDefaultFormFactor } from '../../../services/admin/Settings';
-import CourseworkScheduleOptimized from './CourseworkSchedule/CourseworkScheduleOptimized';
+import CourseworkSchedule from './CourseworkSchedule/CourseworkSchedule';
 
 const MAX_STEPS = 5;
 
@@ -164,7 +164,7 @@ const CreateModule: React.FC = () => {
         );
       case 3:
         return (
-          <CourseworkScheduleOptimized
+          <CourseworkSchedule
             courseworkList={courseworkList}
             moduleCredit={formData.moduleCredit}
             handleScheduleChange={(index, field, value) =>

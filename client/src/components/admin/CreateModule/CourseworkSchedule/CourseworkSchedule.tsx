@@ -20,8 +20,8 @@ import {
   calculateTotalTime,
   handleInputChange,
   handleInputBlur,
-  // recalculateCourseworkList,
   expectedTotalTime,
+  getPreparationTimeAndPrivateStudyTime,
 } from '../../../../utils/admin/CreateModule/CourseworkSchedule';
 import httpClient from '../../../../shared/api/httpClient';
 import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
@@ -44,7 +44,6 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
 
   const isInitialized = useRef<boolean>(false);
   const initialCourseworkListRef = useRef<Coursework[]>([]);
-  // const prevDependencies = useRef({ moduleCredit, formFactor, courseworkList });
 
   const initializeData = async () => {
     if (isInitialized.current) return;
@@ -104,42 +103,6 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
   useEffect(() => {
     initializeData();
   }, []);
-
-  // // Effect for handling changes to dependencies
-  // useEffect(() => {
-  //   if (isInitialized.current) {
-  //     const prevValues = prevDependencies.current;
-
-  //     const hasSignificantChanges =
-  //       prevValues.moduleCredit !== moduleCredit ||
-  //       prevValues.formFactor !== formFactor ||
-  //       JSON.stringify(prevValues.courseworkList) !==
-  //         JSON.stringify(courseworkList);
-
-  //     if (hasSignificantChanges) {
-  //       const adjustedFormFactor =
-  //         courseworkPercentage === 100 ? 100 : formFactor;
-
-  //       // Update previous values
-  //       prevDependencies.current = {
-  //         moduleCredit,
-  //         formFactor,
-  //         courseworkList,
-  //       };
-
-  //       // Update coursework list
-  //       const updatedCourseworkList = recalculateCourseworkList(
-  //         courseworkList,
-  //         moduleCredit,
-  //         adjustedFormFactor,
-  //         manualChanges,
-  //       );
-
-  //       setInternalCourseworkList(updatedCourseworkList);
-  //       handleCourseworkListChange(updatedCourseworkList);
-  //     }
-  //   }
-  // }, [moduleCredit, formFactor, courseworkList, courseworkPercentage]);
 
   return (
     <Box>
@@ -409,45 +372,6 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
             ))}
           </Tr>
           <Tr>
-            <Td style={courseworkScheduleStyles.td}>Private study</Td>
-            {internalCourseworkList.map((coursework, index) => (
-              <Td key={index} style={courseworkScheduleStyles.td}>
-                <Input
-                  type="number"
-                  value={
-                    typeof coursework.privateStudyTime === 'number'
-                      ? coursework.privateStudyTime
-                      : ''
-                  }
-                  onChange={(e) =>
-                    handleInputChange(
-                      index,
-                      'privateStudyTime',
-                      e.target.value === ''
-                        ? undefined
-                        : Number(e.target.value),
-                      internalCourseworkList,
-                      setInternalCourseworkList,
-                      manualChanges,
-                      setManualChanges,
-                      handleScheduleChange,
-                    )
-                  }
-                  onBlur={() =>
-                    handleInputBlur(
-                      index,
-                      'privateStudyTime',
-                      internalCourseworkList,
-                      handleScheduleChange,
-                    )
-                  }
-                  style={courseworkScheduleStyles.input}
-                  disabled={coursework.type !== 'exam'}
-                />
-              </Td>
-            ))}
-          </Tr>
-          <Tr>
             <Td style={courseworkScheduleStyles.td}>Preparation time</Td>
             {internalCourseworkList.map((coursework, index) => (
               <Td key={index} style={courseworkScheduleStyles.td}>
@@ -456,7 +380,10 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   value={
                     typeof coursework.preparationTime === 'number'
                       ? coursework.preparationTime
-                      : ''
+                      : getPreparationTimeAndPrivateStudyTime(
+                          coursework,
+                          moduleCredit,
+                        ).preparationTime
                   }
                   onChange={(e) =>
                     handleInputChange(
@@ -482,6 +409,48 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                   }
                   style={courseworkScheduleStyles.input}
                   disabled={coursework.type === 'exam'}
+                />
+              </Td>
+            ))}
+          </Tr>
+          <Tr>
+            <Td style={courseworkScheduleStyles.td}>Private study time</Td>
+            {internalCourseworkList.map((coursework, index) => (
+              <Td key={index} style={courseworkScheduleStyles.td}>
+                <Input
+                  type="number"
+                  value={
+                    typeof coursework.privateStudyTime === 'number'
+                      ? coursework.privateStudyTime
+                      : getPreparationTimeAndPrivateStudyTime(
+                          coursework,
+                          moduleCredit,
+                        ).privateStudyTime
+                  }
+                  onChange={(e) =>
+                    handleInputChange(
+                      index,
+                      'privateStudyTime',
+                      e.target.value === ''
+                        ? undefined
+                        : Number(e.target.value),
+                      internalCourseworkList,
+                      setInternalCourseworkList,
+                      manualChanges,
+                      setManualChanges,
+                      handleScheduleChange,
+                    )
+                  }
+                  onBlur={() =>
+                    handleInputBlur(
+                      index,
+                      'privateStudyTime',
+                      internalCourseworkList,
+                      handleScheduleChange,
+                    )
+                  }
+                  style={courseworkScheduleStyles.input}
+                  disabled={coursework.type !== 'exam'}
                 />
               </Td>
             ))}
@@ -564,10 +533,10 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                 <Text
                   style={{
                     color:
-                      calculateTotalTime(coursework) ===
+                      calculateTotalTime(coursework, moduleCredit) ===
                       expectedTotalTime(coursework.weight || 0, moduleCredit)
                         ? 'green'
-                        : calculateTotalTime(coursework) >
+                        : calculateTotalTime(coursework, moduleCredit) >
                             expectedTotalTime(
                               coursework.weight || 0,
                               moduleCredit,
@@ -576,16 +545,16 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
                           : 'inherit',
                   }}
                 >
-                  {calculateTotalTime(coursework)} /{' '}
+                  {calculateTotalTime(coursework, moduleCredit)} /{' '}
                   {expectedTotalTime(coursework.weight || 0, moduleCredit)}{' '}
-                  {calculateTotalTime(coursework) >
+                  {calculateTotalTime(coursework, moduleCredit) >
                     expectedTotalTime(coursework.weight || 0, moduleCredit) && (
                     <Text as="span" style={{ color: 'red' }}>
                       {' '}
                       (Warning: Exceeds expected time!)
                     </Text>
                   )}
-                  {calculateTotalTime(coursework) <
+                  {calculateTotalTime(coursework, moduleCredit) <
                     expectedTotalTime(coursework.weight || 0, moduleCredit) && (
                     <Text as="span" style={{ color: 'red' }}>
                       {' '}

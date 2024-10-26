@@ -1,6 +1,10 @@
 import { Coursework } from '../../../../types/admin/CreateModule/CourseworkSetup';
+export const calculateTotalTime = (
+  coursework: Coursework,
+  moduleCredit: number,
+) => {
+  console.log('Coursework data:', coursework);
 
-export const calculateTotalTime = (coursework: Coursework) => {
   const {
     contactTimeLectures,
     contactTimeTutorials,
@@ -9,11 +13,13 @@ export const calculateTotalTime = (coursework: Coursework) => {
     contactTimeFieldworkPlacement,
     contactTimeOthers,
     formativeAssessmentTime,
-    privateStudyTime,
-    preparationTime,
     keyboardTime,
     feedbackTime,
   } = coursework;
+
+  // Fetch preparation and private study time dynamically
+  const { preparationTime, privateStudyTime } =
+    getPreparationTimeAndPrivateStudyTime(coursework, moduleCredit);
 
   return (
     (contactTimeLectures || 0) +

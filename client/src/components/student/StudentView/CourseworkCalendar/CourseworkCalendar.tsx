@@ -128,8 +128,10 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             //   }
             // }
 
-            // the above is hardcoded easter break weeks, this is the correct way to calculate
-            // the easter break weeks
+            // the above is hardcoded easter break weeks (not being used anymore),
+            // the following is the
+            // dynamically getting the easter dates and setting them on the student view calendar
+            // as E1, E2, E3
             if (semester === 'second') {
               if (
                 easterBreakStart &&

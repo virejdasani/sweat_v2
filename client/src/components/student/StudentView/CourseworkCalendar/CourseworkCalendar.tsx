@@ -35,6 +35,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   // readingWeeks,
   semester1Start,
   semester2Start,
+  easterBreakStart,
+  easterBreakEnd,
 }) => {
   const [displayedModules, setDisplayedModules] =
     useState<ModuleDocument[]>(modules);
@@ -117,11 +119,26 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             let displayWeekNumber = weekNumber.toString();
 
             // Adjust week numbers based on the provided rules
+            // if (semester === 'second') {
+            //   if (weekNumber === 11) displayWeekNumber = 'E1';
+            //   else if (weekNumber === 12) displayWeekNumber = 'E2';
+            //   else if (weekNumber === 13) displayWeekNumber = 'E3';
+            //   else if (weekNumber >= 14 && weekNumber <= 18) {
+            //     displayWeekNumber = (weekNumber - 3).toString();
+            //   }
+            // }
+
+            // the above is hardcoded easter break weeks, this is the correct way to calculate
+            // the easter break weeks
             if (semester === 'second') {
-              if (weekNumber === 11) displayWeekNumber = 'E1';
-              else if (weekNumber === 12) displayWeekNumber = 'E2';
-              else if (weekNumber === 13) displayWeekNumber = 'E3';
-              else if (weekNumber >= 14 && weekNumber <= 18) {
+              if (
+                easterBreakStart &&
+                easterBreakEnd &&
+                weekNumber >= 11 &&
+                weekNumber <= 13
+              ) {
+                displayWeekNumber = `E${weekNumber - 10}`;
+              } else if (weekNumber >= 14 && weekNumber <= 18) {
                 displayWeekNumber = (weekNumber - 3).toString();
               }
             }

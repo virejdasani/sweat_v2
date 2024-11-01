@@ -35,9 +35,6 @@ const processCourseworkSchedule = (req, res) => {
       const endWeek = coursework.deadlineWeek;
       lastDeadlineWeek = endWeek;
 
-      console.log(`Processing coursework: ${coursework.shortTitle}`);
-      console.log('Week range:', { startWeek, endWeek });
-
       const fields = calculateFieldsForCoursework(
         coursework,
         templateData,

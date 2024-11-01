@@ -69,8 +69,23 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
           requestData,
         );
 
-        const calculatedCourseworkList = response.data.courseworkList;
-        console.log('calculatedCourseworkList:', calculatedCourseworkList);
+        // In your initializeData function, after fetching the calculatedCourseworkList
+        const calculatedCourseworkList = response.data.courseworkList.map(
+          (coursework: Coursework) => {
+            const computedTimes = getPreparationTimeAndPrivateStudyTime(
+              coursework,
+              moduleCredit,
+            );
+            return {
+              ...coursework,
+              preparationTime:
+                coursework.preparationTime ?? computedTimes.preparationTime,
+              privateStudyTime:
+                coursework.privateStudyTime ?? computedTimes.privateStudyTime,
+            };
+          },
+        );
+
         setInternalCourseworkList(calculatedCourseworkList);
         initialCourseworkListRef.current = JSON.parse(
           JSON.stringify(calculatedCourseworkList),
@@ -377,14 +392,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
               <Td key={index} style={courseworkScheduleStyles.td}>
                 <Input
                   type="number"
-                  value={
-                    typeof coursework.preparationTime === 'number'
-                      ? coursework.preparationTime
-                      : getPreparationTimeAndPrivateStudyTime(
-                          coursework,
-                          moduleCredit,
-                        ).preparationTime
-                  }
+                  value={coursework.preparationTime ?? ''}
                   onChange={(e) =>
                     handleInputChange(
                       index,
@@ -419,14 +427,7 @@ const CourseworkSchedule: React.FC<CourseworkScheduleProps> = ({
               <Td key={index} style={courseworkScheduleStyles.td}>
                 <Input
                   type="number"
-                  value={
-                    typeof coursework.privateStudyTime === 'number'
-                      ? coursework.privateStudyTime
-                      : getPreparationTimeAndPrivateStudyTime(
-                          coursework,
-                          moduleCredit,
-                        ).privateStudyTime
-                  }
+                  value={coursework.privateStudyTime ?? ''}
                   onChange={(e) =>
                     handleInputChange(
                       index,

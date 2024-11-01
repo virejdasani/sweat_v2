@@ -6,10 +6,6 @@ const sortCourseworkByDeadline = (courseworkList) => {
 // Calculate total expected time
 const calculateTotalExpectedTime = (moduleCredit, weight) => {
   const expectedTime = Math.round(moduleCredit * 10 * (weight / 100));
-  console.log(
-    `Calculated total expected time for weight ${weight} and moduleCredit ${moduleCredit}:`,
-    expectedTime,
-  );
   return expectedTime;
 };
 
@@ -24,21 +20,12 @@ const calculateContactTime = (
   let totalContactTime = 0;
   const adjustedFormFactor = formFactor / 100; // Adjust form factor to percentage
 
-  console.log(
-    `Calculating contact time for contactTypeIndex ${contactTypeIndex} with formFactor ${formFactor}% (adjusted: ${adjustedFormFactor}) from week ${startWeek} to ${endWeek}`,
-  );
-
   // Iterate over all semesters in templateData
   for (const semesterData of templateData) {
     if (semesterData[contactTypeIndex]) {
       const weeksData = semesterData[contactTypeIndex].slice(
         startWeek,
         endWeek,
-      );
-
-      console.log(
-        `Weeks data for contactTypeIndex ${contactTypeIndex}:`,
-        weeksData,
       );
 
       weeksData.forEach((hours, index) => {
@@ -50,10 +37,6 @@ const calculateContactTime = (
           totalContactTime += (hours || 0) * adjustedFormFactor;
         }
       });
-
-      console.log(
-        `Total contact time for semester so far: ${totalContactTime}`,
-      );
     }
   }
 
@@ -64,10 +47,6 @@ const calculateContactTime = (
 const calculateExamContactTime = (templateData, endWeek, contactTypeIndex) => {
   let totalContactTime = 0;
 
-  console.log(
-    `Calculating exam contact time for contactTypeIndex ${contactTypeIndex} up to week ${endWeek}`,
-  );
-
   // Iterate over all semesters in templateData
   for (const semesterData of templateData) {
     if (semesterData[contactTypeIndex]) {
@@ -77,9 +56,6 @@ const calculateExamContactTime = (templateData, endWeek, contactTypeIndex) => {
         0,
       );
       totalContactTime += contactTime;
-      console.log(
-        `Added exam contact time for semester: ${contactTime}, total so far: ${totalContactTime}`,
-      );
     }
   }
 
@@ -100,10 +76,6 @@ const calculateFieldsForCoursework = (
     coursework.weight,
   );
   const isExam = coursework.type === 'exam';
-
-  console.log(
-    `Calculating fields for coursework: ${coursework.shortTitle}, type: ${coursework.type}`,
-  );
 
   const fields = {
     contactTimeLectures: isExam
@@ -128,11 +100,6 @@ const calculateFieldsForCoursework = (
     keyboardTime: getKeyboardTime(coursework, moduleCredit),
     feedbackTime: isExam ? null : 1,
   };
-
-  console.log(
-    `Fields calculated for coursework: ${coursework.shortTitle}`,
-    fields,
-  );
 
   // Round all contact time fields to integers
   Object.keys(fields).forEach((key) => {
@@ -187,11 +154,6 @@ const getKeyboardTime = (coursework, moduleCredit) => {
         keyboardTime = 0;
     }
   }
-
-  console.log(
-    `Calculated keyboard time for ${coursework.type} with moduleCredit ${moduleCredit}:`,
-    keyboardTime,
-  );
   return keyboardTime;
 };
 

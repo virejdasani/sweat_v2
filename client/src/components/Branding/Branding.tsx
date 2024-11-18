@@ -21,8 +21,8 @@ const Branding = () => {
         alt="University Logo"
         className="uniLogo"
         style={{
-          width: '300px',
-          height: '80px',
+          width: '394px',
+          height: '130px',
           position: 'absolute',
           top: '25px',
           left: '10px',

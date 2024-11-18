@@ -60,6 +60,20 @@ const AdminHome = () => {
       <h1 className="">Admin Home</h1>
       <button
         className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
+        style={{
+          position: 'absolute', 
+           top: '10px', 
+           left: '10px',
+           padding: '10px 20px',
+           backgroundColor: '#0a0a94',
+           color: 'white',
+           textDecoration: 'none',
+           borderRadius: '15px',
+           fontSize: '1.2rem',
+           textAlign: 'center',
+           transition: 'background-color 0.3s ease',
+           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        }}
         onClick={() => {
           window.location.href = '/';
         }}
@@ -98,12 +112,7 @@ const AdminHome = () => {
         >
           <div className="linkContainer mt-50">
             <Link to="/admin/set-key-dates">
-              Set Key Dates (Admin access only)
-            </Link>
-          </div>
-          <div className="linkContainer">
-            <Link to="/coursework-calendar">
-              Coursework Calendar (for testing)
+              Set Key Dates
             </Link>
           </div>
           <div className="linkContainer">
@@ -116,13 +125,27 @@ const AdminHome = () => {
             <Link to="/academic-event-calendar">Academic Event Calendar</Link>
           </div>
           <div className="linkContainer">
-            <Link to="/Graph">Workload Profiles</Link>
+            <Link to="/student">Workload Profiles</Link>
           </div>
           <div className="linkContainer">
             <Link to="/admin/settings">Settings</Link>
           </div>
         </div>
       )}
+      <div style={{
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        backgroundColor: '#ff0000',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        zIndex: '1000',
+      }}>
+        BETA
+      </div>
     </div>
   );
 };

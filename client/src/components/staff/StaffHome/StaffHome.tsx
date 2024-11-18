@@ -36,6 +36,23 @@ const StaffHome = () => {
 
   return (
     <div className="home">
+      <div
+      style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        backgroundColor: '#ff0000',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        zIndex: 1000, 
+      }}
+      >
+        BETA
+      </div>
+
       <img
         src={logo}
         alt="Logo"
@@ -61,7 +78,20 @@ const StaffHome = () => {
       />
       <h1 className="">Staff Portal</h1>
       <button
-        style={{ position: 'absolute', top: '0', left: '0' }}
+        style={{
+           position: 'absolute', 
+           top: '10px', 
+           left: '10px',
+           padding: '10px 20px',
+           backgroundColor: '#0a0a94',
+           color: 'white',
+           textDecoration: 'none',
+           borderRadius: '15px',
+           fontSize: '1.2rem',
+           textAlign: 'center',
+           transition: 'background-color 0.3s ease',
+           boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+          }}
         onClick={() => {
           window.location.href = '/';
         }}
@@ -98,13 +128,6 @@ const StaffHome = () => {
             </select>
           </div>
 
-          <div>
-            <label>Calendar Version: </label>
-            {/* Dropdown for selecting calendar version */}
-            <select className="mb-4">
-              <option value="CV1">CV1</option>
-            </select>
-          </div>
           <div
             className="makeResponsiveScrollable"
             style={{
@@ -120,18 +143,13 @@ const StaffHome = () => {
               <Link to="/admin/set-key-dates">Set Key Dates</Link>
             </div>
             <div className="linkContainer">
-              <Link to="/coursework-calendar">
-                Coursework Calendar (for testing)
-              </Link>
-            </div>
-            <div className="linkContainer">
-              <Link to="/admin/programme-design">Programme Design</Link>
+              <Link to="/admin/programme-design">Modules</Link>
             </div>
             <div className="linkContainer">
               <Link to="/academic-event-calendar">Academic Event Calendar</Link>
             </div>
             <div className="linkContainer">
-              <Link to="/Graph">Workload Profiles</Link>
+              <Link to="/student">Workload Profiles</Link>
             </div>
           </div>
         </>

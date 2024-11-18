@@ -22,12 +22,12 @@ const About = () => {
            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
         }}
         onClick={() => {
-          window.history.back();
+          window.location.href = '/';
         }}
       >
         Home
       </button>
-      <h1 className="text-center mt-4 mb-4">About</h1>
+      <h1 className="text-center mt-4 mb-4">About Coursework Calendar</h1>
       <div className="container">
         <div className="row">
           <div className="col-12">
@@ -58,36 +58,46 @@ const About = () => {
             <h2>Meet the team</h2>
             <ul>
               <li>
-                <a href="https://www.liverpool.ac.uk/electrical-engineering-and-electronics/staff/waleed-al-nuaimy/">Waleed Al-Nuaimy</a> – Department of Electrical Engineering and
+                <a href="http://https%3A%2F%2Fwww.liverpool.ac.uk%2Felectrical-engineering-and-electronics%2Fstaff%2Fwaleed-al-nuaimy%2F&usg=AOvVaw0ujNrvc3PSg_Csqzrw4etY&opi=89978449">Waleed Al-Nuaimy</a> – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>
-                <a href="https://uk.linkedin.com/in/lee-devlin-08495351?original_referer=https%3A%2F%2Fwww.google.com%2F">Lee Devlin</a> – Department of Electrical Engineering and
+                <a href="https://uk.linkedin.com/in/lee-devlin-08495351?original_referer=https%3A%2F%2Fwww.google.com%2F"></a>Lee Devlin – Department of Electrical Engineering and
                 Electronics
               </li>
               <li>
-                <a href="https://www.liverpool.ac.uk/computer-science/staff/stuart-thomason/">Stuart Thomason</a> – Department of Computer Science
-                </li>
+                <a href="https://www.liverpool.ac.uk/computer-science/staff/stuart-thomason/">
+                  Stuart Thomason
+                </a>{' '}
+                – Department of Computer Science
+              </li>
+              <li>Jeffrey Ray – Department of Computer Science</li>
               <li>
-                Jeffrey Ray – Department of Computer Science
-                </li>
-              <li>
-                <a href="https://www.liverpool.ac.uk/electrical-engineering-and-electronics/staff/judith-lewa/">Judith Birtall</a> – Student Experience Team Leader in the School of
-                Electrical Engineering, Electronics and Computer Science
+                <a href="https://www.liverpool.ac.uk/electrical-engineering-and-electronics/staff/judith-lewa/">
+                  Judith Birtall
+                </a>{' '}
+                – Student Experience Team Leader in the School of Electrical
+                Engineering, Electronics and Computer Science
               </li>
               <li>
                 Changhan Yin – EEE graduate in 2023, developed the first
                 functioning prototype as part of is BEng final year project.
               </li>
               <li>
-                <a href="https://www.linkedin.com/in/abu-baker-iqbal-9112001">Abubaker Iqbal</a> – EEE graduate in 2024, developed the second
-                functioning prototype as part of is BEng final year project, and
-                as part of a summer project with Virej (below).
+                <a href="https://www.linkedin.com/in/abu-baker-iqbal-9112001">
+                  Abubaker Iqbal
+                </a>{' '}
+                – EEE graduate in 2024, developed the second functioning
+                prototype as part of is BEng final year project, and as part of
+                a summer project with Virej (below).
               </li>
               <li>
-                <a href="https://www.linkedin.com/in/virej-dasani-b64470209">Virej Dasani</a> – Computer Science student in 2024, worked with
-                Abubaker to make the web portal suitable for public deployment
-                in 2024-25.
+                <a href="https://www.linkedin.com/in/virej-dasani-b64470209">
+                  Virej Dasani
+                </a>{' '}
+                – Computer Science student in 2024, worked with Abubaker to
+                (from scratch) make the website and make it functional for
+                public deployment in 2024-25.
               </li>
               <li>
                 <a href="https://www.linkedin.com/in/rahul-manikandan-4160351b8?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app">Rahul Manikandan</a> – EEE MSc student in 2024, worked with the team
@@ -95,12 +105,20 @@ const About = () => {
                 appearance and functionality.
               </li>
               <li>
-                <a href="https://www.linkedin.com/in/shahmeer-khan-swe/">Shahmeer Khan</a> - Computer Science student in 2024, worked alongside Virej Dasani to refine the look and functionality of the
-                frontend deployment of the web portal and develop the project further as a final year project. 
+                <a href="https://www.linkedin.com/in/shahmeer-khan-swe/">
+                  Shahmeer Khan
+                </a>{' '}
+                - Computer Science student in 2024, worked alongside Virej
+                Dasani to refine the look and functionality of the frontend
+                deployment of the web portal and develop the project further as
+                a final year project.
               </li>
               <li>
-                <a href="https://www.liverpool.ac.uk/cooper-group/people/bertie,naivalurua/">Bertie Naivalurua</a> - CSEE student working at the Cooper Group, 
-                taking on Coursework Calendar as a challenge for his final year project. 
+                <a href="https://www.liverpool.ac.uk/cooper-group/people/bertie,naivalurua/">
+                  Bertie Naivalurua
+                </a>{' '}
+                - CSEE student working at the Cooper Group, taking on Coursework
+                Calendar as a challenge for his final year project.
               </li>
             </ul>
             <p>

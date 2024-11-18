@@ -93,7 +93,7 @@ const StaffHome = () => {
            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
           }}
         onClick={() => {
-          window.history.back();
+          window.location.href = '/';
         }}
       >
         Home

@@ -50,7 +50,7 @@ export const handleSave = async (
   try {
     await createModule(moduleDocument, readingWeeks);
     toast.success('Module document saved successfully');
-    navigate('/admin');
+    navigate('/');
   } catch (error) {
     console.error('Error saving module document:', error);
     toast.error('Error saving module document');

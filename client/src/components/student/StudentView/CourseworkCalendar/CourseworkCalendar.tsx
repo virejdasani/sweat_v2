@@ -35,6 +35,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   // readingWeeks,
   semester1Start,
   semester2Start,
+  easterBreakStart,
+  easterBreakEnd,
 }) => {
   const [displayedModules, setDisplayedModules] =
     useState<ModuleDocument[]>(modules);
@@ -117,11 +119,28 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             let displayWeekNumber = weekNumber.toString();
 
             // Adjust week numbers based on the provided rules
+            // if (semester === 'second') {
+            //   if (weekNumber === 11) displayWeekNumber = 'E1';
+            //   else if (weekNumber === 12) displayWeekNumber = 'E2';
+            //   else if (weekNumber === 13) displayWeekNumber = 'E3';
+            //   else if (weekNumber >= 14 && weekNumber <= 18) {
+            //     displayWeekNumber = (weekNumber - 3).toString();
+            //   }
+            // }
+
+            // the above is hardcoded easter break weeks (not being used anymore),
+            // the following is the
+            // dynamically getting the easter dates and setting them on the student view calendar
+            // as E1, E2, E3
             if (semester === 'second') {
-              if (weekNumber === 9) displayWeekNumber = 'E1';
-              else if (weekNumber === 10) displayWeekNumber = 'E2';
-              else if (weekNumber === 11) displayWeekNumber = 'E3';
-              else if (weekNumber >= 12 && weekNumber <= 18) {
+              if (
+                easterBreakStart &&
+                easterBreakEnd &&
+                weekNumber >= 11 &&
+                weekNumber <= 13
+              ) {
+                displayWeekNumber = `E${weekNumber - 10}`;
+              } else if (weekNumber >= 14 && weekNumber <= 18) {
                 displayWeekNumber = (weekNumber - 3).toString();
               }
             }
@@ -140,9 +159,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             const grayOutWeek =
               (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
               (semester === 'second' &&
-                (weekNumber === 9 ||
-                  weekNumber === 10 ||
-                  weekNumber === 11 ||
+                (weekNumber === 11 ||
+                  weekNumber === 12 ||
+                  weekNumber === 13 ||
                   weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
 
             const weekLabel = `Week ${displayWeekNumber} (${getDateForWeekAndDay(
@@ -196,10 +215,10 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
 
               // Adjust week numbers based on the provided rules
               if (semester === 'second') {
-                if (weekNumber === 9) displayWeekNumber = 'E1';
-                else if (weekNumber === 10) displayWeekNumber = 'E2';
-                else if (weekNumber === 11) displayWeekNumber = 'E3';
-                else if (weekNumber >= 12 && weekNumber <= 18) {
+                if (weekNumber === 11) displayWeekNumber = 'E1';
+                else if (weekNumber === 12) displayWeekNumber = 'E2';
+                else if (weekNumber === 13) displayWeekNumber = 'E3';
+                else if (weekNumber >= 14 && weekNumber <= 18) {
                   displayWeekNumber = (weekNumber - 3).toString();
                 }
               }
@@ -220,9 +239,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               const grayOutWeek =
                 (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
                 (semester === 'second' &&
-                  (weekNumber === 9 ||
-                    weekNumber === 10 ||
-                    weekNumber === 11 ||
+                  (weekNumber === 11 ||
+                    weekNumber === 12 ||
+                    weekNumber === 13 ||
                     weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
 
               let courseworkForWeek = [];
@@ -271,8 +290,18 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                           textOverflow="ellipsis"
                           overflow="hidden"
                         >
-                          {coursework.longTitle} ({coursework.weight}%){' '}
-                          {coursework.deadlineDay}
+                          {/* only show if coursework weight > 0% */}
+                          {coursework.weight > 0 && (
+                            <Text as="span" fontWeight="">
+                              {coursework.longTitle} ({coursework.weight}%){' '}
+                              {coursework.deadlineDay}
+                            </Text>
+                          )}
+                          {coursework.weight === 0 && (
+                            <Text as="span" fontWeight="">
+                              {coursework.longTitle} {coursework.deadlineDay}
+                            </Text>
+                          )}
                         </Text>
                       ))}
                     </VStack>

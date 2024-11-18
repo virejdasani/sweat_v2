@@ -683,13 +683,13 @@ function CourseworkCalendarSetter() {
         <button
           className="backButton btn btn-secondary mx-3 my-3 fixed-top col-sm-1"
           onClick={() => {
-            window.history.back();
+            window.location.href = '/';
           }}
         >
           Home
         </button>
         <div className="calendarHeader">
-          <h1 className="mb-4">Coursework Calendar</h1>
+          <h1 className="mb-4">Coursework Calendar (Admin)</h1>
 
           <div>
             {/* dropdown for selecting current academic year */}
@@ -725,7 +725,16 @@ function CourseworkCalendarSetter() {
                 </option>
               ))}
             </select>
-            <button onClick={archiveCurrentCalendar}>
+            <button
+              onClick={archiveCurrentCalendar}
+              style={{
+                marginLeft: '10px',
+                padding: '5px',
+                borderRadius: '5px',
+                backgroundColor: 'lightblue',
+                border: 'none',
+              }}
+            >
               Archive Current Calendar
             </button>
           </div>

@@ -52,6 +52,9 @@ const StudentView: React.FC = () => {
     fetchModules();
   }, [year, programme, semester]);
 
+  const easterStart = new Date('2025-04-06T23:00:00.000Z');
+  const easterEnd = new Date('2025-04-25T00:00:00.000Z');
+
   // Fetch semester start dates
   useEffect(() => {
     const fetchSemesterStartDates = async () => {
@@ -59,6 +62,70 @@ const StudentView: React.FC = () => {
         const res = await axios.get(`${baseURL}`);
         const data = res.data;
         console.log(data);
+
+        // the console.log(data) will output something like this:
+        // [
+        //     {
+        //       "_id": "66f0a2499587ce9753f88cd3",
+        //       "title": "Semester 2 Start Date (2024/25)",
+        //       "allDay": true,
+        //       "start": "2025-01-27T00:00:00.000Z",
+        //       "end": "2025-01-27T00:00:00.000Z",
+        //       "__v": 0
+        //   },
+        //   {
+        //       "_id": "66f0a2499587ce9753f88cd1",
+        //       "title": "Semester 1 Start Date (2024/25)",
+        //       "allDay": true,
+        //       "start": "2024-09-22T23:00:00.000Z",
+        //       "end": "2024-09-23T00:00:00.000Z",
+        //       "__v": 0
+        //   },
+        //   {
+        //       "_id": "66f0a2499587ce9753f88cd5",
+        //       "title": "Christmas Break (2024/25)",
+        //       "allDay": true,
+        //       "start": "2024-12-16T00:00:00.000Z",
+        //       "end": "2025-01-03T00:00:00.000Z",
+        //       "__v": 0
+        //   },
+        //   {
+        //       "_id": "66f0a2499587ce9753f88cdb",
+        //       "title": "Reading Week (Week 31) (2024/25)",
+        //       "allDay": true,
+        //       "start": "2025-05-11T23:00:00.000Z",
+        //       "end": "2025-05-16T00:00:00.000Z",
+        //       "__v": 0
+        //   },
+        //   {
+        //       "_id": "66f0a2499587ce9753f88cd7",
+        //       "title": "Easter Break (2024/25)",
+        //       "allDay": true,
+        //       "start": "2025-04-06T23:00:00.000Z",
+        //       "end": "2025-04-25T00:00:00.000Z",
+        //       "__v": 0
+        //   },
+        //   {
+        //       "_id": "66f0a2499587ce9753f88cd9",
+        //       "title": "Reading Week (Week 19) (2024/25)",
+        //       "allDay": true,
+        //       "start": "2025-02-17T00:00:00.000Z",
+        //       "end": "2025-02-21T00:00:00.000Z",
+        //       "__v": 0
+        //   },
+        // ]
+
+        // extract the easter break start date and end date
+        const easterBreak = data.find((event: any) =>
+          event.title.includes('Easter Break'),
+        );
+
+        if (easterBreak) {
+          const easterBreakStart = new Date(easterBreak.start);
+          const easterBreakEnd = new Date(easterBreak.end);
+          console.log('Easter break start date:', easterBreakStart);
+          console.log('Easter break end date:', easterBreakEnd);
+        }
 
         // Search for events with titles "Semester 1 Start Date" and "Semester 2 Start Date"
         // ignore type errors
@@ -145,6 +212,8 @@ const StudentView: React.FC = () => {
               readingWeeks={readingWeeks}
               semester1Start={semester1Start}
               semester2Start={semester2Start}
+              easterBreakStart={easterStart}
+              easterBreakEnd={easterEnd}
             />
             <Text fontSize="xx-large" fontWeight="bold" mb={6} color="teal.600">
               Simulated Workload

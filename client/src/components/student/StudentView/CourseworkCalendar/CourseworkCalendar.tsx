@@ -35,6 +35,8 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   // readingWeeks,
   semester1Start,
   semester2Start,
+  easterBreakStart,
+  easterBreakEnd,
 }) => {
   const [displayedModules, setDisplayedModules] =
     useState<ModuleDocument[]>(modules);
@@ -117,11 +119,28 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
             let displayWeekNumber = weekNumber.toString();
 
             // Adjust week numbers based on the provided rules
+            // if (semester === 'second') {
+            //   if (weekNumber === 11) displayWeekNumber = 'E1';
+            //   else if (weekNumber === 12) displayWeekNumber = 'E2';
+            //   else if (weekNumber === 13) displayWeekNumber = 'E3';
+            //   else if (weekNumber >= 14 && weekNumber <= 18) {
+            //     displayWeekNumber = (weekNumber - 3).toString();
+            //   }
+            // }
+
+            // the above is hardcoded easter break weeks (not being used anymore),
+            // the following is the
+            // dynamically getting the easter dates and setting them on the student view calendar
+            // as E1, E2, E3
             if (semester === 'second') {
-              if (weekNumber === 11) displayWeekNumber = 'E1';
-              else if (weekNumber === 12) displayWeekNumber = 'E2';
-              else if (weekNumber === 13) displayWeekNumber = 'E3';
-              else if (weekNumber >= 14 && weekNumber <= 18) {
+              if (
+                easterBreakStart &&
+                easterBreakEnd &&
+                weekNumber >= 11 &&
+                weekNumber <= 13
+              ) {
+                displayWeekNumber = `E${weekNumber - 10}`;
+              } else if (weekNumber >= 14 && weekNumber <= 18) {
                 displayWeekNumber = (weekNumber - 3).toString();
               }
             }

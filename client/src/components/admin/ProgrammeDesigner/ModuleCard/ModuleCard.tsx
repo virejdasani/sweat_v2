@@ -86,6 +86,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
             <AccordionIcon />
           </AccordionButton>
           <AccordionPanel sx={ModuleCardStyles.accordionPanel}>
+            <Text>Academic Year: {module.moduleSetup.academicYear}</Text>
             <Text>Year: {module.moduleSetup.studyYear}</Text>
             <Text>Type: {module.moduleSetup.type}</Text>
             <Text>Programme: {module.moduleSetup.programme.join(', ')}</Text>

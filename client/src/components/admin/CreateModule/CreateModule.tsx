@@ -56,6 +56,7 @@ const CreateModule: React.FC = () => {
     type: '',
     teachingStaff: [],
     formFactor: 0,
+    academicYear: '2024/25',
   });
 
   const [courseworkList, setCourseworkList] = useState<Coursework[]>([]);
@@ -78,7 +79,10 @@ const CreateModule: React.FC = () => {
           console.error('Error fetching default form factor', error);
         }
       } else {
-        setFormData(module.moduleSetup);
+        setFormData({
+          ...module.moduleSetup,
+          academicYear: module.moduleSetup.academicYear || '2024/25',
+        });
         setCourseworkList(module.courseworkList || []);
         setTemplateData(module.teachingSchedule || []);
       }

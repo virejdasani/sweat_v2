@@ -11,6 +11,7 @@ export interface ModuleSetupFormData {
   teachingStaff: string[];
   formFactor: number;
   archived?: boolean;
+  academicYear: string;
 }
 
 export interface ModuleSetupProps {

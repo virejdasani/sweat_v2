@@ -29,6 +29,7 @@ import {
 
 const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
   const programmes = ['CSEE', 'AVS', 'MRS', 'EEE', 'EEEP', 'EEMS', 'EETW'];
+  const academicYears = ['2024/25', '2025/26', '2026/27', '2027/28', '2028/29'];
 
   return (
     <Box sx={moduleSetupStyles.container}>
@@ -146,6 +147,32 @@ const ModuleSetup: React.FC<ModuleSetupProps> = ({ formData, setFormData }) => {
               <option value={2}>2</option>
               <option value={3}>3</option>
               <option value={4}>4</option>
+            </Select>
+          </FormControl>
+        </GridItem>
+
+        <GridItem>
+          <FormControl
+            id="academicYear"
+            sx={moduleSetupStyles.formControl}
+            isRequired
+          >
+            <FormLabel sx={moduleSetupStyles.formLabel}>
+              Academic Year
+            </FormLabel>
+            <Select
+              name="academicYear"
+              value={formData.academicYear}
+              onChange={(e) =>
+                setFormData({ ...formData, academicYear: e.target.value })
+              }
+            >
+              <option value="">Select</option>
+              {academicYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
             </Select>
           </FormControl>
         </GridItem>

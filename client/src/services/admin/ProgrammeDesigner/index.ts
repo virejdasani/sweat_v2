@@ -49,7 +49,7 @@ export const createProgramme = async (
 ): Promise<Programme> => {
   try {
     const response: AxiosResponse<Programme> = await httpClient.post(
-      '/programmes',
+      '/programmes/create-programme',
       programmeData,
     );
     return response.data;

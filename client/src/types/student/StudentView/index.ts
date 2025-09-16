@@ -20,6 +20,8 @@ export interface CourseworkCalendarProps {
   semester1Start?;
   // @ts-expect-error any type here works
   semester2Start?;
+  easterBreakStart?: Date;
+  easterBreakEnd?: Date;
 }
 
 export interface OptionType {

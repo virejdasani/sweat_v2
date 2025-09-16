@@ -11,6 +11,7 @@ import {
   IconButton,
   Text,
   VStack,
+  Select,
 } from '@chakra-ui/react';
 import { SmallCloseIcon } from '@chakra-ui/icons';
 import { ModuleDocument } from '../../../../types/admin/CreateModule';
@@ -43,11 +44,20 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [filterText, setFilterText] = useState<string>('');
   const [editingStatus, setEditingStatus] = useState<boolean>(false);
+  const academicYears = ['2024/25', '2025/26', '2026/27', '2027/28', '2028/29'];
+  const [selectedAcademicYear, setSelectedAcademicYear] =
+    useState<string>('2024/25');
 
   useEffect(() => {
-    setDisplayedModules(modules);
+    setDisplayedModules(
+      modules.filter(
+        (module) =>
+          (module.moduleSetup.academicYear || '2024/25') ===
+          selectedAcademicYear,
+      ),
+    );
     fetchEditingStatus();
-  }, [modules]);
+  }, [modules, selectedAcademicYear]);
 
   const fetchEditingStatus = async () => {
     try {
@@ -364,6 +374,17 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
       )}
 
       <Box mb={4} maxWidth="200px">
+        <Select
+          value={selectedAcademicYear}
+          onChange={(e) => setSelectedAcademicYear(e.target.value)}
+          mb={2}
+        >
+          {academicYears.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </Select>
         <Dropdown
           value={selectedModule}
           options={modules

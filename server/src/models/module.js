@@ -56,6 +56,7 @@ const moduleSetupSchema = new mongoose.Schema({
   teachingStaff: { type: [String] },
   formFactor: { type: Number },
   archived: { type: Boolean, default: false },
+  academicYear: { type: String, required: false, default: '2024/25' },
 });
 
 const moduleSchema = new mongoose.Schema({

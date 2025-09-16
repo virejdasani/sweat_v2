@@ -146,11 +146,11 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               if (
                 easterBreakStart &&
                 easterBreakEnd &&
-                weekNumber >= 11 &&
-                weekNumber <= 13
+                weekNumber >= 9 &&
+                weekNumber <= 11
               ) {
-                displayWeekNumber = `E${weekNumber - 10}`;
-              } else if (weekNumber >= 14 && weekNumber <= 18) {
+                displayWeekNumber = `E${weekNumber - 8}`;
+              } else if (weekNumber >= 12 && weekNumber <= 15) {
                 displayWeekNumber = (weekNumber - 3).toString();
               }
             }
@@ -162,17 +162,17 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               }
             }
 
-            if (semester === 'second' && weekNumber > 16) {
+            if (semester === 'second' && weekNumber > 15) {
               return null;
             }
 
             const grayOutWeek =
               (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
               (semester === 'second' &&
-                (weekNumber === 11 ||
-                  weekNumber === 12 ||
-                  weekNumber === 13 ||
-                  weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
+                (weekNumber === 9 ||
+                  weekNumber === 10 ||
+                  weekNumber === 11 ||
+                  weekNumber === 16)); // Gray out weeks 9, 10, 11 (Easter) and 16 for Semester 2
 
             const weekLabel = `Week ${displayWeekNumber} (${getDateForWeekAndDay(
               semester === 'first' ? semester1Start : semester2Start,
@@ -249,9 +249,9 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
               const grayOutWeek =
                 (semester === 'first' && weekNumber === 13) || // Gray out week 13 for Semester 1
                 (semester === 'second' &&
-                  (weekNumber === 11 ||
-                    weekNumber === 12 ||
-                    weekNumber === 13 ||
+                  (weekNumber === 9 ||
+                    weekNumber === 10 ||
+                    weekNumber === 11 ||
                     weekNumber === 16)); // Gray out weeks 9, 10, 11, 16 for Semester 2
 
               let courseworkForWeek = [];

@@ -46,16 +46,27 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
   const [editingStatus, setEditingStatus] = useState<boolean>(false);
   const academicYears = ['2024/25', '2025/26', '2026/27', '2027/28', '2028/29'];
   const [selectedAcademicYear, setSelectedAcademicYear] =
-    useState<string>('2024/25');
+    useState<string>('2025/26');
 
   useEffect(() => {
-    setDisplayedModules(
-      modules.filter(
-        (module) =>
-          (module.moduleSetup.academicYear || '2024/25') ===
-          selectedAcademicYear,
-      ),
-    );
+    // If 2025/26 is selected, show both 2024/25 and 2025/26 modules
+    // Otherwise, show only modules matching the selected academic year
+    if (selectedAcademicYear === '2025/26') {
+      setDisplayedModules(
+        modules.filter((module) => {
+          const moduleYear = module.moduleSetup.academicYear || '2024/25';
+          return moduleYear === '2024/25' || moduleYear === '2025/26';
+        }),
+      );
+    } else {
+      setDisplayedModules(
+        modules.filter(
+          (module) =>
+            (module.moduleSetup.academicYear || '2024/25') ===
+            selectedAcademicYear,
+        ),
+      );
+    }
     fetchEditingStatus();
   }, [modules, selectedAcademicYear]);
 
@@ -389,6 +400,18 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
           value={selectedModule}
           options={modules
             .filter((module) => !displayedModules.includes(module))
+            .filter((module) => {
+              // For 2025/26, show modules from both 2024/25 and 2025/26
+              if (selectedAcademicYear === '2025/26') {
+                const moduleYear = module.moduleSetup.academicYear || '2024/25';
+                return moduleYear === '2024/25' || moduleYear === '2025/26';
+              }
+              // For other years, show only matching modules
+              return (
+                (module.moduleSetup.academicYear || '2024/25') ===
+                selectedAcademicYear
+              );
+            })
             .filter((module) =>
               module.moduleSetup.moduleCode
                 .toLowerCase()

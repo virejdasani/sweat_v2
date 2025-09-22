@@ -756,8 +756,7 @@ function StudentCalendar() {
                                       event.title.includes(
                                         moduleSetup.moduleCode,
                                       ) &&
-                                      event.title.includes(`Week ${week})`) &&
-                                      !event.title.includes('Exam'),
+                                      event.title.includes(`Week ${week})`),
                                   );
                                   return (
                                     // if its week 7, have a td with className readingWeekTableData
@@ -843,8 +842,7 @@ function StudentCalendar() {
                                       event.title.includes(
                                         moduleSetup.moduleCode,
                                       ) &&
-                                      event.title.includes(`Week ${week})`) &&
-                                      !event.title.includes('Exam'),
+                                      event.title.includes(`Week ${week})`),
                                   );
                                   return (
                                     // show the first 2 words of the event title only (removes the week number, academic year and version number)

@@ -273,19 +273,14 @@ const CourseworkCalendar: React.FC<CourseworkCalendarProps> = ({
                 courseworkForWeek = module.courseworkList.filter(
                   (coursework) => {
                     const adjustedWeek = coursework.deadlineWeek - 15;
-                    return (
-                      adjustedWeek === weekNumber &&
-                      coursework.longTitle && // Ensure longTitle is defined
-                      !coursework.longTitle.toLowerCase().includes('exam')
-                    );
+                    return adjustedWeek === weekNumber && coursework.longTitle;
                   },
                 );
               } else {
                 courseworkForWeek = module.courseworkList.filter(
                   (coursework) =>
                     coursework.deadlineWeek === weekNumber &&
-                    coursework.longTitle && // Ensure longTitle is defined
-                    !coursework.longTitle.toLowerCase().includes('exam'),
+                    coursework.longTitle,
                 );
               }
 

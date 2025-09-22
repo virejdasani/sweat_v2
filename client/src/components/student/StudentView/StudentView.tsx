@@ -3,7 +3,11 @@ import { Box, Text, Flex } from '@chakra-ui/react';
 import Filters from './Filters/Filters';
 import CourseworkCalendar from './CourseworkCalendar/CourseworkCalendar';
 import StudentWorkloadGraph from './WorkloadGraphs/StackedModuleGraphs/StudentWorkloadGraph';
-import { fetchFilteredModules } from '../../../utils/student/StudentView';
+import {
+  fetchFilteredModules,
+  fetchAvailableProgrammes,
+} from '../../../utils/student/StudentView';
+import { ProgrammeOption } from '../../../types/student/StudentView';
 import { ModuleDocument } from '../../../types/admin/CreateModule';
 import axios from 'axios';
 
@@ -18,10 +22,45 @@ const StudentView: React.FC = () => {
   const [modules, setModules] = useState<ModuleDocument[]>([]); // State to store modules
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
+  const [programmeOptions, setProgrammeOptions] = useState<ProgrammeOption[]>(
+    [],
+  ); // Dynamic programme options
 
   // States for semester start dates
   const [semester1Start, setSemester1Start] = useState<Date | null>(null);
   const [semester2Start, setSemester2Start] = useState<Date | null>(null);
+
+  // Fetch available programmes on component mount
+  useEffect(() => {
+    const fetchProgrammes = async () => {
+      try {
+        const programmes = await fetchAvailableProgrammes();
+        setProgrammeOptions(programmes);
+
+        // Set default programme if current one is not available
+        if (
+          programmes.length > 0 &&
+          !programmes.some((p) => p.value === programme)
+        ) {
+          setProgramme(programmes[0].value);
+        }
+      } catch (err) {
+        console.error('Failed to load programmes:', err);
+        // Fallback to static options if API fails
+        setProgrammeOptions([
+          { label: 'Computer Science and Elec Eng', value: 'CSEE' },
+          { label: 'Avionic Systems', value: 'AVS' },
+          { label: 'Mechatronic and Robotic Systems', value: 'MRS' },
+          { label: 'Electrical Engineering and Electronics', value: 'EEE' },
+          { label: 'Energy and Power Systems', value: 'EEEP' },
+          { label: 'Microelectronic Systems', value: 'EEMS' },
+          { label: 'Telecommunications and Wireless Systems', value: 'EETW' },
+        ]);
+      }
+    };
+
+    fetchProgrammes();
+  }, [programme]);
 
   // Fetch filtered modules from the backend
   useEffect(() => {
@@ -116,7 +155,7 @@ const StudentView: React.FC = () => {
         // ]
 
         // extract the easter break start date and end date
-        const easterBreak = data.find((event: any) =>
+        const easterBreak = data.find((event: { title: string }) =>
           event.title.includes('Easter Break'),
         );
 
@@ -195,6 +234,7 @@ const StudentView: React.FC = () => {
           setProgramme={setProgramme}
           semester={semester}
           setSemester={setSemester}
+          programmeOptions={programmeOptions}
         />
 
         {loading ? (

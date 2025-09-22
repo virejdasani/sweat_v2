@@ -96,8 +96,8 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
       if (semester === 'whole session') {
         if (week <= 15) {
           label = `S1 W${week}`;
-        } else if (week >= 16 && week <= 25) {
-          // Weeks 1-10 of second semester
+        } else if (week >= 16 && week <= 23) {
+          // Weeks 1-8 of second semester
           label = `S2 W${week - 15}`;
         } else if (week >= 24 && week <= 26) {
           // Easter Break Weeks 9-11 (adjusted from weeks 24-26 in whole session)
@@ -175,8 +175,8 @@ const CourseworkSetup: React.FC<CourseworkSetupProps> = ({
         );
       }
 
-      // Second semester: map weeks 16-33 to the required format
-      for (let i = 16; i <= 33; i++) {
+      // Second semester: map weeks 16-30 to the required format
+      for (let i = 16; i <= 30; i++) {
         options.push(
           <option key={i} value={i.toString()}>
             {getLabel(i)}{' '}

@@ -25,6 +25,7 @@ const settingsController = require('./src/controllers/settingsController');
 // Module routes
 app.get('/modules/module-template', moduleController.getModuleTemplate);
 app.get('/modules/filtered', moduleController.getFilteredModules); // Added here to ensure correct order
+app.get('/modules/programmes', moduleController.getAvailableProgrammes);
 app.get('/modules', moduleController.getAllModules);
 app.get('/modules/ids', moduleController.getAllModuleIds);
 app.get('/modules/:id', moduleController.getModuleById);

@@ -170,6 +170,36 @@ const getModuleTemplate = (req, res) => {
   }
 };
 
+const getAvailableProgrammes = async (req, res) => {
+  try {
+    // Get unique programmes from all modules
+    const programmes = await Module.distinct('moduleSetup.programme');
+
+    // Create an array with both the programme code and full name
+    const programmeOptions = programmes.map((programme) => {
+      const programmeMap = {
+        CSEE: 'Computer Science and Elec Eng',
+        AVS: 'Avionic Systems',
+        MRS: 'Mechatronic and Robotic Systems',
+        EEE: 'Electrical Engineering and Electronics',
+        EEEP: 'Energy and Power Systems',
+        EEMS: 'Microelectronic Systems',
+        EETW: 'Telecommunications and Wireless Systems',
+      };
+
+      return {
+        label: programmeMap[programme] || programme,
+        value: programme,
+      };
+    });
+
+    res.status(200).json(programmeOptions);
+  } catch (error) {
+    console.error('Error fetching available programmes:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 const getFilteredModules = async (req, res) => {
   try {
     const { studyYear, programme, semester } = req.query;
@@ -236,4 +266,5 @@ module.exports = {
   updateProgrammeArrayInModules,
   getModuleTemplate,
   getFilteredModules,
+  getAvailableProgrammes,
 };

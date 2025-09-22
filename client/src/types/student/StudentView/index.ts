@@ -1,5 +1,10 @@
 import { ModuleDocument } from '../../admin/CreateModule';
 
+export interface ProgrammeOption {
+  label: string;
+  value: string;
+}
+
 export interface FiltersProps {
   year: number;
   setYear: (value: number) => void;
@@ -9,6 +14,7 @@ export interface FiltersProps {
   setSemester: (
     value: 'first' | 'second' | 'whole session' | 'wholeSession',
   ) => void;
+  programmeOptions: ProgrammeOption[];
 }
 
 export interface CourseworkCalendarProps {

@@ -5,7 +5,6 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import {
   yearOptions,
-  programmeOptions,
   semesterOptions,
 } from '../../../../utils/student/StudentView/Filters';
 import { FiltersProps } from '../../../../types/student/StudentView';
@@ -17,6 +16,7 @@ const Filters: React.FC<FiltersProps> = ({
   setProgramme,
   semester,
   setSemester,
+  programmeOptions,
 }) => {
   return (
     <div

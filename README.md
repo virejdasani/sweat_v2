@@ -1,7 +1,10 @@
 ## Deployed frontend: https://sweatdeployed.netlify.app/
+
 ## Deployed backend: https://sweat-v2.onrender.com
 
 [DEPRECATED] Deployed backend: https://sweat-backend.onrender.com/
+
+[update: 09/10/2025] I believe https://sweat-backend.onrender.com/ works and https://sweat-v2.onrender.com is lost?
 
 ---
 
